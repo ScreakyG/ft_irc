@@ -49,24 +49,25 @@ Server& Server::operator=(const Server &rhs)
 
 void Server::createServerSocket(void)
 {
-    int         status;
-    addrinfo    hint;
-    addrinfo    *res;
-
-    memset(&hint, 0, sizeof(hint));
-    hint.ai_family = AF_UNSPEC; // IP CAN BE IPV4 OR IPV6.
-    hint.ai_socktype = SOCK_STREAM; // USE TCP.
-    hint.ai_flags = AI_PASSIVE; // Trouver pourquoi ?
-
-    status = getaddrinfo(NULL, SERVER_PORT, &hint, &res);
-    if (status != 0)
+    this->_serverSocket = socket(AF_INET, SOCK_STREAM, 0); // IPV4, TCP , protocole auto.
+    if (this->_serverSocket == -1)
         throw Server::SocketCreationError();
-    this->_serverSocket = socket(res->ai_family, res->ai_socktype, res->ai_protocol); // Protocole peut etre mis a 0.
-
     if (DEBUG == LIGHT || DEBUG == FULL)
         std::cout << PURPLE << "Created server socket = " << this->_serverSocket << RESET << std::endl;
+}
 
-    status = bind(this->_serverSocket, res->ai_addr, res->ai_addrlen);
+void Server::createIpv4Address(const char *ip, int port)
+{
+    this->_serverAdress.sin_family = AF_INET; // Ipv4.
+    this->_serverAdress.sin_port = htons(port);
+    inet_pton(AF_INET, ip, &_serverAdress.sin_addr.s_addr); // Transform ipv4/ipv6 addresses from test to binary.
+}
+
+void Server::bindServerSocket(void)
+{
+    int status;
+
+    status = bind(this->_serverSocket, reinterpret_cast<sockaddr*>(&this->_serverAdress), sizeof(this->_serverAdress));
     if (status != 0)
         throw Server::SocketBindError();
 

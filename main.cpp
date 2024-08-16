@@ -24,6 +24,8 @@ int main(void)
     try
     {
         server.createServerSocket();
+        server.createIpv4Address(SERVER_IP, SERVER_PORT);
+        server.bindServerSocket();
         server.listenPort();
 
         // Definier si on utilise select(), poll(), epoll() ou kqueue();

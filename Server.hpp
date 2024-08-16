@@ -8,11 +8,15 @@
 #include <cstdlib>
 #include <exception>
 #include <cerrno>
+#include <arpa/inet.h>
 
 #include "Random.hpp"
 
 #define DEBUG LIGHT
-#define SERVER_PORT "4242"
+
+#define SERVER_IP "127.0.0.1"
+#define SERVER_PORT 4242
+
 #define BACKLOG 10
 
 class Server
@@ -30,6 +34,8 @@ class Server
 
         /****METHODS****/
         void    createServerSocket(void); // Creer un socket pour le server.
+        void    createIpv4Address(const char *ip, int port);
+        void    bindServerSocket(void); // Bind socket to address and port.
         void    listenPort(void); // Ecoute sur le SERVER_PORT avec X BACKLOG.
         int     getServerSocket(void); // Retourne le socket du server.
 
@@ -48,5 +54,6 @@ class Server
         };
 
     private:
-        int _serverSocket;
+        int         _serverSocket;
+        sockaddr_in _serverAdress;
 };
