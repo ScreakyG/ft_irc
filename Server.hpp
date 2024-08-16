@@ -10,6 +10,8 @@
 #include <cerrno>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <poll.h>
+#include <vector>
 
 #include "Random.hpp"
 
@@ -59,7 +61,9 @@ class Server
                 virtual const char *what(void) const throw();
         };
 
+        std::vector<pollfd> allSockets;
     private:
-        int         _serverSocket;
-        sockaddr_in _serverAddress;
+        int                 _serverSocket;
+        sockaddr_in         _serverAddress;
+       // std::vector<pollfd> allSockets;
 };
