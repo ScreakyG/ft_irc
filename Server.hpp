@@ -12,7 +12,7 @@
 
 #include "Random.hpp"
 
-#define DEBUG LIGHT
+#define DEBUG FULL
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 4242
@@ -34,7 +34,7 @@ class Server
 
         /****METHODS****/
         void    createServerSocket(void); // Creer un socket pour le server.
-        void    createIpv4Address(const char *ip, int port);
+        void    createIpv4Address(const char *ip, const int port);
         void    bindServerSocket(void); // Bind socket to address and port.
         void    listenPort(void); // Ecoute sur le SERVER_PORT avec X BACKLOG.
         int     getServerSocket(void); // Retourne le socket du server.
@@ -51,6 +51,11 @@ class Server
             public:
                 virtual const char *what(void) const throw();
 
+        };
+        class ListenServerError: public std::exception
+        {
+            public:
+                virtual const char *what(void) const throw();
         };
 
     private:

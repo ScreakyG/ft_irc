@@ -77,9 +77,13 @@ void Server::bindServerSocket(void)
 
 void Server::listenPort(void)
 {
-    listen(this->_serverSocket, BACKLOG);
-        if (DEBUG == LIGHT)
-            std::cout << PURPLE << "Server is listening on port " << SERVER_PORT << "..." << RESET << std::endl;
+    int status;
+
+    status = listen(this->_serverSocket, BACKLOG);
+    if (status != 0)
+        throw Server::ListenServerError();
+    if (DEBUG == LIGHT || DEBUG == FULL)
+        std::cout << PURPLE << "Server is listening on port " << SERVER_PORT << "..." << RESET << std::endl;
 }
 
 int Server::getServerSocket(void)
@@ -101,5 +105,10 @@ const char* Server::SocketCreationError::what(void) const throw()
 const char* Server::SocketBindError::what(void) const throw()
 {
     std::cout  << RED << "Error while binding server socket : " << RESET;
+    return (std::strerror(errno));
+}
+const char* Server::ListenServerError::what(void) const throw()
+{
+    std::cout  << RED << "Error while listening server socket : " << RESET;
     return (std::strerror(errno));
 }
