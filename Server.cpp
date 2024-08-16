@@ -61,7 +61,7 @@ void Server::createServerSocket(void)
     status = getaddrinfo(NULL, SERVER_PORT, &hint, &res);
     if (status != 0)
         throw Server::SocketCreationError();
-    this->_serverSocket = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    this->_serverSocket = socket(res->ai_family, res->ai_socktype, res->ai_protocol); // Protocole peut etre mis a 0.
 
     if (DEBUG == LIGHT || DEBUG == FULL)
         std::cout << PURPLE << "Created server socket = " << this->_serverSocket << RESET << std::endl;

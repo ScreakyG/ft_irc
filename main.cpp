@@ -4,17 +4,22 @@
 
 #include <stdio.h>
 
-const char *getClientHeader(void)
+void sendClientHeader(const int &clientFd)
 {
-    const char *header = "---------------------------\n---WELCOME TO THE SERVER---\n---------------------------\n";
+    int sentBytes = -1;
+    std::string msg = "---------------------------\n---WELCOME TO THE SERVER---\n---------------------------\n";
 
-    return (header);
+    sentBytes = send(clientFd, msg.c_str(), msg.size(), 0);
+    if (sentBytes == -1)
+        std::cout << RED << "[Server] sending error : " << std::strerror(errno) << RESET << std::endl;
+    else if (sentBytes != static_cast<int>(msg.size()))
+        std::cout << YELLOW << "[Server] Partial message was sent to client." << RESET << std::endl;
+
 }
 
 int main(void)
 {
     Server server;
-    std::cout << getClientHeader() << std::endl;
 
     try
     {
@@ -22,6 +27,8 @@ int main(void)
         server.listenPort();
 
         // Definier si on utilise select(), poll(), epoll() ou kqueue();
+        int client_fd = accept(server.getServerSocket(), NULL, NULL);
+        sendClientHeader(client_fd);
     }
     catch (const std::exception &e)
     {
