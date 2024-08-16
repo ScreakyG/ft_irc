@@ -80,7 +80,7 @@ void Server::createIpv4Address(const char *ip, int port)
 {
     this->_serverAddress.sin_family = AF_INET; // Ipv4.
     this->_serverAddress.sin_port = htons(port); // Converti le port int en quelque chose comprehensible pour la machine.
-    inet_pton(AF_INET, ip, &(this->_serverAddress.sin_addr)); // Transform ipv4/ipv6 addresses from test to binary.
+    inet_pton(AF_INET, ip, &(this->_serverAddress.sin_addr)); // Transform ipv4/ipv6 addresses from test to binary. Peut etre changer en INADDR_ANY pour signifier n'importe quelle interface dispo.
 }
 
 void Server::bindServerSocket(void)
@@ -206,21 +206,20 @@ const char* Server::SocketCreationError::what(void) const throw()
     return (std::strerror(errno));
 }
 
-
 const char* Server::SocketBindError::what(void) const throw()
 {
-    std::cerr  << RED << "Error while binding server socket : " << RESET;
+    std::cerr << RED << "Error while binding server socket : " << RESET;
     return (std::strerror(errno));
 }
 
 const char* Server::ListenServerError::what(void) const throw()
 {
-    std::cerr  << RED << "Error while listening server socket : " << RESET;
+    std::cerr << RED << "Error while listening server socket : " << RESET;
     return (std::strerror(errno));
 }
 
 const char* Server::PollError::what(void) const throw()
 {
-    std::cerr  << RED << "Poll function failed : " << RESET;
+    std::cerr << RED << "Poll function failed : " << RESET;
     return (std::strerror(errno));
 }

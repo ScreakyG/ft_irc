@@ -28,9 +28,7 @@ class Server
     public:
 
         /****CONSTRUCTORS & DESTRUCTORS ****/
-
         Server(int port); // Constructor with port parameter.
-        Server(const Server &src); // Copy constructor.
         ~Server(); // Destructor.
 
         /****OPERATORS****/
@@ -43,12 +41,11 @@ class Server
         void    bindServerSocket(void); // Bind socket to address and port.
         void    listenPort(void); // Ecoute sur le SERVER_PORT avec X BACKLOG.
 
-        int     getServerSocket(void); // Retourne le socket du server.
-
         void    startServerRoutine(void);
         void    acceptNewClient(void); // Accepte une nouvelle connexion d'un client.
         void    readClient(int idx); // Lit une socket client prete en lecture.
 
+        int     getServerSocket(void); // Retourne le socket du server.
 
         /****EXCEPTIONS****/
         class SocketCreationError : public std::exception
@@ -80,4 +77,5 @@ class Server
        std::vector<pollfd>  _allSockets;
 
        Server(); //Default Constructor.
+       Server(const Server &src); // Copy constructor.
 };
