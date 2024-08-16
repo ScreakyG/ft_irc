@@ -74,6 +74,11 @@ void Server::createServerSocket(void)
 
     if (DEBUG == LIGHT || DEBUG == FULL)
         std::cout << PURPLE << "Created server socket fd = " << this->_serverSocket << RESET << std::endl;
+
+    // Permet de reutiliser l'adresse du serveur sans delai, par exemple lorsque l'on relance le serveur il y a un delai par moment.
+    int activate = 1;
+    if (setsockopt(this->_serverSocket, SOL_SOCKET, SO_REUSEADDR, &activate, sizeof(activate)) == -1)
+        throw std::runtime_error("Failed to set SO_REUSEADDR option to socket");
 }
 
 void Server::createIpv4Address(const char *ip, int port)
