@@ -195,7 +195,7 @@ void Server::readClient(int idx)
         std::cout << "[" << this->_allSockets[idx].fd << "]" << " : Closed connection." << std::endl;
 
         // Supprimer le client de pollfd.
-        deleteClient(idx);
+        deleteClient(this->_allSockets[idx].fd);
         // Supprimer le client du vecteur de clients.
     }
     else
@@ -210,12 +210,18 @@ int Server::getServerSocket(void)
     return (this->_serverSocket);
 }
 
-void Server::deleteClient(int idx)
+void Server::deleteClient(int fd_toClear)
 {
-    close(this->_allSockets[idx].fd); // Close the socket.
-    this->_allSockets.erase(this->_allSockets.begin() + idx); // Remove it from the '_pollfd allSockets';
-
+    for (size_t i = 0; i < this->_allSockets.size(); i++)  // Remove it from the '_pollfd allSockets';
+    {
+        if (this->_allSockets[i].fd == fd_toClear)
+        {
+            this->_allSockets.erase(this->_allSockets.begin() + i);
+            break ;
+        }
+    }
     // Remove from the future Client struct.
+     close(fd_toClear); // Close the socket
 }
 
 void Server::closeAllFds(void)
