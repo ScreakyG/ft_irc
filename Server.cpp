@@ -66,6 +66,7 @@ void Server::signalHandler(int signum)
 {
     std::cout << "Caught signal : " << signum << std::endl;
     Server::_sigintSignal = true;
+    std::cout << RED << "Closing server." << std::endl;
 }
 
 void Server::serverInit(void)

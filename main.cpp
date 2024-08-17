@@ -25,6 +25,7 @@ int main(void)
     try
     {
         signal(SIGINT, Server::signalHandler);
+        signal(SIGQUIT, Server::signalHandler);
 
         server.serverInit();
         server.startServerRoutine();
@@ -40,3 +41,4 @@ int main(void)
 }
 
 // lsof -i :PORT   Cette commande permet de voir les connexions etablies.
+// Peut etre rajouter l' option non bloquante sur les sockets ?
