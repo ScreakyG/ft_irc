@@ -5,6 +5,8 @@
 /***CONSTRUCTORS/DESTRUCTORS***/
 /******************************/
 
+bool Server::_sigintSignal = false;
+
 Server::Server(void): _serverPort(DEFAULT_PORT), _serverSocket(-1)
 {
     if (DEBUG == FULL)
@@ -57,6 +59,12 @@ Server& Server::operator=(const Server &rhs)
 /******************************/
 /***********METHODS************/
 /******************************/
+
+void Server::signalHandler(int signum)
+{
+    std::cout << "Caught signal : " << signum << std::endl;
+    Server::_sigintSignal = true;
+}
 
 void Server::serverInit(void)
 {
@@ -125,11 +133,13 @@ void Server::startServerRoutine(void)
     if (DEBUG == LIGHT)
         std::cout << PURPLE << "[Server] Set up poll fd array." << RESET << std::endl;
 
-    while (true)
+    while (Server::_sigintSignal == false)
     {
         int status;
 
         status = poll(&this->_allSockets[0], this->_allSockets.size(), 2000);
+        if (Server::_sigintSignal == true)
+            break ;
         if (status == -1)
             throw Server::PollError();
         if (status == 0)
@@ -156,7 +166,7 @@ void Server::acceptNewClient(void)
     // Penser a creer egalement un objet de la classe Client.
     // Penser a parse les infos de connexions style IP du client.
     pollfd  newClientPoll;
-    int     newClientFd = accept(this->_serverSocket, NULL, NULL);
+    int     newClientFd = accept(this->_serverSocket, NULL, NULL); // Options a peut etre revoir.
 
     if (newClientFd == -1)
         std::cerr << "[Server] Couldn't connect new client." << std::endl;
@@ -178,7 +188,7 @@ void Server::readClient(int idx)
     char    buffer[BUFSIZ];
 
     memset(buffer, '\0', sizeof(buffer));
-    amountReceived = recv(this->_allSockets[idx].fd, buffer, BUFSIZ, 0);
+    amountReceived = recv(this->_allSockets[idx].fd, buffer, BUFSIZ - 1, 0); // BUFSIZ - 1 pour garder minimum un espace pour le '\0'.
 
     if (amountReceived <= 0)
     {

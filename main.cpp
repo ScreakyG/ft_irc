@@ -23,6 +23,8 @@ int main(void)
 
     try
     {
+        signal(SIGINT, Server::signalHandler);
+
         server.serverInit();
         server.startServerRoutine();
     }
