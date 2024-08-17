@@ -200,10 +200,7 @@ void Server::readClient(int idx)
     if (amountReceived <= 0)
     {
         std::cout << "[" << this->_allSockets[idx].fd << "]" << " : Closed connection." << std::endl;
-
-        // Supprimer le client de pollfd.
         deleteClient(this->_allSockets[idx].fd);
-        // Supprimer le client du vecteur de clients.
     }
     else
     {
