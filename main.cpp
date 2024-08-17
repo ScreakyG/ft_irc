@@ -1,8 +1,9 @@
 #include "Colors.hpp"
 #include "Server.hpp"
 #include "Random.hpp"
+#include "Client.hpp"
 
-#include <stdio.h>
+
 
 void sendClientHeader(const int &clientFd)
 {

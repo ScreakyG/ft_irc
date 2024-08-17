@@ -16,8 +16,9 @@
 #include <signal.h>
 
 #include "Random.hpp"
+#include "Client.hpp"
 
-#define DEBUG FULL
+#define DEBUG LIGHT
 
 #define SERVER_IP "127.0.0.1"
 #define DEFAULT_PORT 4242
@@ -81,7 +82,8 @@ class Server
         int                        _serverPort;
         int                        _serverSocket;
         sockaddr_in                _serverAddress;
-       std::vector<pollfd>         _allSockets;
+        std::vector<pollfd>        _allSockets;
+        std::vector<Client>        _allClients;
 
        Server(); //Default Constructor.
        Server(const Server &src); // Copy constructor.

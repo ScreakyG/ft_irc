@@ -23,7 +23,7 @@ Server::Server(int port): _serverPort(port), _serverSocket(-1)
     std::memset(&_serverAddress, 0, sizeof(_serverAddress));
 }
 
-Server::Server(const Server &src): _serverPort(src._serverPort), _serverSocket(src._serverSocket), _serverAddress(src._serverAddress)
+Server::Server(const Server &src): _serverPort(src._serverPort), _serverSocket(src._serverSocket), _serverAddress(src._serverAddress), _allSockets(src._allSockets), _allClients(src._allClients)
 {
     if (DEBUG == FULL)
         std::cout << "Server copy constructor called." << std::endl;
@@ -48,6 +48,8 @@ Server& Server::operator=(const Server &rhs)
         this->_serverPort = rhs._serverPort;
         this->_serverSocket = rhs._serverSocket;
         this->_serverAddress = rhs._serverAddress;
+        this->_allSockets = rhs._allSockets;
+        this->_allClients = rhs._allClients;
     }
     else
         if (DEBUG == FULL)
@@ -166,8 +168,10 @@ void Server::acceptNewClient(void)
     // Penser a creer egalement un objet de la classe Client.
     // Penser a parse les infos de connexions style IP du client.
     pollfd  newClientPoll;
-    int     newClientFd = accept(this->_serverSocket, NULL, NULL); // Options a peut etre revoir.
+    Client  newClientStruct;
+    int     newClientFd;
 
+    newClientFd = accept(this->_serverSocket, NULL, NULL); // Options a peut etre revoir.
     if (newClientFd == -1)
         std::cerr << "[Server] Couldn't connect new client." << std::endl;
     else
@@ -176,7 +180,10 @@ void Server::acceptNewClient(void)
         newClientPoll.events = POLLIN;
         newClientPoll.revents = 0;
 
+        newClientStruct.setFd(newClientFd);
+
         this->_allSockets.push_back(newClientPoll);
+        this->_allClients.push_back(newClientStruct);
 
         std::cout << GREEN << "New client connected on fd : " << newClientFd << RESET << std::endl;
     }
@@ -217,6 +224,15 @@ void Server::deleteClient(int fd_toClear)
         if (this->_allSockets[i].fd == fd_toClear)
         {
             this->_allSockets.erase(this->_allSockets.begin() + i);
+            break ;
+        }
+    }
+
+    for (size_t i = 0; i < this->_allClients.size(); i++) // Remove it from the '_Client allClient';
+    {
+        if (this->_allClients[i].getFd() == fd_toClear)
+        {
+            this->_allClients.erase(this->_allClients.begin() + i);
             break ;
         }
     }
