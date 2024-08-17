@@ -195,9 +195,8 @@ void Server::readClient(int idx)
         std::cout << "[" << this->_allSockets[idx].fd << "]" << " : Closed connection." << std::endl;
 
         // Supprimer le client de pollfd.
-        this->_allSockets.erase(this->_allSockets.begin() + idx);
+        deleteClient(idx);
         // Supprimer le client du vecteur de clients.
-        close(this->_allSockets[idx].fd);
     }
     else
     {
@@ -211,6 +210,23 @@ int Server::getServerSocket(void)
     return (this->_serverSocket);
 }
 
+void Server::deleteClient(int idx)
+{
+    close(this->_allSockets[idx].fd); // Close the socket.
+    this->_allSockets.erase(this->_allSockets.begin() + idx); // Remove it from the '_pollfd allSockets';
+
+    // Remove from the future Client struct.
+}
+
+void Server::closeAllFds(void)
+{
+    for (size_t i = 0; i < this->_allSockets.size(); i++)
+    {
+        if (this->_allSockets[i].fd != this->_serverSocket)
+            std::cout << "Disconnecting socket : [" << this->_allSockets[i].fd  << "]" << std::endl;
+        close(this->_allSockets[i].fd);
+    }
+}
 /******************************/
 /*********EXCEPTIONS***********/
 /******************************/

@@ -48,6 +48,9 @@ class Server
         void            acceptNewClient(void); // Accepte une nouvelle connexion d'un client.
         void            readClient(int idx); // Lit une socket client prete en lecture.
 
+        void            deleteClient(int idx); //Remove from poll allSockets.
+        void            closeAllFds(void); // Close all fds.
+
         int             getServerSocket(void); // Retourne le socket du server.
 
         /****EXCEPTIONS****/

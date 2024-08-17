@@ -27,9 +27,11 @@ int main(void)
 
         server.serverInit();
         server.startServerRoutine();
+        server.closeAllFds();
     }
     catch (const std::exception &e)
     {
+        server.closeAllFds();
         std::cerr << e.what() << std::endl;
     }
     return (0);
