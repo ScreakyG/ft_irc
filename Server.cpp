@@ -166,7 +166,6 @@ void Server::startServerRoutine(void)
 
 void Server::acceptNewClient(void)
 {
-    // Penser a creer egalement un objet de la classe Client.
     // Penser a parse les infos de connexions style IP du client.
     pollfd  newClientPoll;
     Client  newClientStruct;
@@ -207,7 +206,43 @@ void Server::readClient(int idx)
     {
         buffer[amountReceived] = '\0';
         std::cout << "[" << this->_allSockets[idx].fd << "] : " << buffer;
+        handleCommand(buffer, this->_allSockets[idx].fd);
     }
+}
+
+void Server::registerClient(int clientFd, std::string &commands)
+{
+    Client  &client = getClientStruct(clientFd);
+
+    if (client.hasRegistered() == true)
+        return ;
+    client.setNickname("Mbappe");
+    client.setRegistered(true);
+    (void)commands;
+
+    std::string welcomeMessage = ":myircserver 001 " + client.getNickname() + " :Welcome to the IRC network " + client.getNickname() + "!username@hostname\n";
+    send(clientFd, welcomeMessage.c_str(), welcomeMessage.size(), 0);
+}
+
+void Server::handleCommand(char *msg, int clientFd)
+{
+    std::string command(msg);
+
+    if (command.find("CAP LS", 0) != std::string::npos) // Peut poser probleme si on m'envoie plus tard CAP LS.
+    {
+        std::cout << "[" << clientFd << "] : " << "This is the registration phase" << std::endl;
+        registerClient(clientFd, command);
+    }
+}
+
+Client& Server::getClientStruct(int clientFd)
+{
+    for (size_t i = 0; i < this->_allClients.size(); i++)
+    {
+        if (this->_allClients[i].getFd() == clientFd)
+            return (this->_allClients[i]);
+    }
+    return (this->_allClients[0]); // PAS BON DOIT CHANGER , en theorie cela ne devrai jamais arriver.
 }
 
 int Server::getServerSocket(void)
@@ -234,7 +269,6 @@ void Server::deleteClient(int fd_toClear)
             break ;
         }
     }
-    // Remove from the future Client struct.
      close(fd_toClear); // Close the socket
 }
 

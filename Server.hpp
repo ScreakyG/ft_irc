@@ -14,11 +14,13 @@
 #include <poll.h>
 #include <vector>
 #include <signal.h>
+#include <sstream>
+#include <string>
 
 #include "Random.hpp"
 #include "Client.hpp"
 
-#define DEBUG LIGHT
+#define DEBUG OFF
 
 #define SERVER_IP "127.0.0.1"
 #define DEFAULT_PORT 4242
@@ -53,6 +55,10 @@ class Server
         void            closeAllFds(void); // Close all fds.
 
         int             getServerSocket(void); // Retourne le socket du server.
+        Client&         getClientStruct(int clientFd);
+
+        void            handleCommand(char *msg, int clientFd);
+        void            registerClient(int cliendFd, std::string &commands);
 
         /****EXCEPTIONS****/
         class SocketCreationError : public std::exception
