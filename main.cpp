@@ -4,23 +4,25 @@
 #include "Client.hpp"
 
 
-void sendClientHeader(const int &clientFd)
+void printInfoBanner(const Server &server)
 {
-    int sentBytes = -1;
-    std::string msg = "---------------------------\n---WELCOME TO THE SERVER---\n---------------------------\n";
-
-    sentBytes = send(clientFd, msg.c_str(), msg.size(), 0);
-    if (sentBytes == -1)
-        std::cerr << RED << "[Server] sending error : " << std::strerror(errno) << RESET << std::endl;
-    else if (sentBytes != static_cast<int>(msg.size()))
-        std::cout << YELLOW << "[Server] Partial message was sent to client." << RESET << std::endl;
+    (void)server;
+    std::cout << "-----------------------------------" << std::endl;
+    std::cout << "-------- IRC SERVER CONFIG :--------" << std::endl;
+    std::cout << "-----------------------------------" << std::endl;
+    std::cout << "--IP : " << SERVER_IP << " ---------" << std::endl;
+    std::cout << "--PORT : " << DEFAULT_PORT <<" ------" << std::endl;
+    std::cout << "--PASSWORD : " << DEFAULT_PASSWORD << " -----------------------------" << std::endl;
+    std::cout << "-----------------------------------" << std::endl;
 }
 
 int main(void)
 {
-    int port = DEFAULT_PORT;
-    Server server(port);
+    int         port = DEFAULT_PORT;
+    std::string password = DEFAULT_PASSWORD;
+    Server server(port, password);
 
+    printInfoBanner(server);
     try
     {
         signal(SIGINT, Server::signalHandler);

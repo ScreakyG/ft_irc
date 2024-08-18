@@ -24,6 +24,7 @@
 
 #define SERVER_IP "127.0.0.1"
 #define DEFAULT_PORT 4242
+#define DEFAULT_PASSWORD "lol"
 
 #define NICK_MAXLEN 10
 
@@ -34,7 +35,7 @@ class Server
     public:
 
         /****CONSTRUCTORS & DESTRUCTORS ****/
-        Server(int port); // Constructor with port parameter.
+        Server(int port, std::string password); // Constructor with port parameter and password.
         ~Server(); // Destructor.
 
         /****OPERATORS****/
@@ -65,7 +66,7 @@ class Server
         void            executeCommand(std::string &commandName, std::vector<std::string> &arguments, int clientFd);
 
         void            registerClient(Client *client, std::vector<std::string> &arguments); // Register le client lors de la premiere connexion.
-        void            exec_Nick(std::vector<std::string> &arguments, int clientFd);
+        void            exec_NICK(std::vector<std::string> &arguments, int clientFd);
         void            exec_USER(std::vector<std::string> &arguments, int clientFd);
 
         bool            validNickname(std::vector<std::string> &arguments, int clientFd, std::string *nickname); // Verifie si le nickname est pas deja pris et si la len est < NICK_MAXLEN.
@@ -96,6 +97,7 @@ class Server
     private:
         static bool                _stopSignal;
         int                        _serverPort;
+        std::string                _serverPassword;
         int                        _serverSocket;
         sockaddr_in                _serverAddress;
         std::vector<pollfd>        _allSockets;

@@ -7,7 +7,7 @@
 
 bool Server::_stopSignal = false;
 
-Server::Server(void): _serverPort(DEFAULT_PORT), _serverSocket(-1)
+Server::Server(void): _serverPort(DEFAULT_PORT), _serverPassword(DEFAULT_PASSWORD), _serverSocket(-1)
 {
     if (DEBUG == FULL)
         std::cout << "Server default constructor called." << std::endl;
@@ -15,7 +15,7 @@ Server::Server(void): _serverPort(DEFAULT_PORT), _serverSocket(-1)
     std::memset(&_serverAddress, 0, sizeof(_serverAddress));
 }
 
-Server::Server(int port): _serverPort(port), _serverSocket(-1)
+Server::Server(int port, std::string password): _serverPort(port), _serverPassword(password), _serverSocket(-1)
 {
     if (DEBUG == FULL)
         std::cout << "Server port constructor called." << std::endl;
@@ -23,7 +23,7 @@ Server::Server(int port): _serverPort(port), _serverSocket(-1)
     std::memset(&_serverAddress, 0, sizeof(_serverAddress));
 }
 
-Server::Server(const Server &src): _serverPort(src._serverPort), _serverSocket(src._serverSocket), _serverAddress(src._serverAddress), _allSockets(src._allSockets), _allClients(src._allClients)
+Server::Server(const Server &src): _serverPort(src._serverPort), _serverPassword(src._serverPassword), _serverSocket(src._serverSocket), _serverAddress(src._serverAddress), _allSockets(src._allSockets), _allClients(src._allClients)
 {
     if (DEBUG == FULL)
         std::cout << "Server copy constructor called." << std::endl;
@@ -46,6 +46,7 @@ Server& Server::operator=(const Server &rhs)
         if (DEBUG == FULL)
             std::cout << "Server assignement operator success." << std::endl;
         this->_serverPort = rhs._serverPort;
+        this->_serverPassword = rhs._serverPassword;
         this->_serverSocket = rhs._serverSocket;
         this->_serverAddress = rhs._serverAddress;
         this->_allSockets = rhs._allSockets;
@@ -250,30 +251,25 @@ void Server::executeCommand(std::string &commandName, std::vector<std::string> &
     if (commandName == "CAP")
         return ;
     else if (commandName == "NICK")
-        exec_Nick(arguments, clientFd);
+        exec_NICK(arguments, clientFd);
     else if (commandName == "USER")
         exec_USER(arguments, clientFd);
     else
         std::cout << "[" << clientFd << "] " << "[Server] " << "[" << commandName << "]" << " Unknown command" << std::endl;
 }
 
-void Server::exec_Nick(std::vector<std::string> &arguments, int clientFd)
+void Server::exec_NICK(std::vector<std::string> &arguments, int clientFd)
 {
-    // Problemes : "Billy Butcher" sera parse en deux arguments , ARG_0 = "Billy , ARG_1 = Butcher". , Il faut concatener les arguments.
-
     std::string message;
     std::string nickname;
     Client      *client;
-
-    // if (arguments.size() != 1)
-    //     std::cout << "[" << clientFd << "] " << "[Server] [NICK] Couln't change the name because args count is different than 1." << std::endl;
 
     if (validNickname(arguments, clientFd, &nickname) == true)
     {
         client = getClientStruct(clientFd);
         if (client == NULL)
             return ;
-        client->setNickname(nickname); // Changing Nickname. Peut etre ajouter une securite si le nickname est deja existant sur le serveur.
+        client->setNickname(nickname);
         message = "You're now known as " + client->getNickname() + "\n";
 
         std::cout << "[" << clientFd << "] " << "[Server] [NICK] Changed name to : " << client->getNickname() << std::endl;
@@ -332,7 +328,7 @@ void Server::registerClient(Client *client, std::vector<std::string> &arguments)
     std::string username;
     std::string message;
 
-    if (client->getNickname() == "") // It means that the NICK command failed when first connection was made becausse nickname is his default value.
+    if (client->getNickname() == "") // It means that the NICK command failed when first connection was made becausse nickname is still at his default value.
     {
         message = "Your nickname is invalid , please reconnect with a new one.\n";
         sendToClient(message, client->getFd());
