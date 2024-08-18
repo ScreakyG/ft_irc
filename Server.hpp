@@ -20,10 +20,12 @@
 #include "Random.hpp"
 #include "Client.hpp"
 
-#define DEBUG OFF
+#define DEBUG LIGHT
 
 #define SERVER_IP "127.0.0.1"
 #define DEFAULT_PORT 4242
+
+#define NICK_MAXLEN 10
 
 //#define BACKLOG 10
 
@@ -50,6 +52,7 @@ class Server
         void            startServerRoutine(void);
         void            acceptNewClient(void); // Accepte une nouvelle connexion d'un client.
         void            readClient(int idx); // Lit une socket client prete en lecture.
+        void            sendToClient(std::string &message, int clientFd); // Envoie un message client.
 
         void            deleteClient(int idx); //Remove from poll allSockets.
         void            closeAllFds(void); // Close all fds.
@@ -61,8 +64,11 @@ class Server
         void            handleCommand(std::string &command, int clientFd);
         void            executeCommand(std::string &commandName, std::vector<std::string> &arguments, int clientFd);
 
-        void            registerClient(int cliendFd, std::string &commands);
+        void            registerClient(Client *client, std::vector<std::string> &arguments); // Register le client lors de la premiere connexion.
         void            exec_Nick(std::vector<std::string> &arguments, int clientFd);
+        void            exec_USER(std::vector<std::string> &arguments, int clientFd);
+
+        bool            validNickname(std::vector<std::string> &arguments, int clientFd, std::string *nickname); // Verifie si le nickname est pas deja pris et si la len est < NICK_MAXLEN.
 
         /****EXCEPTIONS****/
         class SocketCreationError : public std::exception
@@ -88,7 +94,7 @@ class Server
         };
 
     private:
-        static bool                _sigintSignal;
+        static bool                _stopSignal;
         int                        _serverPort;
         int                        _serverSocket;
         sockaddr_in                _serverAddress;

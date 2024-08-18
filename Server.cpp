@@ -5,7 +5,7 @@
 /***CONSTRUCTORS/DESTRUCTORS***/
 /******************************/
 
-bool Server::_sigintSignal = false;
+bool Server::_stopSignal = false;
 
 Server::Server(void): _serverPort(DEFAULT_PORT), _serverSocket(-1)
 {
@@ -65,8 +65,8 @@ Server& Server::operator=(const Server &rhs)
 void Server::signalHandler(int signum)
 {
     std::cout << "Caught signal : " << signum << std::endl;
-    Server::_sigintSignal = true;
-    std::cout << RED << "Closing server." << std::endl;
+    Server::_stopSignal = true;
+    std::cout << RED << "Closing server." << RESET << std::endl;
 }
 
 void Server::serverInit(void)
@@ -136,12 +136,12 @@ void Server::startServerRoutine(void)
     if (DEBUG == LIGHT)
         std::cout << PURPLE << "[Server] Set up poll fd array." << RESET << std::endl;
 
-    while (Server::_sigintSignal == false)
+    while (Server::_stopSignal == false)
     {
         int status;
 
         status = poll(&this->_allSockets[0], this->_allSockets.size(), 2000);
-        if (Server::_sigintSignal == true)
+        if (Server::_stopSignal == true)
             break ;
         if (status == -1)
             throw Server::PollError();
@@ -210,21 +210,6 @@ void Server::readClient(int idx)
     }
 }
 
-void Server::registerClient(int clientFd, std::string &commands)
-{
-    Client  *client = getClientStruct(clientFd);
-
-
-    if (client == NULL || client->hasRegistered() == true)
-        return ;
-    client->setNickname("Mbappe");
-    client->setRegistered(true);
-    (void)commands;
-
-    std::string welcomeMessage = ":myircserver 001 " + client->getNickname() + " :Welcome to the IRC network " + client->getNickname() + "!username@hostname\n";
-    send(clientFd, welcomeMessage.c_str(), welcomeMessage.size(), 0);
-}
-
 void Server::handleMessage(char *buffer, int clientFd)
 {
     std::istringstream  msgFromClient(buffer);
@@ -262,34 +247,105 @@ void Server::handleCommand(std::string &command, int clientFd)
 
 void Server::executeCommand(std::string &commandName, std::vector<std::string> &arguments, int clientFd)
 {
-    if (commandName == "NICK")
+    if (commandName == "CAP")
+        return ;
+    else if (commandName == "NICK")
         exec_Nick(arguments, clientFd);
+    else if (commandName == "USER")
+        exec_USER(arguments, clientFd);
     else
         std::cout << "[" << clientFd << "] " << "[Server] " << "[" << commandName << "]" << " Unknown command" << std::endl;
 }
 
 void Server::exec_Nick(std::vector<std::string> &arguments, int clientFd)
 {
-    // Problemes : "Billy Butcher" sera parse en deux arguments , ARG_0 = "Billy , ARG_1 = Butcher".
+    // Problemes : "Billy Butcher" sera parse en deux arguments , ARG_0 = "Billy , ARG_1 = Butcher". , Il faut concatener les arguments.
 
     std::string message;
-    Client *    client;
+    std::string nickname;
+    Client      *client;
 
-    if (arguments.size() != 1)
-        std::cout << "[" << clientFd << "] " << "[Server] [NICK] Couln't change the name because args count is different than 1" << std::endl;
-    else if (arguments.size() == 1)
+    // if (arguments.size() != 1)
+    //     std::cout << "[" << clientFd << "] " << "[Server] [NICK] Couln't change the name because args count is different than 1." << std::endl;
+
+    if (validNickname(arguments, clientFd, &nickname) == true)
     {
         client = getClientStruct(clientFd);
         if (client == NULL)
             return ;
-        client->setNickname(arguments[0]); // Changing Nickname.
-
-        message = "You're now know as " + client->getNickname() + "\n";
+        client->setNickname(nickname); // Changing Nickname. Peut etre ajouter une securite si le nickname est deja existant sur le serveur.
+        message = "You're now known as " + client->getNickname() + "\n";
 
         std::cout << "[" << clientFd << "] " << "[Server] [NICK] Changed name to : " << client->getNickname() << std::endl;
-        std::cout << PURPLE << "[Server] ---> " << "[" << clientFd << "] : " << message << RESET;
-        send(clientFd, message.c_str(), message.size(), 0);
+
+        sendToClient(message, clientFd);
     }
+    else
+        std::cout << "[" << clientFd << "] " << "[Server] [NICK] Couln't change the name, reason was sent to client." << std::endl;
+}
+
+bool   Server::validNickname(std::vector<std::string> &arguments, int clientFd, std::string *nickname)
+{
+    std::string nicknameCheck;
+    std::string message;
+
+    for (size_t i = 0; i < arguments.size(); i++)
+        nicknameCheck += arguments[i];
+    if (nicknameCheck.size() > NICK_MAXLEN)
+    {
+        message = "The nickname you choose is too long , this server support MAXLEN = 10.\n";
+        sendToClient(message, clientFd);
+        return (false);
+    }
+    for (size_t i = 0; i < this->_allClients.size(); i++)
+    {
+        if (nicknameCheck == this->_allClients[i].getNickname())
+        {
+            message = "The nickname you choose is already use by another user , please change.\n";
+            sendToClient(message, clientFd);
+            return (false);
+        }
+    }
+    *nickname = nicknameCheck;
+    return (true);
+}
+
+void Server::exec_USER(std::vector<std::string> &arguments, int clientFd)
+{
+    Client      *client;
+
+    client = getClientStruct(clientFd);
+    if (client == NULL)
+        return ;
+
+    if (arguments.size() != 4)
+    {
+        std::string message = "[Server] [USER] Couln't register , please use this format : USER <username> <hostname> <severname> :<realname>\n";
+        sendToClient(message, clientFd);
+    }
+    else if (arguments.size() == 4 && client->hasRegistered() == false) // Uniquement lors de la premiere connecion.
+        registerClient(client, arguments);
+}
+
+void Server::registerClient(Client *client, std::vector<std::string> &arguments)
+{
+    std::string username;
+    std::string message;
+
+    if (client->getNickname() == "") // It means that the NICK command failed when first connection was made becausse nickname is his default value.
+    {
+        message = "Your nickname is invalid , please reconnect with a new one.\n";
+        sendToClient(message, client->getFd());
+        deleteClient(client->getFd());
+        return ;
+    }
+
+    username = arguments[0] + " " + arguments[1] + " " + arguments[2] + " " + arguments[3];
+    client->setUsername(username);
+    client->setRegistered(true);
+
+    message = std::string("001") + " " + client->getNickname() + " :Welcome to the Internet Relay Network : " + client->getUsername() + "\n";
+    sendToClient(message, client->getFd());
 }
 
 Client* Server::getClientStruct(int clientFd)
@@ -327,6 +383,7 @@ void Server::deleteClient(int fd_toClear)
         }
     }
      close(fd_toClear); // Close the socket
+     std::cout << "Disconnecting socket : [" << fd_toClear  << "]" << std::endl;
 }
 
 void Server::closeAllFds(void)
@@ -338,6 +395,20 @@ void Server::closeAllFds(void)
         close(this->_allSockets[i].fd);
     }
 }
+
+void Server::sendToClient(std::string &message, int clientFd)
+{
+    ssize_t sentBytes = -1;
+
+    std::cout << PURPLE << "[Server] ---> " << "[" << clientFd << "] : " << message << RESET;
+
+    sentBytes = send(clientFd, message.c_str(), message.size(), 0);
+    if (sentBytes == -1)
+        std::cerr << RED << "[Server] " << "[" << clientFd << "] " << "sending error : " << std::strerror(errno) << RESET << std::endl;
+    else if (static_cast<size_t>(sentBytes) != message.size())
+        std::cout << YELLOW << "[Server] " << "[" << clientFd << "] " <<"Partial message was sent to client." << RESET << std::endl;
+}
+
 /******************************/
 /*********EXCEPTIONS***********/
 /******************************/

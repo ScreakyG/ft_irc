@@ -4,7 +4,6 @@
 #include "Client.hpp"
 
 
-
 void sendClientHeader(const int &clientFd)
 {
     int sentBytes = -1;

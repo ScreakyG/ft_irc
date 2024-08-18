@@ -4,12 +4,12 @@
 /***CONSTRUCTORS/DESTRUCTORS***/
 /******************************/
 
-Client::Client() : _clientFd(-1), _nickname(""), _hasRegistered(false)
+Client::Client() : _clientFd(-1), _nickname(""), _username(""), _hasRegistered(false)
 {
 
 }
 
-Client::Client(const Client &src) : _clientFd(src._clientFd), _nickname(src._nickname), _hasRegistered(src._hasRegistered)
+Client::Client(const Client &src) : _clientFd(src._clientFd), _nickname(src._nickname), _username(src._username), _hasRegistered(src._hasRegistered)
 {
 
 }
@@ -26,6 +26,7 @@ Client& Client::operator=(const Client &rhs)
     {
         this->_clientFd = rhs._clientFd;
         this->_nickname = rhs._nickname;
+        this->_username = rhs._username;
         this->_hasRegistered = rhs._hasRegistered;
     }
     return (*this);
@@ -53,6 +54,16 @@ void Client::setNickname(std::string nickname)
 std::string Client::getNickname(void)
 {
     return (this->_nickname);
+}
+
+void Client::setUsername(std::string username)
+{
+    this->_username = username;
+}
+
+std::string Client::getUsername(void)
+{
+    return (this->_username);
 }
 
 void Client::setRegistered(bool value)
