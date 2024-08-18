@@ -264,7 +264,8 @@ void Server::executeCommand(std::string &commandName, std::vector<std::string> &
 {
     if (commandName == "NICK")
         exec_Nick(arguments, clientFd);
-
+    else
+        std::cout << "[" << clientFd << "] " << "[Server] " << "[" << commandName << "]" << " Unknown command" << std::endl;
 }
 
 void Server::exec_Nick(std::vector<std::string> &arguments, int clientFd)
@@ -275,17 +276,17 @@ void Server::exec_Nick(std::vector<std::string> &arguments, int clientFd)
     Client *    client;
 
     if (arguments.size() != 1)
-        std::cout << "[" << clientFd << "] " << "[Server] Couln't change the name because args count is different than 1" << std::endl;
+        std::cout << "[" << clientFd << "] " << "[Server] [NICK] Couln't change the name because args count is different than 1" << std::endl;
     else if (arguments.size() == 1)
     {
         client = getClientStruct(clientFd);
         if (client == NULL)
             return ;
-        client->setNickname(arguments[0]);
+        client->setNickname(arguments[0]); // Changing Nickname.
 
         message = "You're now know as " + client->getNickname() + "\n";
 
-        std::cout << "[" << clientFd << "] " << "[Server] Changed name to : " << client->getNickname() << std::endl;
+        std::cout << "[" << clientFd << "] " << "[Server] [NICK] Changed name to : " << client->getNickname() << std::endl;
         std::cout << PURPLE << "[Server] ---> " << "[" << clientFd << "] : " << message << RESET;
         send(clientFd, message.c_str(), message.size(), 0);
     }
