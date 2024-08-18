@@ -147,7 +147,7 @@ void Server::startServerRoutine(void)
             throw Server::PollError();
         if (status == 0)
         {
-            if (DEBUG == LIGHT || DEBUG == FULL)
+            if (DEBUG == FULL)
                 std::cout << PURPLE << "[Server] Waiting..." << RESET << std::endl;
             continue ;
         }
@@ -185,7 +185,7 @@ void Server::acceptNewClient(void)
         this->_allSockets.push_back(newClientPoll);
         this->_allClients.push_back(newClientStruct);
 
-        std::cout << GREEN << "New client connected on fd : " << newClientFd << RESET << std::endl;
+        std::cout << GREEN << "[Server] New client connected on fd : " << newClientFd << RESET << std::endl;
     }
 }
 
@@ -205,44 +205,100 @@ void Server::readClient(int idx)
     else
     {
         buffer[amountReceived] = '\0';
-        std::cout << "[" << this->_allSockets[idx].fd << "] : " << buffer;
-        handleCommand(buffer, this->_allSockets[idx].fd);
+        std::cout << GREEN << "[" << this->_allSockets[idx].fd << "] [Client] : " << buffer << RESET;
+        handleMessage(buffer, this->_allSockets[idx].fd);
     }
 }
 
 void Server::registerClient(int clientFd, std::string &commands)
 {
-    Client  &client = getClientStruct(clientFd);
+    Client  *client = getClientStruct(clientFd);
 
-    if (client.hasRegistered() == true)
+
+    if (client == NULL || client->hasRegistered() == true)
         return ;
-    client.setNickname("Mbappe");
-    client.setRegistered(true);
+    client->setNickname("Mbappe");
+    client->setRegistered(true);
     (void)commands;
 
-    std::string welcomeMessage = ":myircserver 001 " + client.getNickname() + " :Welcome to the IRC network " + client.getNickname() + "!username@hostname\n";
+    std::string welcomeMessage = ":myircserver 001 " + client->getNickname() + " :Welcome to the IRC network " + client->getNickname() + "!username@hostname\n";
     send(clientFd, welcomeMessage.c_str(), welcomeMessage.size(), 0);
 }
 
-void Server::handleCommand(char *msg, int clientFd)
+void Server::handleMessage(char *buffer, int clientFd)
 {
-    std::string command(msg);
+    std::istringstream  msgFromClient(buffer);
+    std::string         line;
 
-    if (command.find("CAP LS", 0) != std::string::npos) // Peut poser probleme si on m'envoie plus tard CAP LS.
+    while (std::getline(msgFromClient, line))
+        handleCommand(line, clientFd);
+}
+
+void Server::handleCommand(std::string &command, int clientFd)
+{
+    std::istringstream          iss(command);
+    std::string                 commandName;
+    std::string                 argument;
+    std::vector<std::string>    argumentsVector;
+
+    iss >> commandName; // Premier mot de la ligne est la commande.
+    while (iss >> argument) // Lire le reste qui correspond aux arguments.
+        argumentsVector.push_back(argument);
+
+    if (DEBUG == LIGHT || DEBUG == FULL)
     {
-        std::cout << "[" << clientFd << "] : " << "This is the registration phase" << std::endl;
-        registerClient(clientFd, command);
+        std::cout << CYAN << "[" << clientFd << "] " << "[Server] Command = " << command << RESET << std::endl;
+
+        std::cout << YELLOW << "[" << clientFd << "] " << "[Server] COMMAND = " << commandName << RESET;
+        for(size_t i = 0; i < argumentsVector.size(); i++)
+        {
+            std::cout << YELLOW << " | ARG_" << i << " = " << RESET;
+            std::cout << YELLOW << argumentsVector[i] << " " << RESET;
+        }
+        std::cout << std::endl;
+    }
+    executeCommand(commandName, argumentsVector, clientFd);
+}
+
+void Server::executeCommand(std::string &commandName, std::vector<std::string> &arguments, int clientFd)
+{
+    if (commandName == "NICK")
+        exec_Nick(arguments, clientFd);
+
+}
+
+void Server::exec_Nick(std::vector<std::string> &arguments, int clientFd)
+{
+    // Problemes : "Billy Butcher" sera parse en deux arguments , ARG_0 = "Billy , ARG_1 = Butcher".
+
+    std::string message;
+    Client *    client;
+
+    if (arguments.size() != 1)
+        std::cout << "[" << clientFd << "] " << "[Server] Couln't change the name because args count is different than 1" << std::endl;
+    else if (arguments.size() == 1)
+    {
+        client = getClientStruct(clientFd);
+        if (client == NULL)
+            return ;
+        client->setNickname(arguments[0]);
+
+        message = "You're now know as " + client->getNickname() + "\n";
+
+        std::cout << "[" << clientFd << "] " << "[Server] Changed name to : " << client->getNickname() << std::endl;
+        std::cout << PURPLE << "[Server] ---> " << "[" << clientFd << "] : " << message << RESET;
+        send(clientFd, message.c_str(), message.size(), 0);
     }
 }
 
-Client& Server::getClientStruct(int clientFd)
+Client* Server::getClientStruct(int clientFd)
 {
     for (size_t i = 0; i < this->_allClients.size(); i++)
     {
         if (this->_allClients[i].getFd() == clientFd)
-            return (this->_allClients[i]);
+            return (&this->_allClients[i]);
     }
-    return (this->_allClients[0]); // PAS BON DOIT CHANGER , en theorie cela ne devrai jamais arriver.
+    return (NULL); //En theorie cela ne devrai jamais arriver.
 }
 
 int Server::getServerSocket(void)

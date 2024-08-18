@@ -55,10 +55,14 @@ class Server
         void            closeAllFds(void); // Close all fds.
 
         int             getServerSocket(void); // Retourne le socket du server.
-        Client&         getClientStruct(int clientFd);
+        Client*         getClientStruct(int clientFd);
 
-        void            handleCommand(char *msg, int clientFd);
+        void            handleMessage(char *buffer, int clientFd);
+        void            handleCommand(std::string &command, int clientFd);
+        void            executeCommand(std::string &commandName, std::vector<std::string> &arguments, int clientFd);
+
         void            registerClient(int cliendFd, std::string &commands);
+        void            exec_Nick(std::vector<std::string> &arguments, int clientFd);
 
         /****EXCEPTIONS****/
         class SocketCreationError : public std::exception
