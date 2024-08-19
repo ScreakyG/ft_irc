@@ -2,6 +2,7 @@
 #include "Server.hpp"
 #include "Random.hpp"
 #include "Client.hpp"
+#include "Commands.hpp"
 
 
 void printInfoBanner(const Server &server)

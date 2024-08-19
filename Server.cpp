@@ -259,135 +259,15 @@ void Server::executeCommand(std::string &commandName, std::vector<std::string> &
     if (commandName == "CAP")
         return ;
     else if (commandName == "PASS")
-        exec_PASS(arguments, clientFd);
+        exec_PASS((*this), arguments, clientFd);
     else if (commandName == "NICK")
-        exec_NICK(arguments, clientFd);
+        exec_NICK((*this), arguments, clientFd);
     else if (commandName == "USER")
-        exec_USER(arguments, clientFd);
+        exec_USER((*this), arguments, clientFd);
     else
     {
         message = std::string("421 ") + commandName + " :Unknown command\n";
         sendToClient(message, clientFd);
-    }
-}
-
-void   Server::exec_PASS(std::vector<std::string> &arguments, int clientFd)
-{
-    std::string message;
-    Client      *client;
-
-    client = Server::getClientStruct(clientFd);
-    if (client == NULL)
-        return ;
-
-    if (client->hasRegistered() == true)
-    {
-        message = "462 : You may not reregister\n";
-        sendToClient(message, clientFd);
-        return ;
-    }
-
-    if (arguments.size() == 0)
-    {
-        message = "461 PASS : Not enough parameters\n";
-        sendToClient(message, clientFd);
-        return ;
-    }
-
-    if (getServerPassword() != arguments[0])
-    {
-        message = "461 : Password incorrect\n"; // Ce n'est pas le bon code mais il n'y pas l'air d'avoir de bon code.
-        sendToClient(message, clientFd);
-        //deleteClient(clientFd);
-        return ;
-    }
-
-    if (getServerPassword() == arguments[0])
-    {
-        client->setServerPassword(true);
-        return ;
-    }
-}
-
-void Server::exec_NICK(std::vector<std::string> &arguments, int clientFd)
-{
-    std::string message;
-    std::string nickname;
-    Client      *client;
-
-    client = getClientStruct(clientFd);
-    if (client == NULL)
-        return ;
-
-    if (clientValidPassword(client, clientFd) == false)
-        return ;
-
-    if (arguments.size() == 0)
-    {
-        message = std::string("431 * ") + ":No nickname given\n";
-        sendToClient(message, clientFd);
-        return ;
-    }
-
-    for (size_t i = 0; i < arguments.size(); i++) // Concatene si par exemple "Billy Butcher" , correspond a 2 args dans le parsing , pourtant ceci peut etre valide.
-        nickname += arguments[i];
-
-    if (nickname.size() > NICK_MAXLEN) // Sur les vrais serveurs cela truncate le pseudo a MAXLEN. Faire la grosse verification ici pour les char invalides ect..
-    {
-        message = std::string("432 ") + nickname + " :Erroneus Nickname, MAX_LEN = 10\n";
-        sendToClient(message, clientFd);
-        return ;
-    }
-
-    for (size_t i = 0; i < this->_allClients.size(); i++) // Regarde si n'y a pas deja quelqu'un avec ce pseudo sur le server.
-    {
-        if (nickname == this->_allClients[i].getNickname())
-        {
-            //message = nickname + " :Nickname is already in use\n";
-            message = std::string("432 ") + nickname + " :Nickname is already in use\n"; // Le vrai code d'erreur est 433 , cest un choix perso d'utiliser 432 pour deconnecter le client.
-            sendToClient(message, clientFd);
-            return ;
-        }
-    }
-    client->setNickname(nickname);
-    message = "You're now known as " + client->getNickname() + "\n";
-    sendToClient(message, clientFd);
-
-    if (client->hasRegistered() == false)
-        isRegistrationComplete(client);
-}
-
-void Server::exec_USER(std::vector<std::string> &arguments, int clientFd)
-{
-    Client      *client;
-    std::string message;
-    std::string username;
-
-    client = getClientStruct(clientFd);
-    if (client == NULL)
-        return ;
-
-    if (clientValidPassword(client, clientFd) == false)
-        return ;
-
-    if (client->hasRegistered() == true)
-    {
-        message = "462 :You may not reregister\n";
-        sendToClient(message, clientFd);
-        return ;
-    }
-
-    if (arguments.size() != 4)
-    {
-        message = "461 * USER :Not enough parameters\n";
-        sendToClient(message, clientFd);
-        return ;
-    }
-    else if (arguments.size() == 4 && client->hasRegistered() == false)
-    {
-        username = arguments[0] + " " + arguments[1] + " " + arguments[2] + " " + arguments[3];
-        client->setUsername(username);
-        isRegistrationComplete(client); //Si oui on envoie le message de bienvenue et client->setRegistered(true), si non alors on attends avec un timeout.
     }
 }
 
@@ -431,6 +311,11 @@ Client* Server::getClientStruct(int clientFd)
             return (&this->_allClients[i]);
     }
     return (NULL); //En theorie cela ne devrai jamais arriver.
+}
+
+std::vector<Client>&    Server::getVectorClient(void)
+{
+    return (this->_allClients);
 }
 
 int Server::getServerSocket(void)

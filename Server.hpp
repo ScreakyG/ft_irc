@@ -19,6 +19,7 @@
 
 #include "Random.hpp"
 #include "Client.hpp"
+#include "Commands.hpp"
 
 #define DEBUG LIGHT
 
@@ -43,38 +44,39 @@ class Server
         Server& operator=(const Server &rhs); // Assignement operator.
 
         /****METHODS****/
-        static void     signalHandler(int signum); // Signal handler.
+        static void             signalHandler(int signum); // Signal handler.
 
-        void            serverInit(void); // Appelle les fonctions pour init.
-        void            createServerSocket(void); // Creer un socket pour le server.
-        void            createIpv4Address(const char *ip, int port);
-        void            bindServerSocket(void); // Bind socket to address and port.
-        void            listenPort(void); // Ecoute sur le SERVER_PORT avec X BACKLOG.
+        void                    serverInit(void); // Appelle les fonctions pour init.
+        void                    createServerSocket(void); // Creer un socket pour le server.
+        void                    createIpv4Address(const char *ip, int port);
+        void                    bindServerSocket(void); // Bind socket to address and port.
+        void                    listenPort(void); // Ecoute sur le SERVER_PORT avec X BACKLOG.
 
-        void            startServerRoutine(void);
-        void            acceptNewClient(void); // Accepte une nouvelle connexion d'un client.
-        void            readClient(int idx); // Lit une socket client prete en lecture.
-        void            sendToClient(std::string &message, int clientFd); // Envoie un message client.
+        void                    startServerRoutine(void);
+        void                    acceptNewClient(void); // Accepte une nouvelle connexion d'un client.
+        void                    readClient(int idx); // Lit une socket client prete en lecture.
+        void                    sendToClient(std::string &message, int clientFd); // Envoie un message client.
 
-        void            deleteClient(int idx); //Remove from poll allSockets.
-        void            closeAllFds(void); // Close all fds.
+        void                    deleteClient(int idx); //Remove from poll allSockets.
+        void                    closeAllFds(void); // Close all fds.
 
-        int             getServerSocket(void); // Retourne le socket du server.
-        Client*         getClientStruct(int clientFd);
-        std::string     getServerPassword(void); // Retourne le mot de passe du serveur.
+        int                     getServerSocket(void); // Retourne le socket du server.
+        Client*                 getClientStruct(int clientFd);
+        std::string             getServerPassword(void); // Retourne le mot de passe du serveur.
+        std::vector<Client>&    getVectorClient(void); // Retourne le vecteur de client.
 
-        void            handleMessage(char *buffer, int clientFd);
-        void            handleCommand(std::string &command, int clientFd);
-        void            executeCommand(std::string &commandName, std::vector<std::string> &arguments, int clientFd);
+        void                    handleMessage(char *buffer, int clientFd);
+        void                    handleCommand(std::string &command, int clientFd);
+        void                    executeCommand(std::string &commandName, std::vector<std::string> &arguments, int clientFd);
 
-        void            isRegistrationComplete(Client *client); // Regarde si la registration est complete.
-        void            exec_PASS(std::vector<std::string> &arguments, int clientFd);
-        void            exec_NICK(std::vector<std::string> &arguments, int clientFd);
-        void            exec_USER(std::vector<std::string> &arguments, int clientFd);
+        void                    isRegistrationComplete(Client *client); // Regarde si la registration est complete.
+        //void            exec_PASS(std::vector<std::string> &arguments, int clientFd);
+        //void            exec_NICK(std::vector<std::string> &arguments, int clientFd);
+        //void            exec_USER(std::vector<std::string> &arguments, int clientFd);
 
-        bool            clientValidPassword(Client *client, int clientFd);
+        bool                    clientValidPassword(Client *client, int clientFd);
 
-        void            checkClientTimeouts();
+        void                    checkClientTimeouts();
 
         /****EXCEPTIONS****/
         class SocketCreationError : public std::exception
