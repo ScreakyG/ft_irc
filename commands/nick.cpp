@@ -2,7 +2,7 @@
 
 static bool isValidNickname(std::string nickname)
 {
-    const std::string validCharacters = "abcdefghijklmnopqrstuvwxyz0123456789";
+    const std::string validCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     if (nickname.empty())
         return (false);
