@@ -272,12 +272,8 @@ void Server::exec_NICK(std::vector<std::string> &arguments, int clientFd)
         client->setNickname(nickname);
         message = "You're now known as " + client->getNickname() + "\n";
 
-        std::cout << "[" << clientFd << "] " << "[Server] [NICK] Changed name to : " << client->getNickname() << std::endl;
-
         sendToClient(message, clientFd);
     }
-    else
-        std::cout << "[" << clientFd << "] " << "[Server] [NICK] Couln't change the name, reason was sent to client." << std::endl;
 }
 
 bool   Server::validNickname(std::vector<std::string> &arguments, int clientFd, std::string *nickname)
@@ -285,11 +281,25 @@ bool   Server::validNickname(std::vector<std::string> &arguments, int clientFd, 
     std::string nicknameCheck;
     std::string message;
 
+    if (arguments.size() == 0)
+    {
+        message = std::string("431 * ") + ":No nickname given\n";
+        sendToClient(message, clientFd);
+        return (false);
+    }
+
     for (size_t i = 0; i < arguments.size(); i++)
         nicknameCheck += arguments[i];
-    if (nicknameCheck.size() > NICK_MAXLEN)
+
+    if (nicknameCheck.empty()) // Changer pour verifier si le nickname contient des caracteres interdits.
     {
-        message = "The nickname you choose is too long , this server support MAXLEN = 10.\n";
+        message = std::string("432 * ") + "" + " :Erroneous Nickname\n";
+        sendToClient(message, clientFd);
+        return (false);
+    }
+    if (nicknameCheck.size() > NICK_MAXLEN) // Sur les vrais serveurs cela truncate le pseudo a MAXLEN.
+    {
+        message = std::string("432 ") + nicknameCheck + " :Erroneus Nickname, MAX_LEN = 10\n";
         sendToClient(message, clientFd);
         return (false);
     }
@@ -297,7 +307,7 @@ bool   Server::validNickname(std::vector<std::string> &arguments, int clientFd, 
     {
         if (nicknameCheck == this->_allClients[i].getNickname())
         {
-            message = "The nickname you choose is already use by another user , please change.\n";
+            message = nicknameCheck + " :Nickname is already in use\n";
             sendToClient(message, clientFd);
             return (false);
         }
@@ -309,15 +319,24 @@ bool   Server::validNickname(std::vector<std::string> &arguments, int clientFd, 
 void Server::exec_USER(std::vector<std::string> &arguments, int clientFd)
 {
     Client      *client;
+    std::string message;
 
     client = getClientStruct(clientFd);
     if (client == NULL)
         return ;
 
+    if (client->hasRegistered() == true)
+    {
+        message = "462 :You may not reregister\n";
+        sendToClient(message, clientFd);
+        return ;
+    }
+
     if (arguments.size() != 4)
     {
-        std::string message = "[Server] [USER] Couln't register , please use this format : USER <username> <hostname> <severname> :<realname>\n";
+        message = "461 * USER :Not enough parameters\n";
         sendToClient(message, clientFd);
+        return ;
     }
     else if (arguments.size() == 4 && client->hasRegistered() == false) // Uniquement lors de la premiere connecion.
         registerClient(client, arguments);
@@ -330,7 +349,7 @@ void Server::registerClient(Client *client, std::vector<std::string> &arguments)
 
     if (client->getNickname() == "") // It means that the NICK command failed when first connection was made becausse nickname is still at his default value.
     {
-        message = "Your nickname is invalid , please reconnect with a new one.\n";
+        message = "You did not entered a valid nickname\n";
         sendToClient(message, client->getFd());
         deleteClient(client->getFd());
         return ;
@@ -340,7 +359,7 @@ void Server::registerClient(Client *client, std::vector<std::string> &arguments)
     client->setUsername(username);
     client->setRegistered(true);
 
-    message = std::string("001") + " " + client->getNickname() + " :Welcome to the Internet Relay Network : " + client->getUsername() + "\n";
+    message = std::string("001 ") + client->getNickname() + " :Welcome to the Internet Relay Network : " + client->getUsername() + "\n";
     sendToClient(message, client->getFd());
 }
 
