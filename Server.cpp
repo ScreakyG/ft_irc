@@ -141,6 +141,8 @@ void Server::startServerRoutine(void)
     {
         int status;
 
+        checkClientTimeouts();
+
         status = poll(&this->_allSockets[0], this->_allSockets.size(), 2000);
         if (Server::_stopSignal == true)
             break ;
@@ -171,6 +173,7 @@ void Server::acceptNewClient(void)
     pollfd  newClientPoll;
     Client  newClientStruct;
     int     newClientFd;
+    time_t  timeoutStart;
 
     newClientFd = accept(this->_serverSocket, NULL, NULL); // Options a peut etre revoir.
     if (newClientFd == -1)
@@ -182,6 +185,9 @@ void Server::acceptNewClient(void)
         newClientPoll.revents = 0;
 
         newClientStruct.setFd(newClientFd);
+
+        timeoutStart = time(NULL);
+        newClientStruct.setTimeoutStart(timeoutStart);
 
         this->_allSockets.push_back(newClientPoll);
         this->_allClients.push_back(newClientStruct);
@@ -248,14 +254,59 @@ void Server::handleCommand(std::string &command, int clientFd)
 
 void Server::executeCommand(std::string &commandName, std::vector<std::string> &arguments, int clientFd)
 {
+    std::string message;
+
     if (commandName == "CAP")
         return ;
+    else if (commandName == "PASS")
+        exec_PASS(arguments, clientFd);
     else if (commandName == "NICK")
         exec_NICK(arguments, clientFd);
     else if (commandName == "USER")
         exec_USER(arguments, clientFd);
     else
-        std::cout << "[" << clientFd << "] " << "[Server] " << "[" << commandName << "]" << " Unknown command" << std::endl;
+    {
+        message = std::string("421 ") + commandName + " :Unknown command\n";
+        sendToClient(message, clientFd);
+    }
+}
+
+void   Server::exec_PASS(std::vector<std::string> &arguments, int clientFd)
+{
+    std::string message;
+    Client      *client;
+
+    client = Server::getClientStruct(clientFd);
+    if (client == NULL)
+        return ;
+
+    if (client->hasRegistered() == true)
+    {
+        message = "462 : You may not reregister\n";
+        sendToClient(message, clientFd);
+        return ;
+    }
+
+    if (arguments.size() == 0)
+    {
+        message = "461 PASS : Not enough parameters\n";
+        sendToClient(message, clientFd);
+        return ;
+    }
+
+    if (getServerPassword() != arguments[0])
+    {
+        message = "464 : Password incorrect\n";
+        sendToClient(message, clientFd);
+        deleteClient(clientFd);
+        return ;
+    }
+
+    if (getServerPassword() == arguments[0])
+    {
+        client->setServerPassword(true);
+        return ;
+    }
 }
 
 void Server::exec_NICK(std::vector<std::string> &arguments, int clientFd)
@@ -264,65 +315,58 @@ void Server::exec_NICK(std::vector<std::string> &arguments, int clientFd)
     std::string nickname;
     Client      *client;
 
-    if (validNickname(arguments, clientFd, &nickname) == true)
-    {
-        client = getClientStruct(clientFd);
-        if (client == NULL)
-            return ;
-        client->setNickname(nickname);
-        message = "You're now known as " + client->getNickname() + "\n";
+    client = getClientStruct(clientFd);
+    if (client == NULL)
+        return ;
 
-        sendToClient(message, clientFd);
-    }
-}
-
-bool   Server::validNickname(std::vector<std::string> &arguments, int clientFd, std::string *nickname)
-{
-    std::string nicknameCheck;
-    std::string message;
+    if (clientValidPassword(client, clientFd) == false)
+        return ;
 
     if (arguments.size() == 0)
     {
         message = std::string("431 * ") + ":No nickname given\n";
         sendToClient(message, clientFd);
-        return (false);
+        return ;
     }
 
-    for (size_t i = 0; i < arguments.size(); i++)
-        nicknameCheck += arguments[i];
+    for (size_t i = 0; i < arguments.size(); i++) // Concatene si par exemple "Billy Butcher" , correspond a 2 args dans le parsing , pourtant ceci peut etre valide.
+        nickname += arguments[i];
 
-    if (nicknameCheck.empty()) // Changer pour verifier si le nickname contient des caracteres interdits.
+    if (nickname.size() > NICK_MAXLEN) // Sur les vrais serveurs cela truncate le pseudo a MAXLEN. Faire la grosse verification ici pour les char invalides ect..
     {
-        message = std::string("432 * ") + "" + " :Erroneous Nickname\n";
+        message = std::string("432 ") + nickname + " :Erroneus Nickname, MAX_LEN = 10\n";
         sendToClient(message, clientFd);
-        return (false);
+        return ;
     }
-    if (nicknameCheck.size() > NICK_MAXLEN) // Sur les vrais serveurs cela truncate le pseudo a MAXLEN.
+
+    for (size_t i = 0; i < this->_allClients.size(); i++) // Regarde si n'y a pas deja quelqu'un avec ce pseudo sur le server.
     {
-        message = std::string("432 ") + nicknameCheck + " :Erroneus Nickname, MAX_LEN = 10\n";
-        sendToClient(message, clientFd);
-        return (false);
-    }
-    for (size_t i = 0; i < this->_allClients.size(); i++)
-    {
-        if (nicknameCheck == this->_allClients[i].getNickname())
+        if (nickname == this->_allClients[i].getNickname())
         {
-            message = nicknameCheck + " :Nickname is already in use\n";
+            message = nickname + " :Nickname is already in use\n";
             sendToClient(message, clientFd);
-            return (false);
+            return ;
         }
     }
-    *nickname = nicknameCheck;
-    return (true);
+    client->setNickname(nickname);
+    message = "You're now known as " + client->getNickname() + "\n";
+    sendToClient(message, clientFd);
+
+    if (client->hasRegistered() == false)
+        isRegistrationComplete(client);
 }
 
 void Server::exec_USER(std::vector<std::string> &arguments, int clientFd)
 {
     Client      *client;
     std::string message;
+    std::string username;
 
     client = getClientStruct(clientFd);
     if (client == NULL)
+        return ;
+
+    if (clientValidPassword(client, clientFd) == false)
         return ;
 
     if (client->hasRegistered() == true)
@@ -338,29 +382,44 @@ void Server::exec_USER(std::vector<std::string> &arguments, int clientFd)
         sendToClient(message, clientFd);
         return ;
     }
-    else if (arguments.size() == 4 && client->hasRegistered() == false) // Uniquement lors de la premiere connecion.
-        registerClient(client, arguments);
+    else if (arguments.size() == 4 && client->hasRegistered() == false)
+    {
+        username = arguments[0] + " " + arguments[1] + " " + arguments[2] + " " + arguments[3];
+        client->setUsername(username);
+        isRegistrationComplete(client); //Si oui on envoie le message de bienvenue et client->setRegistered(true), si non alors on attends avec un timeout.
+    }
 }
 
-void Server::registerClient(Client *client, std::vector<std::string> &arguments)
+void Server::isRegistrationComplete(Client *client)
 {
-    std::string username;
     std::string message;
 
-    if (client->getNickname() == "") // It means that the NICK command failed when first connection was made becausse nickname is still at his default value.
+    if (client->getNickname() != "" && client->getUsername() != "") // Cela veut dire que elle ne sont plus a default et on ete modifie.
     {
-        message = "You did not entered a valid nickname\n";
+        message = std::string("001 ") + client->getNickname() + " :Welcome to the Internet Relay Network : " + client->getUsername() + "\n";
+        client->setRegistered(true);
         sendToClient(message, client->getFd());
-        deleteClient(client->getFd());
+
         return ;
     }
+}
 
-    username = arguments[0] + " " + arguments[1] + " " + arguments[2] + " " + arguments[3];
-    client->setUsername(username);
-    client->setRegistered(true);
+void Server::checkClientTimeouts(void)
+{
+    std::string message;
 
-    message = std::string("001 ") + client->getNickname() + " :Welcome to the Internet Relay Network : " + client->getUsername() + "\n";
-    sendToClient(message, client->getFd());
+    for (size_t i = 0; i < _allClients.size(); i++)
+    {
+        if (_allClients[i].hasRegistered() == false)
+        {
+            if (difftime(time(NULL), _allClients[i].getTimeoutStart()) > REGISTER_TIMEOUT)
+            {
+                message = "ERROR :Registration timeout\n";
+                sendToClient(message, _allClients[i].getFd());
+                deleteClient(_allClients[i].getFd());
+            }
+        }
+    }
 }
 
 Client* Server::getClientStruct(int clientFd)
@@ -376,6 +435,11 @@ Client* Server::getClientStruct(int clientFd)
 int Server::getServerSocket(void)
 {
     return (this->_serverSocket);
+}
+
+std::string Server::getServerPassword(void)
+{
+    return (this->_serverPassword);
 }
 
 void Server::deleteClient(int fd_toClear)
@@ -409,6 +473,18 @@ void Server::closeAllFds(void)
             std::cout << "Disconnecting socket : [" << this->_allSockets[i].fd  << "]" << std::endl;
         close(this->_allSockets[i].fd);
     }
+}
+
+bool  Server::clientValidPassword(Client *client, int clientFd)
+{
+    std::string message;
+    if (client->hasEnteredServerPassword() == false)
+    {
+        message = "451 : Password required before registering\n";
+        sendToClient(message, clientFd);
+        return (false);
+    }
+    return (true);
 }
 
 void Server::sendToClient(std::string &message, int clientFd)

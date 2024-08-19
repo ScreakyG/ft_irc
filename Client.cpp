@@ -4,12 +4,12 @@
 /***CONSTRUCTORS/DESTRUCTORS***/
 /******************************/
 
-Client::Client() : _clientFd(-1), _nickname(""), _username(""), _hasRegistered(false)
+Client::Client() : _clientFd(-1), _nickname(""), _username(""), _enteredServerPassword(false), _hasRegistered(false), _timeoutStart(0)
 {
 
 }
 
-Client::Client(const Client &src) : _clientFd(src._clientFd), _nickname(src._nickname), _username(src._username), _hasRegistered(src._hasRegistered)
+Client::Client(const Client &src) : _clientFd(src._clientFd), _nickname(src._nickname), _username(src._username), _enteredServerPassword(src._enteredServerPassword), _hasRegistered(src._hasRegistered), _timeoutStart(src._timeoutStart)
 {
 
 }
@@ -27,7 +27,9 @@ Client& Client::operator=(const Client &rhs)
         this->_clientFd = rhs._clientFd;
         this->_nickname = rhs._nickname;
         this->_username = rhs._username;
+        this->_enteredServerPassword = rhs._enteredServerPassword;
         this->_hasRegistered = rhs._hasRegistered;
+        this->_timeoutStart = rhs._timeoutStart;
     }
     return (*this);
 }
@@ -74,4 +76,24 @@ void Client::setRegistered(bool value)
 bool Client::hasRegistered(void)
 {
     return (this->_hasRegistered);
+}
+
+void Client::setServerPassword(bool value)
+{
+    this->_enteredServerPassword = value;
+}
+
+bool Client::hasEnteredServerPassword(void)
+{
+    return (this->_enteredServerPassword);
+}
+
+void Client::setTimeoutStart(time_t start)
+{
+    this->_timeoutStart = start;
+}
+
+time_t Client::getTimeoutStart(void)
+{
+    return (this->_timeoutStart);
 }

@@ -27,9 +27,17 @@ class Client
         void        setRegistered(bool value); // Modifie _hasRegistered.
         bool        hasRegistered(void); // Retourne _hasRegistered.
 
+        void        setServerPassword(bool value); // Modifie _enteredServerPassword.
+        bool        hasEnteredServerPassword(void); // Retourne _enteredServerPassword.
+
+        void        setTimeoutStart(time_t start);
+        time_t      getTimeoutStart(void);
+
     private:
         int         _clientFd;
         std::string _nickname;
         std::string _username;
+        bool        _enteredServerPassword;
         bool        _hasRegistered;
+        time_t      _timeoutStart;
 };

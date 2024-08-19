@@ -27,6 +27,7 @@
 #define DEFAULT_PASSWORD "lol"
 
 #define NICK_MAXLEN 10
+#define REGISTER_TIMEOUT 30
 
 //#define BACKLOG 10
 
@@ -60,16 +61,20 @@ class Server
 
         int             getServerSocket(void); // Retourne le socket du server.
         Client*         getClientStruct(int clientFd);
+        std::string     getServerPassword(void); // Retourne le mot de passe du serveur.
 
         void            handleMessage(char *buffer, int clientFd);
         void            handleCommand(std::string &command, int clientFd);
         void            executeCommand(std::string &commandName, std::vector<std::string> &arguments, int clientFd);
 
-        void            registerClient(Client *client, std::vector<std::string> &arguments); // Register le client lors de la premiere connexion.
+        void            isRegistrationComplete(Client *client); // Regarde si la registration est complete.
+        void            exec_PASS(std::vector<std::string> &arguments, int clientFd);
         void            exec_NICK(std::vector<std::string> &arguments, int clientFd);
         void            exec_USER(std::vector<std::string> &arguments, int clientFd);
 
-        bool            validNickname(std::vector<std::string> &arguments, int clientFd, std::string *nickname); // Verifie si le nickname est pas deja pris et si la len est < NICK_MAXLEN.
+        bool            clientValidPassword(Client *client, int clientFd);
+
+        void            checkClientTimeouts();
 
         /****EXCEPTIONS****/
         class SocketCreationError : public std::exception
