@@ -71,9 +71,6 @@ class Server
         void                    executeCommand(std::string &commandName, std::vector<std::string> &arguments, int clientFd);
 
         void                    isRegistrationComplete(Client *client); // Regarde si la registration est complete.
-        //void            exec_PASS(std::vector<std::string> &arguments, int clientFd);
-        //void            exec_NICK(std::vector<std::string> &arguments, int clientFd);
-        //void            exec_USER(std::vector<std::string> &arguments, int clientFd);
 
         bool                    clientValidPassword(Client *client, int clientFd);
 

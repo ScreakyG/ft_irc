@@ -1,5 +1,18 @@
 #include "../includes/Commands.hpp"
 
+static bool isValidNickname(std::string nickname)
+{
+    const std::string validCharacters = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+    if (nickname.empty())
+        return (false);
+    if (nickname.size() > NICK_MAXLEN)
+        return (false);
+    if (nickname.find_first_not_of(validCharacters) != std::string::npos)
+        return (false);
+    return (true);
+}
+
 void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd)
 {
     std::string message;
@@ -25,9 +38,9 @@ void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd
     for (size_t i = 0; i < arguments.size(); i++) // Concatene si par exemple "Billy Butcher" , correspond a 2 args dans le parsing , pourtant ceci peut etre valide.
         nickname += arguments[i];
 
-    if (nickname.size() > NICK_MAXLEN) // Sur les vrais serveurs cela truncate le pseudo a MAXLEN. Faire la grosse verification ici pour les char invalides ect..
+    if (isValidNickname(nickname) == false) // Sur les vrais serveurs cela truncate le pseudo a MAXLEN. Faire la grosse verification ici pour les char invalides ect..
     {
-        message = std::string("432 ") + nickname + " :Erroneus Nickname, MAX_LEN = 10\n";
+        message = std::string("432 ") + nickname + " :Erroneus Nickname\n";
         server.sendToClient(message, clientFd);
         return ;
     }
