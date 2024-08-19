@@ -1,8 +1,8 @@
-#include "Colors.hpp"
-#include "Server.hpp"
-#include "Random.hpp"
-#include "Client.hpp"
-#include "Commands.hpp"
+#include "includes/Colors.hpp"
+#include "includes/Server.hpp"
+#include "includes/Random.hpp"
+#include "includes/Client.hpp"
+#include "includes/Commands.hpp"
 
 
 void printInfoBanner(const Server &server)

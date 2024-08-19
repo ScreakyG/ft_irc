@@ -20,6 +20,7 @@
 #include "Random.hpp"
 #include "Client.hpp"
 #include "Commands.hpp"
+#include "Colors.hpp"
 
 #define DEBUG LIGHT
 

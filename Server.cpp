@@ -1,5 +1,4 @@
-#include "Server.hpp"
-#include "Colors.hpp"
+#include "includes/Server.hpp"
 
 /******************************/
 /***CONSTRUCTORS/DESTRUCTORS***/
