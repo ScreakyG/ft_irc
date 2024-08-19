@@ -296,9 +296,9 @@ void   Server::exec_PASS(std::vector<std::string> &arguments, int clientFd)
 
     if (getServerPassword() != arguments[0])
     {
-        message = "464 : Password incorrect\n";
+        message = "461 : Password incorrect\n"; // Ce n'est pas le bon code mais il n'y pas l'air d'avoir de bon code.
         sendToClient(message, clientFd);
-        deleteClient(clientFd);
+        //deleteClient(clientFd);
         return ;
     }
 
@@ -343,7 +343,8 @@ void Server::exec_NICK(std::vector<std::string> &arguments, int clientFd)
     {
         if (nickname == this->_allClients[i].getNickname())
         {
-            message = nickname + " :Nickname is already in use\n";
+            //message = nickname + " :Nickname is already in use\n";
+            message = std::string("432 ") + nickname + " :Nickname is already in use\n"; // Le vrai code d'erreur est 433 , cest un choix perso d'utiliser 432 pour deconnecter le client.
             sendToClient(message, clientFd);
             return ;
         }
