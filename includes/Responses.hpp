@@ -24,5 +24,8 @@
 #define ERR_NOTREGISTERED ("localhost 451 * :You have not registered\r\n");
 
 
+// WELCOME BURST
 
 #define RPL_WELCOME(client, nickname) (":localhost 001 " + client + " :Welcome to the Internet Relay Network, " + nickname + "\r\n");
+#define RPL_YOURHOST(client) (":localhost 002 " + client + " :Your host is localhost, running version beta.1.0\r\n");
+#define RPL_CREATED(client) (":localhost 003 " + client + " :This server was created Mon Aug 12 2024 at 14:32:25 UTC\r\n");

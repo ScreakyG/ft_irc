@@ -292,8 +292,13 @@ void Server::isRegistrationComplete(Client *client)
 
     if (client->getNickname() != "" && client->getUsername() != "" && client->hasEnteredServerPassword() == true) // Cela veut dire que elle ne sont plus a default et on ete modifie.
     {
-        message = RPL_WELCOME(client->getNickname(), client->getNickname());
         client->setRegistered(true);
+
+        message = RPL_WELCOME(client->getNickname(), client->getNickname());
+        sendToClient(message, client->getFd());
+        message = RPL_YOURHOST(client->getNickname());
+        sendToClient(message, client->getFd());
+        message = RPL_CREATED(client->getNickname());
         sendToClient(message, client->getFd());
 
         return ;

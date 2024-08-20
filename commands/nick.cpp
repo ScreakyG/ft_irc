@@ -60,7 +60,7 @@ void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd
         }
     }
     client->setNickname(nickname);
-    message = "You're now known as " + client->getNickname() + "\n";
+    message = "You're now known as " + client->getNickname() + "\n"; // Pas oblige d'envoyer une confirmation (en tout cas en phase de register).
     server.sendToClient(message, clientFd);
 
     if (client->hasRegistered() == false)
