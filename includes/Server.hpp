@@ -75,7 +75,7 @@ class Server
 
         bool                    clientValidPassword(Client *client, int clientFd);
 
-        void                    checkClientTimeouts();
+        void                    checkClientRegisterTimeouts();
 
         /****EXCEPTIONS****/
         class SocketCreationError : public std::exception

@@ -1,10 +1,15 @@
 #pragma once
 
+#define ERROR_MSG(msg) ("ERROR :" + msg + "\r\n");
+
 //NICK
 #define ERR_NONICKNAMEGIVEN(client) ("431 " + client + " :There is no nickname\r\n")
 #define ERR_ERRONEUSNICKNAME(client, nickname) ("432 " + client + " " + nickname + " :Erroneus nickname\r\n")
 #define ERR_NICKNAMEINUSE(client, nickname) ("432 " + client + " " + nickname + " :Nickname is already in use\r\n");
 
+//PASS
+
+#define ERR_PASSWDMISMATCH(client) ("464 " + client + " :Password incorrect\r\n");
 
 //MULTIPLE COMMANDS
 #define ERR_ALREADYREGISTRED(client) ("462 " + client + " " + ":You may not reregister\r\n");

@@ -23,10 +23,14 @@ void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd
 
     client = server.getClientStruct(clientFd);
     if (client == NULL)
+    {
+        std::cout << RED << "[" << clientFd << "] [Server] Client is not connected to server" << RESET << std::endl;
         return ;
+    }
 
-    if (server.clientValidPassword(client, clientFd) == false)
-        return ;
+    // Ceci etait une ancienne protection pour empecher la commande tant que PASS n'etais pas indique.
+    // if (server.clientValidPassword(client, clientFd) == false)
+    //     return ;
 
     if (arguments.size() == 0)
     {

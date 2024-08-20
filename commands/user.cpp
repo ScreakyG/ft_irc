@@ -8,14 +8,17 @@ void exec_USER(Server &server, std::vector<std::string> &arguments, int clientFd
 
     client = server.getClientStruct(clientFd);
     if (client == NULL)
+    {
+        std::cout << RED << "[" << clientFd << "] [Server] Client is not connected to server" << RESET << std::endl;
         return ;
+    }
 
-    if (server.clientValidPassword(client, clientFd) == false)
-        return ;
+    // Ceci etait une ancienne protection pour empecher la commande tant que PASS n'etais pas indique.
+    // if (server.clientValidPassword(client, clientFd) == false)
+    //     return ;
 
     if (client->hasRegistered() == true)
     {
-        //message = "462 :You may not reregister\n";
         message = ERR_ALREADYREGISTRED(client->getNickname());
         server.sendToClient(message, clientFd);
         return ;
@@ -23,7 +26,6 @@ void exec_USER(Server &server, std::vector<std::string> &arguments, int clientFd
 
     if (arguments.size() != 4)
     {
-        //message = "461 * USER :Not enough parameters\n";
         message = ERR_NEEDMOREPARAMS(client->getNickname(), "USER");
         server.sendToClient(message, clientFd);
         return ;

@@ -8,11 +8,13 @@ void   exec_PASS(Server &server, std::vector<std::string> &arguments, int client
 
     client = server.getClientStruct(clientFd);
     if (client == NULL)
+    {
+        std::cout << RED << "[" << clientFd << "] [Server] Client is not connected to server" << RESET << std::endl;
         return ;
+    }
 
     if (client->hasRegistered() == true)
     {
-        //message = "462 : You may not reregister\n";
         message = ERR_ALREADYREGISTRED(client->getNickname());
         server.sendToClient(message, clientFd);
         return ;
@@ -20,7 +22,6 @@ void   exec_PASS(Server &server, std::vector<std::string> &arguments, int client
 
     if (arguments.size() == 0)
     {
-        //message = "461 PASS : Not enough parameters\n";
         message = ERR_NEEDMOREPARAMS(client->getNickname(), "PASS");
         server.sendToClient(message, clientFd);
         return ;
@@ -28,15 +29,17 @@ void   exec_PASS(Server &server, std::vector<std::string> &arguments, int client
 
     if (server.getServerPassword() != arguments[0])
     {
-        message = "461 : Password incorrect\n"; // Ce n'est pas le bon code mais il n'y pas l'air d'avoir de bon code.
+        message = ERR_PASSWDMISMATCH(client->getNickname());
         server.sendToClient(message, clientFd);
-        //deleteClient(clientFd);
+        message = ERROR_MSG(std::string("Closing Link: localhost (Bad Password)"));
+        server.sendToClient(message, clientFd);
+        server.deleteClient(clientFd);
         return ;
     }
 
     if (server.getServerPassword() == arguments[0])
-    {
         client->setServerPassword(true);
-        return ;
-    }
+
+    if (client->hasRegistered() == false)
+        server.isRegistrationComplete(client);
 }

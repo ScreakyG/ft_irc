@@ -140,7 +140,7 @@ void Server::startServerRoutine(void)
     {
         int status;
 
-        checkClientTimeouts();
+        checkClientRegisterTimeouts();
 
         status = poll(&this->_allSockets[0], this->_allSockets.size(), 2000);
         if (Server::_stopSignal == true)
@@ -254,6 +254,14 @@ void Server::handleCommand(std::string &command, int clientFd)
 void Server::executeCommand(std::string &commandName, std::vector<std::string> &arguments, int clientFd)
 {
     std::string message;
+    Client *client;
+
+    client = getClientStruct(clientFd);
+    if (client == NULL)
+    {
+        std::cout << RED << "[" << clientFd << "] [Server] Client is not connected to server" << RESET << std::endl;
+        return ;
+    }
 
     if (commandName == "CAP")
         return ;
@@ -267,8 +275,7 @@ void Server::executeCommand(std::string &commandName, std::vector<std::string> &
         exec_PING((*this), arguments, clientFd);
     else
     {
-        //message = std::string("421 ") + commandName + " :Unknown command\n";
-        message = ERR_UNKNOWNCOMMAND(getClientStruct(clientFd)->getUsername(), commandName);
+        message = ERR_UNKNOWNCOMMAND(client->getNickname(), commandName);
         sendToClient(message, clientFd);
     }
 }
@@ -277,9 +284,14 @@ void Server::isRegistrationComplete(Client *client)
 {
     std::string message;
 
-    if (client->getNickname() != "" && client->getUsername() != "") // Cela veut dire que elle ne sont plus a default et on ete modifie.
+    if (client == NULL)
     {
-        //message = std::string("001 ") + client->getNickname() + " :Welcome to the Internet Relay Network : " + client->getUsername() + "\n";
+        std::cout << RED << "[" << "?" << "] [Server] Client is not connected to server" << RESET << std::endl;
+        return ;
+    }
+
+    if (client->getNickname() != "" && client->getUsername() != "" && client->hasEnteredServerPassword() == true) // Cela veut dire que elle ne sont plus a default et on ete modifie.
+    {
         message = RPL_WELCOME(client->getNickname(), client->getUsername());
         client->setRegistered(true);
         sendToClient(message, client->getFd());
@@ -288,7 +300,7 @@ void Server::isRegistrationComplete(Client *client)
     }
 }
 
-void Server::checkClientTimeouts(void)
+void Server::checkClientRegisterTimeouts(void)
 {
     std::string message;
 
@@ -298,7 +310,7 @@ void Server::checkClientTimeouts(void)
         {
             if (difftime(time(NULL), _allClients[i].getTimeoutStart()) > REGISTER_TIMEOUT)
             {
-                message = "ERROR :Registration timeout\n";
+                message = ERROR_MSG(std::string("Registration timeout, PASS, NICK or USER might be incorrect"));
                 sendToClient(message, _allClients[i].getFd());
                 deleteClient(_allClients[i].getFd());
             }
@@ -364,9 +376,16 @@ void Server::closeAllFds(void)
     }
 }
 
-bool  Server::clientValidPassword(Client *client, int clientFd)
+bool  Server::clientValidPassword(Client *client, int clientFd) // Fonction potentiellement obsolete.
 {
     std::string message;
+
+    if (client == NULL)
+    {
+        std::cout << RED << "[" << clientFd << "] [Server] Client is not connected to server" << RESET << std::endl;
+        return (false);
+    }
+
     if (client->hasEnteredServerPassword() == false)
     {
         message = "451 : Password required before registering\n";
