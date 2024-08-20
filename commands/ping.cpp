@@ -2,22 +2,50 @@
 
 void exec_PING(Server &server, std::vector<std::string> &arguments, int clientFd)
 {
+    Client *    client;
     std::string message;
 
-    if (arguments.size() == 0)
+    client = server.getClientStruct(clientFd);
+    if (client == NULL)
     {
-        message = "461 PING :Not enough parameters\n";
+        std::cout << RED << "[" << clientFd << "] [Server] Client is not connected to server" << RESET << std::endl;
+        return ;
+    }
+
+    if (client->hasRegistered() == false)
+    {
+        message = ERR_NOTREGISTERED;
         server.sendToClient(message, clientFd);
         return ;
     }
 
-    message = "PONG :";
-    for (size_t i = 0; i < arguments.size(); i++)
+    if (arguments.size() == 0)
     {
-        message += arguments[i];
-        if (i < arguments.size() - 1)
-            message += " ";
+        message = ERR_NEEDMOREPARAMS(client->getNickname(), "PING"); // ERR_NOORIGIN est egalement valable.
+        server.sendToClient(message, clientFd);
+        return ;
     }
-    message += "\n";
-    server.sendToClient(message, clientFd);
+
+    if (arguments.size() == 1)
+    {
+        message = ":localhost PONG localhost :" + arguments[0] + "\r\n";
+        server.sendToClient(message, clientFd);
+        return ;
+    }
+
+    if (arguments.size() > 1)
+    {
+        if (arguments[1] == "localhost")
+        {
+            message = ":localhost PONG localhost :" + arguments[0] + "\r\n";
+            server.sendToClient(message, clientFd);
+            return ;
+        }
+        else if (arguments[1] != "localhost")
+        {
+            message = ERR_NOSUCHSERVER(client->getNickname(), arguments[1]);
+            server.sendToClient(message, clientFd);
+            return ;
+        }
+    }
 }
