@@ -15,14 +15,16 @@ void exec_USER(Server &server, std::vector<std::string> &arguments, int clientFd
 
     if (client->hasRegistered() == true)
     {
-        message = "462 :You may not reregister\n";
+        //message = "462 :You may not reregister\n";
+        message = ERR_ALREADYREGISTRED(client->getNickname());
         server.sendToClient(message, clientFd);
         return ;
     }
 
     if (arguments.size() != 4)
     {
-        message = "461 * USER :Not enough parameters\n";
+        //message = "461 * USER :Not enough parameters\n";
+        message = ERR_NEEDMOREPARAMS(client->getNickname(), "USER");
         server.sendToClient(message, clientFd);
         return ;
     }

@@ -3,7 +3,7 @@ NAME = ircserv
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
-SRCS = main.cpp Server.cpp Client.cpp commands/pass.cpp commands/nick.cpp commands/user.cpp
+SRCS = main.cpp Server.cpp Client.cpp commands/pass.cpp commands/nick.cpp commands/user.cpp commands/ping.cpp
 SRCS_OBJS = $(SRCS:.cpp=.o)
 
 DEPS = $(SRCS:.cpp=.d)

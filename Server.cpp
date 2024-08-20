@@ -263,6 +263,8 @@ void Server::executeCommand(std::string &commandName, std::vector<std::string> &
         exec_NICK((*this), arguments, clientFd);
     else if (commandName == "USER")
         exec_USER((*this), arguments, clientFd);
+    else if (commandName == "PING")
+        exec_PING((*this), arguments, clientFd);
     else
     {
         message = std::string("421 ") + commandName + " :Unknown command\n";
