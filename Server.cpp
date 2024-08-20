@@ -267,7 +267,8 @@ void Server::executeCommand(std::string &commandName, std::vector<std::string> &
         exec_PING((*this), arguments, clientFd);
     else
     {
-        message = std::string("421 ") + commandName + " :Unknown command\n";
+        //message = std::string("421 ") + commandName + " :Unknown command\n";
+        message = ERR_UNKNOWNCOMMAND(getClientStruct(clientFd)->getUsername(), commandName);
         sendToClient(message, clientFd);
     }
 }
@@ -278,7 +279,8 @@ void Server::isRegistrationComplete(Client *client)
 
     if (client->getNickname() != "" && client->getUsername() != "") // Cela veut dire que elle ne sont plus a default et on ete modifie.
     {
-        message = std::string("001 ") + client->getNickname() + " :Welcome to the Internet Relay Network : " + client->getUsername() + "\n";
+        //message = std::string("001 ") + client->getNickname() + " :Welcome to the Internet Relay Network : " + client->getUsername() + "\n";
+        message = RPL_WELCOME(client->getNickname(), client->getUsername());
         client->setRegistered(true);
         sendToClient(message, client->getFd());
 

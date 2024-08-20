@@ -21,6 +21,7 @@
 #include "Client.hpp"
 #include "Commands.hpp"
 #include "Colors.hpp"
+#include "Responses.hpp"
 
 #define DEBUG LIGHT
 
