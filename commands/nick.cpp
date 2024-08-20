@@ -34,7 +34,6 @@ void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd
 
     if (arguments.size() == 0)
     {
-        //message = std::string("431 * ") + ":No nickname given\n";
         message = ERR_NONICKNAMEGIVEN(client->getNickname());
         server.sendToClient(message, clientFd);
         return ;
@@ -45,7 +44,6 @@ void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd
 
     if (isValidNickname(nickname) == false) // Sur les vrais serveurs cela truncate le pseudo a MAXLEN. Faire la grosse verification ici pour les char invalides ect..
     {
-        //message = std::string("432 ") + nickname + " :Erroneus Nickname\n";
         message = ERR_ERRONEUSNICKNAME(client->getNickname(), nickname);
         server.sendToClient(message, clientFd);
         return ;
@@ -55,7 +53,7 @@ void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd
     {
         if (nickname == allClients[i].getNickname())
         {
-            //message = std::string("432 ") + nickname + " :Nickname is already in use\n"; // Le vrai code d'erreur est 433 , cest un choix perso d'utiliser 432 pour deconnecter le client.
+            //Le vrai code d'erreur est 433 , cest un choix perso d'utiliser 432 pour deconnecter le client.
             message = ERR_NICKNAMEINUSE(client->getNickname(), nickname);
             server.sendToClient(message, clientFd);
             return ;

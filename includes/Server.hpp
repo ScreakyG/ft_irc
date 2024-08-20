@@ -25,6 +25,7 @@
 
 #define DEBUG LIGHT
 
+#define SERVER_NAME "localhost"
 #define SERVER_IP "127.0.0.1"
 #define DEFAULT_PORT 4242
 #define DEFAULT_PASSWORD "lol"

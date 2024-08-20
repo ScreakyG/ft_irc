@@ -24,13 +24,13 @@ void exec_USER(Server &server, std::vector<std::string> &arguments, int clientFd
         return ;
     }
 
-    if (arguments.size() != 4)
+    if (arguments.size() < 4)
     {
         message = ERR_NEEDMOREPARAMS(client->getNickname(), "USER");
         server.sendToClient(message, clientFd);
         return ;
     }
-    else if (arguments.size() == 4 && client->hasRegistered() == false)
+    else if (arguments.size() >= 4 && client->hasRegistered() == false)
     {
         username = arguments[0] + " " + arguments[1] + " " + arguments[2] + " " + arguments[3];
         client->setUsername(username);
