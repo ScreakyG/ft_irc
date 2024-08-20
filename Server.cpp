@@ -218,9 +218,24 @@ void Server::readClient(int idx)
 
 void Server::handleMessage(char *buffer, int clientFd)
 {
-    std::istringstream  msgFromClient(buffer);
+    std::string stringedBuffer(buffer);
+    Client* client;
+
+    client = getClientStruct(clientFd);
+    if (client == NULL)
+    {
+        std::cout << RED << "[" << clientFd << "] [Server] Client is not connected to server" << RESET << std::endl;
+        return ;
+    }
+    
+    client->addtoClientBuffer(stringedBuffer);
+    if (client->getClientBuffer().find("\n") == std::string::npos) // Handle CTRL + D , it means that the client has not sent the full command
+        return ;
+
+    std::istringstream  msgFromClient(client->getClientBuffer());
     std::string         line;
 
+    client->getClientBuffer().clear();
     while (std::getline(msgFromClient, line))
         handleCommand(line, clientFd);
 }
@@ -290,7 +305,8 @@ void Server::isRegistrationComplete(Client *client)
         return ;
     }
 
-    if (client->getNickname() != "" && client->getUsername() != "" && client->hasEnteredServerPassword() == true) // Cela veut dire que elle ne sont plus a default et on ete modifie.
+   // if (client->getNickname() != "" && client->getUsername() != "" && client->hasEnteredServerPassword() == true) // Cela veut dire que elle ne sont plus a default et on ete modifie.
+    if (client->getNickname().empty() == false && client->getUsername().empty() == false && client->hasEnteredServerPassword() == true) // Cela veut dire que elle ne sont plus a default et on ete modifie.
     {
         client->setRegistered(true);
 

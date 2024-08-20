@@ -33,8 +33,12 @@ class Client
         void        setTimeoutStart(time_t start);
         time_t      getTimeoutStart(void);
 
+        std::string& getClientBuffer(void); // Retourne le _clientBuffer;
+        void        addtoClientBuffer(std::string &string); // Ajoute string au _clientBuffer;
+
     private:
         int         _clientFd;
+        std::string _clientBuffer;
         std::string _nickname;
         std::string _username;
         bool        _enteredServerPassword;
