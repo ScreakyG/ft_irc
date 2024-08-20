@@ -153,7 +153,7 @@ void Server::startServerRoutine(void)
                 std::cout << PURPLE << "[Server] Waiting..." << RESET << std::endl;
             continue ;
         }
-        for (size_t i = 0; i < this->_allSockets.size(); i++)
+        for (size_t i = 0; i < this->_allSockets.size(); i++) // Faire une deuxieme condition et regarder POLLOUT.
         {
             if (this->_allSockets[i].revents & POLLIN)
             {
@@ -180,7 +180,7 @@ void Server::acceptNewClient(void)
     else
     {
         newClientPoll.fd = newClientFd;
-        newClientPoll.events = POLLIN;
+        newClientPoll.events = POLLIN; // Rajouter POLLOUT Ulterieurement pour egalement surveiller si la socket est prete a recevoir. Peut etre utile dans le cas de CTRL + Z.
         newClientPoll.revents = 0;
 
         newClientStruct.setFd(newClientFd);
@@ -227,7 +227,7 @@ void Server::handleMessage(char *buffer, int clientFd)
         std::cout << RED << "[" << clientFd << "] [Server] Client is not connected to server" << RESET << std::endl;
         return ;
     }
-    
+
     client->addtoClientBuffer(stringedBuffer);
     if (client->getClientBuffer().find("\n") == std::string::npos) // Handle CTRL + D , it means that the client has not sent the full command
         return ;
