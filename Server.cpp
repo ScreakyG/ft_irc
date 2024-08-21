@@ -89,7 +89,16 @@ void Server::createServerSocket(void)
     // Permet de reutiliser l'adresse du serveur sans delai, par exemple lorsque l'on relance le serveur il y a un delai par moment.
     int activate = 1;
     if (setsockopt(this->_serverSocket, SOL_SOCKET, SO_REUSEADDR, &activate, sizeof(activate)) == -1)
+    {
+        close(this->_serverSocket);
         throw std::runtime_error("Failed to set SO_REUSEADDR option to socket");
+    }
+    int flags = fcntl(this->_serverSocket, F_GETFL, 0); //Recupere les flags actuels de la socket.
+    if (fcntl(this->_serverSocket, F_SETFL, flags | O_NONBLOCK) == -1) // Set des nouveaux flags sur la socket, les ancients + O_NONBLOCK.
+    {
+        close(this->_serverSocket);
+        throw std::runtime_error("Failed to set O_NONBLOCK option to socket");
+    }
 }
 
 void Server::createIpv4Address(const char *ip, int port)
@@ -105,7 +114,10 @@ void Server::bindServerSocket(void)
 
     status = bind(this->_serverSocket, reinterpret_cast<sockaddr*>(&this->_serverAddress), sizeof(this->_serverAddress));
     if (status != 0)
+    {
+        close(this->_serverSocket);
         throw Server::SocketBindError();
+    }
 
     if (DEBUG == LIGHT || DEBUG == FULL)
         std::cout << PURPLE << "Server socket bound to " << SERVER_IP << " on port : " << this->_serverPort << RESET << std::endl;
@@ -117,8 +129,10 @@ void Server::listenPort(void)
 
     status = listen(this->_serverSocket, SOMAXCONN); // SOMAXCONN = max de connexions dispo sur la machine.
     if (status != 0)
+    {
+        close(this->_serverSocket);
         throw Server::ListenServerError();
-
+    }
     if (DEBUG == LIGHT || DEBUG == FULL)
         std::cout << PURPLE << "Server is listening on port " << this->_serverPort << "..." << RESET << std::endl;
 }
@@ -196,7 +210,18 @@ void Server::acceptNewClient(void)
 
     newClientFd = accept(this->_serverSocket, NULL, NULL); // Options a peut etre revoir.
     if (newClientFd == -1)
+    {
         std::cerr << "[Server] Couldn't connect new client." << std::endl;
+        return ;
+    }
+
+    int flags = fcntl(newClientFd, F_GETFL, 0);
+    if (fcntl(newClientFd, F_SETFL, flags | O_NONBLOCK) == -1) // Set des nouveaux flags sur la socket, les ancients + O_NONBLOCK.
+    {
+        close(newClientFd);
+        std::cout << "[Server] Failed to set O_NONBLOCK option to socket" << std::endl;
+        return ;
+    }
     else
     {
         newClientPoll.fd = newClientFd;

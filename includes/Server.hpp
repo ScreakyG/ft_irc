@@ -15,6 +15,7 @@
 #include <vector>
 #include <signal.h>
 #include <sstream>
+#include <fcntl.h>
 #include <string>
 
 #include "Random.hpp"
