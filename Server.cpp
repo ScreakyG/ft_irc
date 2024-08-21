@@ -162,7 +162,27 @@ void Server::startServerRoutine(void)
                 else
                     readClient(i);
             }
+            else if (this->_allSockets[i].revents & POLLOUT) // Peu poser probleme si readClient a ferme la connexion avant. else if empeche les deux de se faire dans le meme tour.
+                checkClientSendBuffer(i);
         }
+    }
+}
+
+void Server::checkClientSendBuffer(int idx)
+{
+    Client*     clientStruct;
+    std::string message = "";
+
+    clientStruct = getClientStruct(_allSockets[idx].fd);
+    if (clientStruct == NULL)
+    {
+        std::cout << RED << "[" << "?" << "] [Server] Client is not connected to server" << RESET << std::endl;
+        return ;
+    }
+    if (clientStruct->getClientSendBuffer().empty() == false)
+    {
+        std::cout << YELLOW << "[" << clientStruct->getFd() << "] [Server] Trying to send remaining buffer to client" << RESET << std::endl;
+        sendToClient(message, clientStruct->getFd());
     }
 }
 
@@ -450,9 +470,13 @@ void Server::sendToClient(std::string &message, int clientFd)
     if (sentBytes == -1)
         std::cerr << RED << "[Server] " << "[" << clientFd << "] " << "sending error : " << std::strerror(errno) << RESET << std::endl;
     else if (static_cast<size_t>(sentBytes) != clientStruct->getClientSendBuffer().size())
+    {
         std::cout << YELLOW << "[Server] " << "[" << clientFd << "] " <<"Partial message was sent to client." << RESET << std::endl;
-
-    clientStruct->getClientSendBuffer().clear();
+        clientStruct->getClientSendBuffer().erase(0, sentBytes); // Suprime le nombre de donnees que on a reussi a envoyer.
+        return ;
+    }
+    else if (static_cast<size_t>(sentBytes) == clientStruct->getClientSendBuffer().size())
+        clientStruct->getClientSendBuffer().clear(); // Si on arrive ici c'est que on a reussi a tout envoyer, alors on reset le buffer.
 }
 
 /******************************/

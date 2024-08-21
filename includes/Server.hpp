@@ -58,6 +58,7 @@ class Server
         void                    startServerRoutine(void);
         void                    acceptNewClient(void); // Accepte une nouvelle connexion d'un client.
         void                    readClient(int idx); // Lit une socket client prete en lecture.
+        void                    checkClientSendBuffer(int idx); // Regarde si il y a des choses dans le sendBuffer du client , et dans ce cas essaye de lui envoyer.
         void                    sendToClient(std::string &message, int clientFd); // Envoie un message client.
 
         void                    deleteClient(int idx); //Remove from poll allSockets.
