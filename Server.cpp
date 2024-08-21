@@ -223,7 +223,19 @@ void Server::readClient(int idx)
     memset(buffer, '\0', sizeof(buffer));
     amountReceived = recv(this->_allSockets[idx].fd, buffer, BUFSIZ - 1, 0); // BUFSIZ - 1 pour garder minimum un espace pour le '\0'.
 
-    if (amountReceived <= 0)
+    if (amountReceived == -1)
+    {
+        if (errno == EWOULDBLOCK || errno == EAGAIN) // il n'y as pas de donnees pour l'instant.
+            return;
+        else
+        {
+            std::cerr << RED << "[Server] " << "[" << this->_allSockets[idx].fd << "] " << "recv error : " << std::strerror(errno) << RESET << std::endl;
+            deleteClient(this->_allSockets[idx].fd);
+            return;
+        }
+
+    }
+    if (amountReceived == 0)
     {
         std::cout << "[" << this->_allSockets[idx].fd << "]" << " : Closed connection." << std::endl;
         deleteClient(this->_allSockets[idx].fd);
@@ -249,15 +261,17 @@ void Server::handleMessage(char *buffer, int clientFd)
     }
 
     client->addtoClientReadBuffer(stringedBuffer);
-    if (client->getClientReadBuffer().find("\n") == std::string::npos) // Handle CTRL + D , it means that the client has not sent the full command
-        return ;
 
-    std::istringstream  msgFromClient(client->getClientReadBuffer());
-    std::string         line;
+    std::string &readClientBuffer = client->getClientReadBuffer();
+    std::string line;
+    size_t pos;
 
-    client->getClientReadBuffer().clear();
-    while (std::getline(msgFromClient, line))
+    while ((pos = readClientBuffer.find("\r\n")) != std::string::npos) // Modifier en "\n" pour utiliser avec nc plus facilement.
+    {
+        line = readClientBuffer.substr(0, pos);
         handleCommand(line, clientFd);
+        readClientBuffer.erase(0, pos + 2); // Si on enleve le "\r" il faut modifier en pos + 1;
+    }
 }
 
 void Server::handleCommand(std::string &command, int clientFd)
@@ -468,8 +482,17 @@ void Server::sendToClient(std::string &message, int clientFd)
 
     sentBytes = send(clientFd, clientStruct->getClientSendBuffer().c_str(), clientStruct->getClientSendBuffer().size(), 0);
     if (sentBytes == -1)
-        std::cerr << RED << "[Server] " << "[" << clientFd << "] " << "sending error : " << std::strerror(errno) << RESET << std::endl;
-    else if (static_cast<size_t>(sentBytes) != clientStruct->getClientSendBuffer().size())
+    {
+        if (errno == EAGAIN || errno == EWOULDBLOCK) // On garde le buffer intact et on ressaye au prochain appel de sendToClient().
+            std::cerr << RED << "[Server] " << "[" << clientFd << "] " << "Sending socket temporarily unavailable for writing : " << std::strerror(errno) << RESET << std::endl;
+        else // Une erreur plus grave est arrive , pour des mesures de securite il vaut mieux deconnecter le client.
+        {
+            std::cerr << RED << "[Server] " << "[" << clientFd << "] " << "sending error : " << std::strerror(errno) << RESET << std::endl;
+            deleteClient(clientFd);
+        }
+        return ;
+    }
+    if (static_cast<size_t>(sentBytes) != clientStruct->getClientSendBuffer().size())
     {
         std::cout << YELLOW << "[Server] " << "[" << clientFd << "] " <<"Partial message was sent to client." << RESET << std::endl;
         clientStruct->getClientSendBuffer().erase(0, sentBytes); // Suprime le nombre de donnees que on a reussi a envoyer.
