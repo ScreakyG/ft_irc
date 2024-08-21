@@ -180,7 +180,7 @@ void Server::acceptNewClient(void)
     else
     {
         newClientPoll.fd = newClientFd;
-        newClientPoll.events = POLLIN; // Rajouter POLLOUT Ulterieurement pour egalement surveiller si la socket est prete a recevoir. Peut etre utile dans le cas de CTRL + Z.
+        newClientPoll.events = POLLIN | POLLOUT; // Rajouter POLLOUT Ulterieurement pour egalement surveiller si la socket est prete a recevoir. Peut etre utile dans le cas de CTRL + Z.
         newClientPoll.revents = 0;
 
         newClientStruct.setFd(newClientFd);
@@ -228,14 +228,14 @@ void Server::handleMessage(char *buffer, int clientFd)
         return ;
     }
 
-    client->addtoClientBuffer(stringedBuffer);
-    if (client->getClientBuffer().find("\n") == std::string::npos) // Handle CTRL + D , it means that the client has not sent the full command
+    client->addtoClientReadBuffer(stringedBuffer);
+    if (client->getClientReadBuffer().find("\n") == std::string::npos) // Handle CTRL + D , it means that the client has not sent the full command
         return ;
 
-    std::istringstream  msgFromClient(client->getClientBuffer());
+    std::istringstream  msgFromClient(client->getClientReadBuffer());
     std::string         line;
 
-    client->getClientBuffer().clear();
+    client->getClientReadBuffer().clear();
     while (std::getline(msgFromClient, line))
         handleCommand(line, clientFd);
 }
@@ -349,6 +349,16 @@ Client* Server::getClientStruct(int clientFd)
     return (NULL); //En theorie cela ne devrai jamais arriver.
 }
 
+pollfd* Server::getClientPoll(int clientFd)
+{
+    for (size_t i = 0;  i < this->_allSockets.size(); i++)
+    {
+        if (this->_allSockets[i].fd == clientFd)
+            return (&this->_allSockets[i]);
+    }
+    return (NULL);
+}
+
 std::vector<Client>&    Server::getVectorClient(void)
 {
     return (this->_allClients);
@@ -418,15 +428,31 @@ bool  Server::clientValidPassword(Client *client, int clientFd) // Fonction pote
 
 void Server::sendToClient(std::string &message, int clientFd)
 {
+    pollfd  *client;
+    Client  *clientStruct;
     ssize_t sentBytes = -1;
 
-    std::cout << PURPLE << "[Server] ---> " << "[" << clientFd << "] : " << message << RESET;
+    client = getClientPoll(clientFd);
+    clientStruct = getClientStruct(clientFd);
+    if (client == NULL || clientStruct == NULL)
+    {
+        std::cout << RED << "[" << clientFd << "] [Server] Could not send, client is not connected to server" << RESET << std::endl;
+        return ;
+    }
 
-    sentBytes = send(clientFd, message.c_str(), message.size(), 0);
+    clientStruct->addToClientSendBuffer(message);
+    if (!(client->revents & POLLOUT))
+        return ;
+
+    std::cout << PURPLE << "[Server] ---> " << "[" << clientFd << "] : " << clientStruct->getClientSendBuffer() << RESET;
+
+    sentBytes = send(clientFd, clientStruct->getClientSendBuffer().c_str(), clientStruct->getClientSendBuffer().size(), 0);
     if (sentBytes == -1)
         std::cerr << RED << "[Server] " << "[" << clientFd << "] " << "sending error : " << std::strerror(errno) << RESET << std::endl;
-    else if (static_cast<size_t>(sentBytes) != message.size())
+    else if (static_cast<size_t>(sentBytes) != clientStruct->getClientSendBuffer().size())
         std::cout << YELLOW << "[Server] " << "[" << clientFd << "] " <<"Partial message was sent to client." << RESET << std::endl;
+
+    clientStruct->getClientSendBuffer().clear();
 }
 
 /******************************/

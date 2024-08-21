@@ -4,12 +4,12 @@
 /***CONSTRUCTORS/DESTRUCTORS***/
 /******************************/
 
-Client::Client() : _clientFd(-1), _clientBuffer(""), _nickname(""), _username(""), _enteredServerPassword(false), _hasRegistered(false), _timeoutStart(0)
+Client::Client() : _clientFd(-1), _clientReadBuffer(""), _clientSendBuffer(""), _nickname(""), _username(""), _enteredServerPassword(false), _hasRegistered(false), _timeoutStart(0)
 {
 
 }
 
-Client::Client(const Client &src) : _clientFd(src._clientFd), _clientBuffer(src._clientBuffer), _nickname(src._nickname), _username(src._username), _enteredServerPassword(src._enteredServerPassword), _hasRegistered(src._hasRegistered), _timeoutStart(src._timeoutStart)
+Client::Client(const Client &src) : _clientFd(src._clientFd), _clientReadBuffer(src._clientReadBuffer), _clientSendBuffer(src._clientSendBuffer), _nickname(src._nickname), _username(src._username), _enteredServerPassword(src._enteredServerPassword), _hasRegistered(src._hasRegistered), _timeoutStart(src._timeoutStart)
 {
 
 }
@@ -25,7 +25,8 @@ Client& Client::operator=(const Client &rhs)
     if (this != &rhs)
     {
         this->_clientFd = rhs._clientFd;
-        this->_clientBuffer = rhs._clientBuffer;
+        this->_clientReadBuffer = rhs._clientReadBuffer;
+        this->_clientSendBuffer = rhs._clientSendBuffer;
         this->_nickname = rhs._nickname;
         this->_username = rhs._username;
         this->_enteredServerPassword = rhs._enteredServerPassword;
@@ -99,11 +100,21 @@ time_t Client::getTimeoutStart(void)
     return (this->_timeoutStart);
 }
 
-std::string& Client::getClientBuffer(void) // Retourne le _clientBuffer;
+std::string& Client::getClientReadBuffer(void) // Retourne le _clientBuffer;
 {
-    return (this->_clientBuffer);
+    return (this->_clientReadBuffer);
 }
-void Client::addtoClientBuffer(std::string &string)  // Ajoute string au _clientBuffer;
+void Client::addtoClientReadBuffer(std::string &string)  // Ajoute string au _clientBuffer;
 {
-    this->_clientBuffer += string;
+    this->_clientReadBuffer += string;
+}
+
+std::string& Client::getClientSendBuffer(void)
+{
+    return (this->_clientSendBuffer);
+}
+
+void Client::addToClientSendBuffer(std::string &string)
+{
+    this->_clientSendBuffer += string;
 }

@@ -65,6 +65,7 @@ class Server
 
         int                     getServerSocket(void); // Retourne le socket du server.
         Client*                 getClientStruct(int clientFd);
+        pollfd*                 getClientPoll(int clientFd);
         std::string             getServerPassword(void); // Retourne le mot de passe du serveur.
         std::vector<Client>&    getVectorClient(void); // Retourne le vecteur de client.
 
