@@ -347,7 +347,7 @@ void Server::executeCommand(std::string &commandName, std::vector<std::string> &
     }
 
     if (commandName == "CAP")
-        return ;
+        exec_CAP((*this), arguments, clientFd);
     else if (commandName == "PASS")
         exec_PASS((*this), arguments, clientFd);
     else if (commandName == "NICK")
