@@ -31,9 +31,11 @@ void   exec_PASS(Server &server, std::vector<std::string> &arguments, int client
     {
         message = ERR_PASSWDMISMATCH(client->getNickname());
         server.sendToClient(message, clientFd);
-        message = ERROR_MSG(std::string("Closing Link: localhost (Bad Password)"));
+        message = ERROR_MSG(std::string("Closing Link: localhost (Bad Password)"));  //Cette partie provoque un segfault si plusieurs mot de passes loupes d'affiles
         server.sendToClient(message, clientFd);
+
         server.deleteClient(clientFd);
+        throw Server::ClientDisconnect();
         return ;
     }
 

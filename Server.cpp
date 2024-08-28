@@ -291,11 +291,20 @@ void Server::handleMessage(char *buffer, int clientFd)
     std::string line;
     size_t pos;
 
+    try
+    {
+
     while ((pos = readClientBuffer.find("\r\n")) != std::string::npos) // Modifier en "\n" pour utiliser avec nc plus facilement.
     {
         line = readClientBuffer.substr(0, pos);
         handleCommand(line, clientFd);
         readClientBuffer.erase(0, pos + 2); // Si on enleve le "\r" il faut modifier en pos + 1;
+    }
+    }
+
+    catch(std::exception &e)
+    {
+        std::cout << e.what() << std::endl;
     }
 }
 
@@ -347,6 +356,8 @@ void Server::executeCommand(std::string &commandName, std::vector<std::string> &
         exec_USER((*this), arguments, clientFd);
     else if (commandName == "PING")
         exec_PING((*this), arguments, clientFd);
+    else if (commandName == "JOIN")
+        exec_JOIN((*this), arguments, clientFd);
     else
     {
         message = ERR_UNKNOWNCOMMAND(client->getNickname(), commandName);
@@ -553,4 +564,9 @@ const char* Server::PollError::what(void) const throw()
 {
     std::cerr << RED << "Poll function failed : " << RESET;
     return (std::strerror(errno));
+}
+const char* Server::ClientDisconnect::what(void) const throw()
+{
+    std::cerr << RED << "Client disconnected" << RESET;
+    return ("");
 }

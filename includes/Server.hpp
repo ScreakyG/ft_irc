@@ -103,6 +103,11 @@ class Server
             public:
                 virtual const char *what(void) const throw();
         };
+        class ClientDisconnect : public std::exception
+        {
+            public:
+                virtual const char *what(void) const throw();
+        };
 
     private:
         static bool                _stopSignal;
