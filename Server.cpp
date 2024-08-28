@@ -262,7 +262,7 @@ void Server::readClient(int idx)
     }
     if (amountReceived == 0)
     {
-        std::cout << "[" << this->_allSockets[idx].fd << "]" << " : Closed connection." << std::endl;
+        std::cout << "[" << this->_allSockets[idx].fd << "]" << " : Client closed connection." << std::endl;
         deleteClient(this->_allSockets[idx].fd);
     }
     else
@@ -475,25 +475,6 @@ void Server::closeAllFds(void)
             std::cout << "Disconnecting socket : [" << this->_allSockets[i].fd  << "]" << std::endl;
         close(this->_allSockets[i].fd);
     }
-}
-
-bool  Server::clientValidPassword(Client *client, int clientFd) // Fonction potentiellement obsolete.
-{
-    std::string message;
-
-    if (client == NULL)
-    {
-        std::cout << RED << "[" << clientFd << "] [Server] Client is not connected to server" << RESET << std::endl;
-        return (false);
-    }
-
-    if (client->hasEnteredServerPassword() == false)
-    {
-        message = "451 : Password required before registering\n";
-        sendToClient(message, clientFd);
-        return (false);
-    }
-    return (true);
 }
 
 void Server::sendToClient(std::string &message, int clientFd)

@@ -77,8 +77,6 @@ class Server
 
         void                    isRegistrationComplete(Client *client); // Regarde si la registration est complete.
 
-        bool                    clientValidPassword(Client *client, int clientFd);
-
         void                    checkClientRegisterTimeouts();
 
         /****EXCEPTIONS****/
