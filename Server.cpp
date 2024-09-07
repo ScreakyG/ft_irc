@@ -302,9 +302,11 @@ void Server::handleMessage(char *buffer, int clientFd)
     }
     }
 
-    catch(std::exception &e)
+    catch(Server::ClientDisconnect &e)
     {
         std::cout << e.what() << std::endl;
+        deleteClient(client->getFd());
+        // Ici on catch les disconnectClients et on les deleteClients(), cela permet de ne pas traiter le reste des commandes si le client se fait deconnecter.
     }
 }
 
@@ -505,7 +507,7 @@ void Server::sendToClient(std::string &message, int clientFd)
         else // Une erreur plus grave est arrive , pour des mesures de securite il vaut mieux deconnecter le client.
         {
             std::cerr << RED << "[Server] " << "[" << clientFd << "] " << "sending error : " << std::strerror(errno) << RESET << std::endl;
-            deleteClient(clientFd);
+            throw Server::ClientDisconnect(); // Il faut mette des try catch autour des fonctions qui sendToClient().
         }
         return ;
     }
