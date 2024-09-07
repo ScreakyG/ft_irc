@@ -193,10 +193,19 @@ void Server::checkClientSendBuffer(int idx)
         std::cout << RED << "[" << "?" << "] [Server] Client is not connected to server" << RESET << std::endl;
         return ;
     }
-    if (clientStruct->getClientSendBuffer().empty() == false)
+    try
     {
-        std::cout << YELLOW << "[" << clientStruct->getFd() << "] [Server] Trying to send remaining buffer to client" << RESET << std::endl;
-        sendToClient(message, clientStruct->getFd());
+        if (clientStruct->getClientSendBuffer().empty() == false)
+        {
+            std::cout << YELLOW << "[" << clientStruct->getFd() << "] [Server] Trying to send remaining buffer to client" << RESET << std::endl;
+            sendToClient(message, clientStruct->getFd());
+        }
+    }
+    catch(Server::ClientDisconnect &e)
+    {
+        std::cout << e.what() << std::endl;
+        std::cout << RED << "Error trying to resend buffer to client" << RESET << std::endl;
+        deleteClient(clientStruct->getFd());
     }
 }
 
@@ -293,15 +302,13 @@ void Server::handleMessage(char *buffer, int clientFd)
 
     try
     {
-
-    while ((pos = readClientBuffer.find("\r\n")) != std::string::npos) // Modifier en "\n" pour utiliser avec nc plus facilement.
-    {
-        line = readClientBuffer.substr(0, pos);
-        handleCommand(line, clientFd);
-        readClientBuffer.erase(0, pos + 2); // Si on enleve le "\r" il faut modifier en pos + 1;
+        while ((pos = readClientBuffer.find("\r\n")) != std::string::npos) // Modifier en "\n" pour utiliser avec nc plus facilement.
+        {
+            line = readClientBuffer.substr(0, pos);
+            handleCommand(line, clientFd);
+            readClientBuffer.erase(0, pos + 2); // Si on enleve le "\r" il faut modifier en pos + 1;
+        }
     }
-    }
-
     catch(Server::ClientDisconnect &e)
     {
         std::cout << e.what() << std::endl;
@@ -403,9 +410,17 @@ void Server::checkClientRegisterTimeouts(void)
         {
             if (difftime(time(NULL), _allClients[i].getTimeoutStart()) > REGISTER_TIMEOUT)
             {
-                message = ERROR_MSG(std::string("Registration timeout, PASS, NICK or USER might be incorrect"));
-                sendToClient(message, _allClients[i].getFd());
-                deleteClient(_allClients[i].getFd());
+                try
+                {
+                    message = ERROR_MSG(std::string("Registration timeout, PASS, NICK or USER might be incorrect"));
+                    sendToClient(message, _allClients[i].getFd()); // sendToClient peut throw en cas de probleme majeur alors on catch pour eviter un segfault.
+                    deleteClient(_allClients[i].getFd());
+                }
+                catch(Server::ClientDisconnect &e)
+                {
+                    std::cout << e.what() << std::endl;
+                    deleteClient(_allClients[i].getFd());
+                }
             }
         }
     }
