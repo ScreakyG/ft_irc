@@ -35,8 +35,10 @@ void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd
         return ;
     }
 
-    for (size_t i = 0; i < arguments.size(); i++) // Concatene si par exemple "Billy Butcher" , correspond a 2 args dans le parsing , pourtant ceci peut etre valide.
-        nickname += arguments[i];
+    // for (size_t i = 0; i < arguments.size(); i++) // Concatene si par exemple "Billy Butcher" , correspond a 2 args dans le parsing , pourtant ceci peut etre valide.
+    //     nickname += arguments[i];
+
+    nickname = arguments[0];
 
     if (isValidNickname(nickname) == false) // Sur les vrais serveurs cela truncate le pseudo a MAXLEN. Faire la grosse verification ici pour les char invalides ect..
     {
