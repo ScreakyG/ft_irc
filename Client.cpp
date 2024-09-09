@@ -4,12 +4,12 @@
 /***CONSTRUCTORS/DESTRUCTORS***/
 /******************************/
 
-Client::Client() : _clientFd(-1), _clientReadBuffer(""), _clientSendBuffer(""), _nickname(""), _username(""), _enteredServerPassword(false), _hasRegistered(false), _timeoutStart(0)
+Client::Client() : _clientFd(-1), _clientReadBuffer(""), _clientSendBuffer(""), _nickname(""), _oldNickname(""), _username(""), _enteredServerPassword(false), _hasRegistered(false), _timeoutStart(0)
 {
 
 }
 
-Client::Client(const Client &src) : _clientFd(src._clientFd), _clientReadBuffer(src._clientReadBuffer), _clientSendBuffer(src._clientSendBuffer), _nickname(src._nickname), _username(src._username), _enteredServerPassword(src._enteredServerPassword), _hasRegistered(src._hasRegistered), _timeoutStart(src._timeoutStart)
+Client::Client(const Client &src) : _clientFd(src._clientFd), _clientReadBuffer(src._clientReadBuffer), _clientSendBuffer(src._clientSendBuffer), _nickname(src._nickname), _oldNickname(src._oldNickname), _username(src._username), _enteredServerPassword(src._enteredServerPassword), _hasRegistered(src._hasRegistered), _timeoutStart(src._timeoutStart)
 {
 
 }
@@ -28,6 +28,7 @@ Client& Client::operator=(const Client &rhs)
         this->_clientReadBuffer = rhs._clientReadBuffer;
         this->_clientSendBuffer = rhs._clientSendBuffer;
         this->_nickname = rhs._nickname;
+        this->_oldNickname = rhs._oldNickname;
         this->_username = rhs._username;
         this->_enteredServerPassword = rhs._enteredServerPassword;
         this->_hasRegistered = rhs._hasRegistered;
@@ -52,12 +53,18 @@ int Client::getFd(void)
 
 void Client::setNickname(std::string nickname)
 {
+    this->_oldNickname = this->getNickname();
     this->_nickname = nickname;
 }
 
 std::string Client::getNickname(void)
 {
     return (this->_nickname);
+}
+
+std::string Client::getOldNickname(void)
+{
+    return (this->_oldNickname);
 }
 
 void Client::setUsername(std::string username)

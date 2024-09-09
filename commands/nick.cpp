@@ -28,10 +28,6 @@ void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd
         return ;
     }
 
-    // Ceci etait une ancienne protection pour empecher la commande tant que PASS n'etais pas indique.
-    // if (server.clientValidPassword(client, clientFd) == false)
-    //     return ;
-
     if (arguments.size() == 0)
     {
         message = ERR_NONICKNAMEGIVEN(client->getNickname());
@@ -64,8 +60,8 @@ void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd
     // On envoie seulement un message si la commande est utilisee apres la phase de register.
     if (client->hasRegistered() == true)
     {
-        //message = "You're now known as " + client->getNickname() + "\n"; // Pas oblige d'envoyer une confirmation (en tout cas en phase de register).
-        message = ":NICK_OLD_NICK!user@host NICK :NEW_NICK";
+        //message = ":NICK_OLD_NICK!user@host NICK :NEW_NICK";
+        message = ":" + client->getOldNickname() + "!~parallels@parallels NICK :" + client->getNickname() + "\r\n";
         server.sendToClient(message, clientFd);
     }
 

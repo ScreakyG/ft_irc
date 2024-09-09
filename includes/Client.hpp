@@ -22,6 +22,8 @@ class Client
         void        setNickname(std::string nickname); // Modifie _nickname.
         std::string getNickname(void); // Retourne _nickname.
 
+        std::string getOldNickname(void); // Retourne _oldNickname.
+
         void        setUsername(std::string username); // Modifie _username.
         std::string getUsername(void); // Retourne _username.
 
@@ -45,6 +47,7 @@ class Client
         std::string _clientReadBuffer;
         std::string _clientSendBuffer;
         std::string _nickname;
+        std::string _oldNickname;
         std::string _username;
         bool        _enteredServerPassword;
         bool        _hasRegistered;
