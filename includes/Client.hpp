@@ -27,6 +27,9 @@ class Client
         void        setUsername(std::string username); // Modifie _username.
         std::string getUsername(void); // Retourne _username.
 
+        void        setHostname(std::string hostname); // Modifie _hostname.
+        std::string getHostname(void); // Retourne _hostname.
+
         void        setRegistered(bool value); // Modifie _hasRegistered.
         bool        hasRegistered(void); // Retourne _hasRegistered.
 
@@ -49,6 +52,7 @@ class Client
         std::string _nickname;
         std::string _oldNickname;
         std::string _username;
+        std::string _hostname;
         bool        _enteredServerPassword;
         bool        _hasRegistered;
         time_t      _timeoutStart;

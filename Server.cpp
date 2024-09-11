@@ -212,12 +212,14 @@ void Server::checkClientSendBuffer(int idx)
 void Server::acceptNewClient(void)
 {
     // Penser a parse les infos de connexions style IP du client.
-    pollfd  newClientPoll;
-    Client  newClientStruct;
-    int     newClientFd;
-    time_t  timeoutStart;
+    pollfd      newClientPoll;
+    Client      newClientStruct;
+    int         newClientFd;
+    sockaddr_in clientAdress;
+    socklen_t   addr_len = sizeof(clientAdress);
+    time_t      timeoutStart;
 
-    newClientFd = accept(this->_serverSocket, NULL, NULL); // Options a peut etre revoir.
+    newClientFd = accept(this->_serverSocket, reinterpret_cast<sockaddr*>(&clientAdress), &addr_len); // Options a peut etre revoir.
     if (newClientFd == -1)
     {
         std::cerr << "[Server] Couldn't connect new client." << std::endl;
@@ -241,6 +243,9 @@ void Server::acceptNewClient(void)
 
         timeoutStart = time(NULL);
         newClientStruct.setTimeoutStart(timeoutStart);
+
+        getsockname(newClientFd, reinterpret_cast<sockaddr*>(&clientAdress), &addr_len);
+        newClientStruct.setHostname(inet_ntoa(clientAdress.sin_addr));
 
         this->_allSockets.push_back(newClientPoll);
         this->_allClients.push_back(newClientStruct);

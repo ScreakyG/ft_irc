@@ -4,12 +4,12 @@
 /***CONSTRUCTORS/DESTRUCTORS***/
 /******************************/
 
-Client::Client() : _clientFd(-1), _clientReadBuffer(""), _clientSendBuffer(""), _nickname(""), _oldNickname(""), _username(""), _enteredServerPassword(false), _hasRegistered(false), _timeoutStart(0)
+Client::Client() : _clientFd(-1), _clientReadBuffer(""), _clientSendBuffer(""), _nickname(""), _oldNickname(""), _username(""), _hostname(""), _enteredServerPassword(false), _hasRegistered(false), _timeoutStart(0)
 {
 
 }
 
-Client::Client(const Client &src) : _clientFd(src._clientFd), _clientReadBuffer(src._clientReadBuffer), _clientSendBuffer(src._clientSendBuffer), _nickname(src._nickname), _oldNickname(src._oldNickname), _username(src._username), _enteredServerPassword(src._enteredServerPassword), _hasRegistered(src._hasRegistered), _timeoutStart(src._timeoutStart)
+Client::Client(const Client &src) : _clientFd(src._clientFd), _clientReadBuffer(src._clientReadBuffer), _clientSendBuffer(src._clientSendBuffer), _nickname(src._nickname), _oldNickname(src._oldNickname), _username(src._username), _hostname(src._hostname), _enteredServerPassword(src._enteredServerPassword), _hasRegistered(src._hasRegistered), _timeoutStart(src._timeoutStart)
 {
 
 }
@@ -30,6 +30,7 @@ Client& Client::operator=(const Client &rhs)
         this->_nickname = rhs._nickname;
         this->_oldNickname = rhs._oldNickname;
         this->_username = rhs._username;
+        this->_hostname = rhs._hostname;
         this->_enteredServerPassword = rhs._enteredServerPassword;
         this->_hasRegistered = rhs._hasRegistered;
         this->_timeoutStart = rhs._timeoutStart;
@@ -75,6 +76,16 @@ void Client::setUsername(std::string username)
 std::string Client::getUsername(void)
 {
     return (this->_username);
+}
+
+void Client::setHostname(std::string hostname)
+{
+    this->_hostname = hostname;
+}
+
+std::string Client::getHostname(void)
+{
+    return (this->_hostname);
 }
 
 void Client::setRegistered(bool value)
