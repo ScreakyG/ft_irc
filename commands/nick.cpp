@@ -64,7 +64,7 @@ void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd
     {
         //message = ":NICK_OLD_NICK!user@host NICK :NEW_NICK";
         //message = ":" + client->getOldNickname() + "!~parallels@parallels NICK :" + client->getNickname() + "\r\n";
-        message = ":" + client->getOldNickname() + "!~parallels" + "@" + client->getHostname() + " NICK :" + client->getNickname() + "\r\n";
+        message = ":" + client->getOldNickname() + "!~" + client->getUsername() + "@" + client->getHostname() + " NICK :" + client->getNickname() + "\r\n";
         server.sendToClient(message, clientFd);
     }
 
