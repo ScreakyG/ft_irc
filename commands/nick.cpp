@@ -2,7 +2,7 @@
 
 static bool isValidNickname(std::string nickname)
 {
-    const std::string validCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const std::string validCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
 
     if (nickname.empty())
         return (false);
@@ -51,8 +51,13 @@ void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd
     {
         if (nickname == allClients[i].getNickname())
         {
-            //Le vrai code d'erreur est 433 , cest un choix perso d'utiliser 432 pour deconnecter le client en phase de register.
-            message = ERR_NICKNAMEINUSE(client->getNickname(), nickname);
+            if (client->getNickname() == "")
+            {
+                message = ERR_NICKNAMEINUSE(std::string("*"), nickname);
+            }
+            else
+                message = ERR_NICKNAMEINUSE(client->getNickname(), nickname);
+
             server.sendToClient(message, clientFd);
             return ;
         }
