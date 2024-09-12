@@ -570,6 +570,6 @@ const char* Server::PollError::what(void) const throw()
 }
 const char* Server::ClientDisconnect::what(void) const throw()
 {
-    std::cerr << RED << "Client disconnected" << RESET;
+    std::cerr << RED << "Throw Client disconnect" << RESET;
     return ("");
 }
