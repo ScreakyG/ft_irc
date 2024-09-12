@@ -6,7 +6,7 @@
 
 //NICK
 #define ERR_NONICKNAMEGIVEN(client) (":localhost 431 " + client + " :There is no nickname\r\n")
-#define ERR_ERRONEUSNICKNAME(client, nickname) (":localhost 432 " + client + " " + nickname + " :Erroneus nickname\r\n")
+#define ERR_ERRONEUSNICKNAME(client, nickname) (":localhost 433 " + client + " " + nickname + " :Erroneus nickname\r\n")
 #define ERR_NICKNAMEINUSE(client, nickname) (":localhost 432 " + client + " " + nickname + " :Nickname is already in use\r\n"); //Vrai code d'erreur est 433 mais il ne deconnecte pas donc on utilise 432.
 
 //PASS

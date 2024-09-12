@@ -31,7 +31,7 @@
 #define DEFAULT_PORT 4242
 #define DEFAULT_PASSWORD "lol"
 
-#define NICK_MAXLEN 20
+#define NICK_MAXLEN 9
 #define REGISTER_TIMEOUT 30
 
 //#define BACKLOG 10
