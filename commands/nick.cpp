@@ -51,7 +51,7 @@ void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd
     {
         if (nickname == allClients[i].getNickname())
         {
-            //Le vrai code d'erreur est 433 , cest un choix perso d'utiliser 432 pour deconnecter le client.
+            //Le vrai code d'erreur est 433 , cest un choix perso d'utiliser 432 pour deconnecter le client en phase de register.
             message = ERR_NICKNAMEINUSE(client->getNickname(), nickname);
             server.sendToClient(message, clientFd);
             return ;
