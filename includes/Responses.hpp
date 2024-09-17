@@ -4,6 +4,8 @@
 
 #define ERROR_MSG(msg) ("ERROR :" + msg + "\r\n");
 
+#define ERR_NOSUCHCHANNEL(client, channelName) (":localhost 403 " + client + " " + channelName + " :No such channel\r\n");
+
 //NICK
 #define ERR_NONICKNAMEGIVEN(client) (":localhost 431 " + client + " :There is no nickname\r\n")
 #define ERR_ERRONEUSNICKNAME(client, nickname) (":localhost 432 " + client + " " + nickname + " :Erroneus nickname\r\n")

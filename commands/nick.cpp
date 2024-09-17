@@ -51,7 +51,7 @@ void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd
     {
         if (nickname == allClients[i].getNickname())
         {
-            if (client->getNickname() == "")
+            if (client->getNickname() == "") // Cas particulier au register seulement, on envoie '*' car le client n'a pas encore de pseudo. Sinon la client renvoie une commande etrange.
             {
                 message = ERR_NICKNAMEINUSE(std::string("*"), nickname);
             }
