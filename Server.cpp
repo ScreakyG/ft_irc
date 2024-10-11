@@ -345,10 +345,10 @@ void Server::handleCommand(std::string &command, int clientFd)
         }
         std::cout << std::endl;
     }
-    executeCommand(commandName, argumentsVector, clientFd);
+    executeCommand(command, commandName, argumentsVector, clientFd);
 }
 
-void Server::executeCommand(std::string &commandName, std::vector<std::string> &arguments, int clientFd)
+void Server::executeCommand(std::string &ogString, std::string &commandName, std::vector<std::string> &arguments, int clientFd)
 {
     std::string message;
     Client *client;
@@ -371,7 +371,7 @@ void Server::executeCommand(std::string &commandName, std::vector<std::string> &
     else if (commandName == "PING")
         exec_PING((*this), arguments, clientFd);
     else if (commandName == "JOIN")
-        exec_JOIN((*this), arguments, clientFd);
+        exec_JOIN((*this), ogString, arguments, clientFd);
     else
     {
         message = ERR_UNKNOWNCOMMAND(client->getNickname(), commandName);

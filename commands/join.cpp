@@ -1,6 +1,6 @@
 #include "../includes/Commands.hpp"
 
-static void    joinChannels(Server &server, std::string &channelName, std::string &channelPassword, Client *client)
+static void    joinChannels(Server &server, std::vector<std::pair<std::string, std::string> > &namesAndPasswords, Client *client)
 {
     std::string message;
 
@@ -9,9 +9,12 @@ static void    joinChannels(Server &server, std::string &channelName, std::strin
         std::cout << RED << "[" << "?" << "] [Server] Client is not connected to server" << RESET << std::endl;
         return ;
     }
-    message = client->getNickname() + " Will join channel " + channelName + " , password = " + channelPassword + "\r\n";
-    server.sendToClient(message, client->getFd());
 
+    for (size_t idx = 0; idx < namesAndPasswords.size(); idx++)
+    {
+        message = client->getNickname() + " Will join channel " + namesAndPasswords[idx].first + " , password = " + namesAndPasswords[idx].second + "\r\n";
+        server.sendToClient(message, client->getFd());
+    }
     //Regarder si le nom du channel est existant
             // Si oui, tenter de le rejoindre.
             // Si non, le creer et ajouter client en channel operator.
@@ -33,49 +36,49 @@ static bool validChannelName(std::string &name)
     return (true);
 }
 
-static void parseChannels(Server &server, Client *client, std::vector<std::string> &arguments, std::vector<std::pair<std::string, std::string> > &channels)
+void checkChannelsNamesValid(Server &server, Client *client, std::vector<std::pair<std::string, std::string> > &namesAndPasswords)
 {
-    std::string name;
-    std::string password;
-    std::pair<std::string, std::string> channelPair;
-    std::string message;
+    std::string                                                 name;
+    std::string                                                 message;
+    std::vector<std::pair<std::string, std::string> >::iterator it;
 
-    for (size_t i = 0; i < arguments.size(); i++)
+    for (it = namesAndPasswords.begin(); it != namesAndPasswords.end(); it++)
     {
-        if (i == 0)
+        std::cout << "Name = " << it->first << " | Pass = " << it->second << std::endl;
+    }
+
+    for (it = namesAndPasswords.begin(); it != namesAndPasswords.end(); it++)
+    {
+        name = it->first;
+        if (validChannelName(name) == false)
         {
-            name = arguments[i];
-            if (validChannelName(name) == false)
-            {
-                message = ERR_NOSUCHCHANNEL(client->getNickname(), name);
-                server.sendToClient(message, client->getFd());
-            }
+            message = ERR_NOSUCHCHANNEL(client->getNickname(), name);
+            server.sendToClient(message, client->getFd());
+            namesAndPasswords.erase(it);// Peut etre remove le channel du vecteur ?
+            it = namesAndPasswords.begin(); // Obliger de restart apres erase sinon y'a un segfault.
         }
     }
-
-    name = arguments[0]; // Le premier argument sera obligatoirement un nom de channel.
-    if (validChannelName(name) == false)
-    {
-        message = ERR_NOSUCHCHANNEL(client->getNickname(), name);
-        server.sendToClient(message, client->getFd());
-        return ;
-    }
-    if (arguments.size() == 1)
-        password = "";
-    channelPair = std::make_pair<std::string, std::string>(name, password);
-    channels.push_back(channelPair);
 }
 
-void           exec_JOIN(Server &server, std::vector<std::string> &arguments, int clientFd)
+void           exec_JOIN(Server &server, std::string &ogString, std::vector<std::string> &arguments, int clientFd)
 {
     Client      *client;
     std::string message;
 
 
+    std::cout << ogString << std::endl;
+
     client = server.getClientStruct(clientFd);
     if (client == NULL)
     {
         std::cout << RED << "[" << clientFd << "] [Server] Client is not connected to server" << RESET << std::endl;
+        return ;
+    }
+
+    if (client->hasRegistered() == false)
+    {
+        message = ERR_NOTREGISTERED;
+        server.sendToClient(message, clientFd);
         return ;
     }
 
@@ -85,15 +88,20 @@ void           exec_JOIN(Server &server, std::vector<std::string> &arguments, in
         server.sendToClient(message, clientFd);
         return ;
     }
-    //parser si plusieurs channels.
 
-    std::vector<std::pair<std::string, std::string> > channels;
-    parseChannels(server, client, arguments, channels);
-    if (channels.size() == 0)
+    ////////////////////////////////////
+
+    trimString(ogString, " ");
+    ogString.erase(ogString.find("JOIN"), 4);
+
+    std::vector<std::pair<std::string, std::string> > vector;
+
+    vector = parseInput(server, client, ogString);
+
+    if (vector.size() == 0) // Protege dans le cas ou aucun channel a un nom valide. Donc un vecteur vide.
     {
         std::cout << RED << "Error channel parsing, no valid channel was entered" << RESET << std::endl;
         return ;
     }
-
-    joinChannels(server, channels[0].first, channels[0].second, client);
+   joinChannels(server, vector, client);
 }

@@ -74,7 +74,7 @@ class Server
 
         void                    handleMessage(char *buffer, int clientFd);
         void                    handleCommand(std::string &command, int clientFd);
-        void                    executeCommand(std::string &commandName, std::vector<std::string> &arguments, int clientFd);
+        void                    executeCommand(std::string &ogString, std::string &commandName, std::vector<std::string> &arguments, int clientFd);
 
         void                    isRegistrationComplete(Client *client); // Regarde si la registration est complete.
 
