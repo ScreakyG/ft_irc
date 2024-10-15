@@ -29,6 +29,8 @@ class Channel
         void                    addClient(Client *client);
         void                    quitClient(Client *client);
 
+        void                    printUsers(void);
+
     private:
         std::string             _channelName;
         std::string             _channelPassword;

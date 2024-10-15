@@ -87,6 +87,9 @@ class Server
         void                    addChannel(Channel &newChannel); // Ajoute un channel dans le vecteur '_Channels'.
         Channel*                getChannel(std::string channelName); // Retourne le channel du vecteur '_Channels' correspondant a channelName.
 
+
+        void                    printAllChannelsUsers(void);
+
         /****EXCEPTIONS****/
         class SocketCreationError : public std::exception
         {

@@ -580,6 +580,18 @@ Channel* Server::getChannel(std::string channelName)
     }
     return (NULL);
 }
+
+
+void Server::printAllChannelsUsers(void)
+{
+    for (size_t idx = 0; idx < _Channels.size(); idx++)
+    {
+        std::cout << _Channels[idx].getChannelName() << std::endl;
+        _Channels[idx].printUsers();
+    }
+}
+
+
 /******************************/
 /*********EXCEPTIONS***********/
 /******************************/

@@ -63,7 +63,7 @@ std::vector<Client *>& Channel::getActiveUsersVector(void)
 
 void Channel::addClient(Client *client)
 {
-    _connectedClients.push_back(client);
+   this-> _connectedClients.push_back(client);
     //Envoyer les messages de bienvenue dans le channel.
 }
 
@@ -78,4 +78,12 @@ void Channel::quitClient(Client *client)
             _connectedClients.erase(it);
         }
     }
+}
+
+void Channel::printUsers(void)
+{
+    std::vector<Client *>::iterator it;
+
+    for (it = this->_connectedClients.begin(); it != this->_connectedClients.end(); it++)
+        std::cout << (*it)->getNickname() << std::endl;
 }
