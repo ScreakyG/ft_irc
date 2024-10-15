@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+static std::string getActiveUsers(Channel &channel);
+
 /******************************/
 /***CONSTRUCTORS/DESTRUCTORS***/
 /******************************/
@@ -143,6 +145,7 @@ void Client::addToClientSendBuffer(std::string &string)
 void Client::joinChannel(Server &server, Channel &channel, std::string channelPassword)
 {
     std::string message;
+    std::string activeUsers;
 
     if (channelPassword != channel.getChannelPassword())
     {
@@ -156,8 +159,20 @@ void Client::joinChannel(Server &server, Channel &channel, std::string channelPa
         _clientChannels.push_back(channel);
         channel.addClient(this);
 
+        message = ":" + this->getNickname() + "!~" + this->getUsername() + "@" + this->getHostname() + " JOIN " + channel.getChannelName() + "\r\n";
+        server.sendToClient(message, this->getFd());
+
         message = RPL_TOPIC(this->getNickname(), channel.getChannelName(), channel.getChannelTopic());
         server.sendToClient(message, this->getFd());
+
+        activeUsers = getActiveUsers(channel);
+        message = RPL_NAMREPLY(this->getNickname(), channel.getChannelName(), activeUsers);
+        server.sendToClient(message, this->getFd());
+
+        message = RPL_ENDOFNAMES(this->getNickname(), channel.getChannelName());
+        server.sendToClient(message, this->getFd());
+
+        // Envoyer les NAMRPLY avec tout les noms des utilisateurs.
         //std::cout << "Client joined channel : " << channel.getChannelName() << " | password = " << channel.getChannelPassword() << std::endl;
     }
 }
@@ -179,4 +194,18 @@ void Client::leaveChannel(Channel &channel)
 void Client::leaveAllChannels()
 {
     _clientChannels.clear();
+}
+
+static std::string getActiveUsers(Channel &channel)
+{
+    std::string activeUsers;
+    std::vector<Client *>::iterator it;
+
+    for (it = channel.getActiveUsersVector().begin(); it != channel.getActiveUsersVector().end(); it++)
+    {
+       // std::cout << (*it)->getNickname() << std::endl;
+        activeUsers += (*it)->getNickname();
+        activeUsers += " ";
+    }
+    return (activeUsers);
 }

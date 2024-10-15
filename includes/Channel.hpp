@@ -21,16 +21,17 @@ class Channel
 
         /****METHODS****/
 
-        std::string getChannelName();
-        std::string getChannelPassword(void);
-        std::string getChannelTopic(void);
+        std::string             getChannelName();
+        std::string             getChannelPassword(void);
+        std::string             getChannelTopic(void);
+        std::vector<Client *>&   getActiveUsersVector(void);
 
-        void    addClient(Client *client);
-        void    quitClient(Client *client);
+        void                    addClient(Client *client);
+        void                    quitClient(Client *client);
 
     private:
-        std::string         _channelName;
-        std::string         _channelPassword;
-        std::vector<Client *> _connectedClients;
-        std::string         _topic;
+        std::string             _channelName;
+        std::string             _channelPassword;
+        std::vector<Client *>   _connectedClients;
+        std::string             _topic;
 };

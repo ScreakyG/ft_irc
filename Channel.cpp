@@ -56,6 +56,11 @@ std::string Channel::getChannelTopic(void)
     return (_topic);
 }
 
+std::vector<Client *>& Channel::getActiveUsersVector(void)
+{
+    return (this->_connectedClients);
+}
+
 void Channel::addClient(Client *client)
 {
     _connectedClients.push_back(client);
