@@ -1,5 +1,7 @@
 #include "includes/Client.hpp"
 
+#include <iostream>
+
 /******************************/
 /***CONSTRUCTORS/DESTRUCTORS***/
 /******************************/
@@ -9,7 +11,7 @@ Client::Client() : _clientFd(-1), _clientReadBuffer(""), _clientSendBuffer(""), 
 
 }
 
-Client::Client(const Client &src) : _clientFd(src._clientFd), _clientReadBuffer(src._clientReadBuffer), _clientSendBuffer(src._clientSendBuffer), _nickname(src._nickname), _oldNickname(src._oldNickname), _username(src._username), _hostname(src._hostname), _enteredServerPassword(src._enteredServerPassword), _hasRegistered(src._hasRegistered), _timeoutStart(src._timeoutStart)
+Client::Client(const Client &src) : _clientFd(src._clientFd), _clientReadBuffer(src._clientReadBuffer), _clientSendBuffer(src._clientSendBuffer), _nickname(src._nickname), _oldNickname(src._oldNickname), _username(src._username), _hostname(src._hostname), _enteredServerPassword(src._enteredServerPassword), _hasRegistered(src._hasRegistered), _timeoutStart(src._timeoutStart), _clientChannels(src._clientChannels)
 {
 
 }
@@ -34,6 +36,7 @@ Client& Client::operator=(const Client &rhs)
         this->_enteredServerPassword = rhs._enteredServerPassword;
         this->_hasRegistered = rhs._hasRegistered;
         this->_timeoutStart = rhs._timeoutStart;
+        this->_clientChannels = rhs._clientChannels;
     }
     return (*this);
 }
@@ -135,4 +138,45 @@ std::string& Client::getClientSendBuffer(void)
 void Client::addToClientSendBuffer(std::string &string)
 {
     this->_clientSendBuffer += string;
+}
+
+void Client::joinChannel(Server &server, Channel &channel, std::string channelPassword)
+{
+    std::string message;
+
+    if (channelPassword != channel.getChannelPassword())
+    {
+        message = ERR_BADCHANNELKEY(this->getNickname(), channel.getChannelName());
+        server.sendToClient(message, this->getFd());
+        return ;
+    }
+
+    if (channelPassword == channel.getChannelPassword())
+    {
+        _clientChannels.push_back(channel);
+        channel.addClient(this);
+
+        message = RPL_TOPIC(this->getNickname(), channel.getChannelName(), channel.getChannelTopic());
+        server.sendToClient(message, this->getFd());
+        //std::cout << "Client joined channel : " << channel.getChannelName() << " | password = " << channel.getChannelPassword() << std::endl;
+    }
+}
+
+void Client::leaveChannel(Channel &channel)
+{
+    std::vector<Channel>::iterator  it;
+
+    for (it = _clientChannels.begin(); it != _clientChannels.end(); it++)
+    {
+        if (channel.getChannelName() == it->getChannelName())
+        {
+            it->quitClient(this);
+            _clientChannels.erase(it);
+        }
+    }
+}
+
+void Client::leaveAllChannels()
+{
+    _clientChannels.clear();
 }

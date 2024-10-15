@@ -22,7 +22,7 @@ Server::Server(int port, std::string password): _serverPort(port), _serverPasswo
     std::memset(&_serverAddress, 0, sizeof(_serverAddress));
 }
 
-Server::Server(const Server &src): _serverPort(src._serverPort), _serverPassword(src._serverPassword), _serverSocket(src._serverSocket), _serverAddress(src._serverAddress), _allSockets(src._allSockets), _allClients(src._allClients)
+Server::Server(const Server &src): _serverPort(src._serverPort), _serverPassword(src._serverPassword), _serverSocket(src._serverSocket), _serverAddress(src._serverAddress), _allSockets(src._allSockets), _allClients(src._allClients), _Channels(src._Channels)
 {
     if (DEBUG == FULL)
         std::cout << "Server copy constructor called." << std::endl;
@@ -50,6 +50,7 @@ Server& Server::operator=(const Server &rhs)
         this->_serverAddress = rhs._serverAddress;
         this->_allSockets = rhs._allSockets;
         this->_allClients = rhs._allClients;
+        this->_Channels = rhs._Channels;
     }
     else
         if (DEBUG == FULL)
@@ -468,6 +469,13 @@ std::string Server::getServerPassword(void)
 
 void Server::deleteClient(int fd_toClear)
 {
+    Client *client;
+
+    client = getClientStruct(fd_toClear);
+
+    if (client)
+        client->leaveAllChannels();
+
     for (size_t i = 0; i < this->_allSockets.size(); i++)  // Remove it from the '_pollfd allSockets';
     {
         if (this->_allSockets[i].fd == fd_toClear)
@@ -541,6 +549,37 @@ void Server::sendToClient(std::string &message, int clientFd)
         clientStruct->getClientSendBuffer().clear(); // Si on arrive ici c'est que on a reussi a tout envoyer, alors on reset le buffer.
 }
 
+/******************************/
+/*********CHANNELS***********/
+/******************************/
+
+bool Server::channelExist(std::string name)
+{
+    for (size_t idx = 0; idx < _Channels.size(); idx++)
+    {
+        if (_Channels[idx].getChannelName() == name)
+            return (true);
+    }
+    return (false);
+}
+
+void Server::addChannel(Channel &newChannel)
+{
+    if (DEBUG == LIGHT || DEBUG == FULL)
+        std::cout << "NEW CHANNEL CREATED, Name = " << newChannel.getChannelName() << " | Password = " << newChannel.getChannelPassword() << std::endl;
+
+    _Channels.push_back(newChannel);
+}
+
+Channel* Server::getChannel(std::string channelName)
+{
+    for (size_t idx = 0; idx < _Channels.size(); idx++)
+    {
+        if (_Channels[idx].getChannelName() == channelName)
+            return (&_Channels[idx]);
+    }
+    return (NULL);
+}
 /******************************/
 /*********EXCEPTIONS***********/
 /******************************/

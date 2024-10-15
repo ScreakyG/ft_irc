@@ -12,12 +12,28 @@ static void    joinChannels(Server &server, std::vector<std::pair<std::string, s
 
     for (size_t idx = 0; idx < namesAndPasswords.size(); idx++)
     {
-        message = client->getNickname() + " Will join channel " + namesAndPasswords[idx].first + " , password = " + namesAndPasswords[idx].second + "\r\n";
-        server.sendToClient(message, client->getFd());
+        std::string channelName = namesAndPasswords[idx].first;
+        std::string channelPassword = namesAndPasswords[idx].second;
+        if (server.channelExist(channelName) == true)
+        {
+            //Rejoindre le channel.
+            Channel *channelToJoin = server.getChannel(channelName);
+
+            if (channelToJoin != NULL)
+                client->joinChannel(server,*channelToJoin, channelPassword);
+            else
+                std::cout << "Unexpected error when joingning a Channel" << std::endl;
+        }
+        else
+        {
+            //Creer le channel.
+            Channel newChannel(channelName, channelPassword);
+
+            server.addChannel(newChannel);
+            client->joinChannel(server, newChannel, channelPassword);
+            // Rendre le client Operateur du channel.
+        }
     }
-    //Regarder si le nom du channel est existant
-            // Si oui, tenter de le rejoindre.
-            // Si non, le creer et ajouter client en channel operator.
 }
 
 static bool validChannelName(std::string &name)
@@ -55,6 +71,8 @@ void checkChannelsNamesValid(Server &server, Client *client, std::vector<std::pa
             message = ERR_NOSUCHCHANNEL(client->getNickname(), name);
             server.sendToClient(message, client->getFd());
             namesAndPasswords.erase(it);// Peut etre remove le channel du vecteur ?
+            if (namesAndPasswords.empty() == true) // Arrive dans le cas ou il y a un seul channel dans le vecteur et qu'il est faux. Segfault sinon avec begin().
+                break ;
             it = namesAndPasswords.begin(); // Obliger de restart apres erase sinon y'a un segfault.
         }
     }
@@ -66,7 +84,7 @@ void           exec_JOIN(Server &server, std::string &ogString, std::vector<std:
     std::string message;
 
 
-    std::cout << ogString << std::endl;
+    //std::cout << ogString << std::endl;
 
     client = server.getClientStruct(clientFd);
     if (client == NULL)

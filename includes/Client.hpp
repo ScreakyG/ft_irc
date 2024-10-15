@@ -2,6 +2,14 @@
 
 #include <string>
 #include <ctime>
+#include <vector>
+
+#include "Channel.hpp"
+#include "Responses.hpp"
+#include "Server.hpp"
+
+class Channel;
+class Server;
 
 class Client
 {
@@ -45,15 +53,20 @@ class Client
         std::string& getClientSendBuffer(void); // Retourne le _clientSendBuffer;
         void        addToClientSendBuffer(std::string &string); // Ajoute string au _clientSendBuffer;
 
+        void        joinChannel(Server &server, Channel &channel, std::string channelPassword); // Rejoint le channel.
+        void        leaveChannel(Channel &channel); //Quitte un channel
+        void        leaveAllChannels(); //Quitte tout les channels.
+
     private:
-        int         _clientFd;
-        std::string _clientReadBuffer;
-        std::string _clientSendBuffer;
-        std::string _nickname;
-        std::string _oldNickname;
-        std::string _username;
-        std::string _hostname;
-        bool        _enteredServerPassword;
-        bool        _hasRegistered;
-        time_t      _timeoutStart;
+        int                     _clientFd;
+        std::string             _clientReadBuffer;
+        std::string             _clientSendBuffer;
+        std::string             _nickname;
+        std::string             _oldNickname;
+        std::string             _username;
+        std::string             _hostname;
+        bool                    _enteredServerPassword;
+        bool                    _hasRegistered;
+        time_t                  _timeoutStart;
+        std::vector<Channel>    _clientChannels;
 };

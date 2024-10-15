@@ -24,6 +24,7 @@
 #include "Commands.hpp"
 #include "Colors.hpp"
 #include "Responses.hpp"
+#include "Channel.hpp"
 
 #define DEBUG LIGHT
 
@@ -36,6 +37,8 @@
 #define REGISTER_TIMEOUT 30
 
 //#define BACKLOG 10
+
+class Channel;
 
 class Server
 {
@@ -80,6 +83,10 @@ class Server
 
         void                    checkClientRegisterTimeouts();
 
+        bool                    channelExist(std::string name); // Regarde dans le vecteur '_Channels' si il y en a un qui existe avec le meme nom.
+        void                    addChannel(Channel &newChannel); // Ajoute un channel dans le vecteur '_Channels'.
+        Channel*                getChannel(std::string channelName); // Retourne le channel du vecteur '_Channels' correspondant a channelName.
+
         /****EXCEPTIONS****/
         class SocketCreationError : public std::exception
         {
@@ -116,6 +123,7 @@ class Server
         sockaddr_in                _serverAddress;
         std::vector<pollfd>        _allSockets;
         std::vector<Client>        _allClients;
+        std::vector<Channel>       _Channels;
 
        Server(); //Default Constructor.
        Server(const Server &src); // Copy constructor.

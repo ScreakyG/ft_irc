@@ -3,6 +3,7 @@
 #include "includes/Random.hpp"
 #include "includes/Client.hpp"
 #include "includes/Commands.hpp"
+#include "includes/Channel.hpp"
 
 
 void printInfoBanner(const Server &server)

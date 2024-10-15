@@ -91,7 +91,7 @@ std::vector<std::pair<std::string, std::string> >  parseInput(Server &server, Cl
         return (vector);
 
     trimString(input, " ");
-    std::cout << input << std::endl;
+    //std::cout << input << std::endl;
 
     splitChannelsAndPasswords(input, channels, passwords);
     if (channels.empty())
