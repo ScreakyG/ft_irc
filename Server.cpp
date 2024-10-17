@@ -241,18 +241,25 @@ void Server::acceptNewClient(void)
         newClientPoll.revents = 0;
 
         newClientStruct = new Client();
-        newClientStruct->setFd(newClientFd);
+        if (newClientStruct != NULL)
+        {
+            newClientStruct->setFd(newClientFd);
+            timeoutStart = time(NULL);
+            newClientStruct->setTimeoutStart(timeoutStart);
 
-        timeoutStart = time(NULL);
-        newClientStruct->setTimeoutStart(timeoutStart);
+            getsockname(newClientFd, reinterpret_cast<sockaddr*>(&clientAdress), &addr_len);
+            newClientStruct->setHostname(inet_ntoa(clientAdress.sin_addr));
 
-        getsockname(newClientFd, reinterpret_cast<sockaddr*>(&clientAdress), &addr_len);
-        newClientStruct->setHostname(inet_ntoa(clientAdress.sin_addr));
+            this->_allSockets.push_back(newClientPoll);
+            this->_allClients.push_back(newClientStruct);
 
-        this->_allSockets.push_back(newClientPoll);
-        this->_allClients.push_back(newClientStruct);
-
-        std::cout << GREEN << "[Server] New client connected on fd : " << newClientFd << RESET << std::endl;
+            std::cout << GREEN << "[Server] New client connected on fd : " << newClientFd << RESET << std::endl;
+        }
+        else
+        {
+            close(newClientFd);
+            std::cout << "[Server] allocate memory for client" << std::endl;
+        }
     }
 }
 
