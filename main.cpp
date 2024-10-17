@@ -32,11 +32,14 @@ int main(void)
 
         server.serverInit();
         server.startServerRoutine();
+        server.deleteAllClients();
+        server.deleteAllChannels();
         server.closeAllFds();
-        server.deleteChannels();
     }
     catch (const std::exception &e)
     {
+        server.deleteAllClients();
+        server.deleteAllChannels();
         server.closeAllFds();
         std::cerr << e.what() << std::endl;
     }

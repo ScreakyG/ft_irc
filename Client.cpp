@@ -174,22 +174,20 @@ void Client::joinChannel(Server &server, Channel *channel, std::string channelPa
 
         message = RPL_ENDOFNAMES(this->getNickname(), channel->getChannelName());
         server.sendToClient(message, this->getFd());
-
-        // Envoyer les NAMRPLY avec tout les noms des utilisateurs.
-        //std::cout << "Client joined channel : " << channel.getChannelName() << " | password = " << channel.getChannelPassword() << std::endl;
     }
 }
 
-void Client::leaveChannel(Channel &channel)
+void Client::leaveChannel(Channel *channel)
 {
     std::vector<Channel *>::iterator  it;
 
     for (it = _clientChannels.begin(); it != _clientChannels.end(); it++)
     {
-        if (channel.getChannelName() == (*it)->getChannelName())
+        if (channel->getChannelName() == (*it)->getChannelName())
         {
             (*it)->quitClient(this);
             _clientChannels.erase(it);
+            return ;
         }
     }
 }
@@ -198,6 +196,7 @@ void Client::leaveAllChannels()
 {
     for (size_t idx = 0; idx < _clientChannels.size(); idx++)
         _clientChannels[idx]->quitClient(this);
+    _clientChannels.clear();
 }
 
 static std::string getActiveUsers(Channel *channel)

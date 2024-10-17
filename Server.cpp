@@ -214,7 +214,7 @@ void Server::acceptNewClient(void)
 {
     // Penser a parse les infos de connexions style IP du client.
     pollfd      newClientPoll;
-    Client      newClientStruct;
+    Client      *newClientStruct = NULL;
     int         newClientFd;
     sockaddr_in clientAdress;
     socklen_t   addr_len = sizeof(clientAdress);
@@ -240,13 +240,14 @@ void Server::acceptNewClient(void)
         newClientPoll.events = POLLIN | POLLOUT; // Rajouter POLLOUT Ulterieurement pour egalement surveiller si la socket est prete a recevoir. Peut etre utile dans le cas de CTRL + Z.
         newClientPoll.revents = 0;
 
-        newClientStruct.setFd(newClientFd);
+        newClientStruct = new Client();
+        newClientStruct->setFd(newClientFd);
 
         timeoutStart = time(NULL);
-        newClientStruct.setTimeoutStart(timeoutStart);
+        newClientStruct->setTimeoutStart(timeoutStart);
 
         getsockname(newClientFd, reinterpret_cast<sockaddr*>(&clientAdress), &addr_len);
-        newClientStruct.setHostname(inet_ntoa(clientAdress.sin_addr));
+        newClientStruct->setHostname(inet_ntoa(clientAdress.sin_addr));
 
         this->_allSockets.push_back(newClientPoll);
         this->_allClients.push_back(newClientStruct);
@@ -412,20 +413,20 @@ void Server::checkClientRegisterTimeouts(void)
 
     for (size_t i = 0; i < _allClients.size(); i++)
     {
-        if (_allClients[i].hasRegistered() == false)
+        if (_allClients[i]->hasRegistered() == false)
         {
-            if (difftime(time(NULL), _allClients[i].getTimeoutStart()) > REGISTER_TIMEOUT)
+            if (difftime(time(NULL), _allClients[i]->getTimeoutStart()) > REGISTER_TIMEOUT)
             {
                 try
                 {
                     message = ERROR_MSG(std::string("Registration timeout, PASS, NICK or USER might be incorrect"));
-                    sendToClient(message, _allClients[i].getFd()); // sendToClient peut throw en cas de probleme majeur alors on catch pour eviter un segfault.
-                    deleteClient(_allClients[i].getFd());
+                    sendToClient(message, _allClients[i]->getFd()); // sendToClient peut throw en cas de probleme majeur alors on catch pour eviter un segfault.
+                    deleteClient(_allClients[i]->getFd());
                 }
                 catch(Server::ClientDisconnect &e)
                 {
                     std::cout << e.what() << std::endl;
-                    deleteClient(_allClients[i].getFd());
+                    deleteClient(_allClients[i]->getFd());
                 }
             }
         }
@@ -436,8 +437,8 @@ Client* Server::getClientStruct(int clientFd)
 {
     for (size_t i = 0; i < this->_allClients.size(); i++)
     {
-        if (this->_allClients[i].getFd() == clientFd)
-            return (&this->_allClients[i]);
+        if (this->_allClients[i]->getFd() == clientFd)
+            return (this->_allClients[i]);
     }
     return (NULL); //En theorie cela ne devrai jamais arriver.
 }
@@ -452,7 +453,7 @@ pollfd* Server::getClientPoll(int clientFd)
     return (NULL);
 }
 
-std::vector<Client>&    Server::getVectorClient(void)
+std::vector<Client *>&    Server::getVectorClient(void)
 {
     return (this->_allClients);
 }
@@ -487,9 +488,13 @@ void Server::deleteClient(int fd_toClear)
 
     for (size_t i = 0; i < this->_allClients.size(); i++) // Remove it from the '_Client allClient';
     {
-        if (this->_allClients[i].getFd() == fd_toClear)
+        if (this->_allClients[i]->getFd() == fd_toClear)
         {
+            Client *clientToClear = NULL;
+
+            clientToClear = this->_allClients[i];
             this->_allClients.erase(this->_allClients.begin() + i);
+            delete clientToClear;
             break ;
         }
     }
@@ -497,14 +502,34 @@ void Server::deleteClient(int fd_toClear)
      std::cout << "Disconnecting socket : [" << fd_toClear  << "]" << std::endl;
 }
 
+void Server::deleteAllClients(void)
+{
+    if (_allClients.size() > 0)
+    {
+        for (size_t i = 0; i < _allClients.size();)
+        deleteClient(_allClients[i]->getFd());
+    }
+    _allClients.clear();
+}
+
 void Server::closeAllFds(void)
 {
     for (size_t i = 0; i < this->_allSockets.size(); i++)
     {
-        if (this->_allSockets[i].fd != this->_serverSocket)
-            std::cout << "Disconnecting socket : [" << this->_allSockets[i].fd  << "]" << std::endl;
-        close(this->_allSockets[i].fd);
+        if (this->_allSockets[i].fd == this->_serverSocket)
+        {
+            std::cout << "Deleting server socket" << std::endl;
+            close(this->_allSockets[i].fd);
+        }
     }
+    _allSockets.clear();
+
+    // for (size_t i = 0; i < this->_allSockets.size(); i++)
+    // {
+    //     if (this->_allSockets[i].fd != this->_serverSocket)
+    //         std::cout << "Disconnecting socket : [" << this->_allSockets[i].fd  << "]" << std::endl;
+    //     close(this->_allSockets[i].fd);
+    // }
 }
 
 void Server::sendToClient(std::string &message, int clientFd)
@@ -584,25 +609,25 @@ Channel* Server::getChannel(std::string channelName)
 
 void Server::printAllUsers(void)
 {
-   std::vector<Client>::iterator    it;
+   std::vector<Client *>::iterator    it;
 
    for (it = _allClients.begin(); it != _allClients.end(); it++)
    {
-        std::cout << "[Server] Nickname : " <<  it->getNickname() << " | ";
-        std::cout << "fd : " << it->getFd();
+        std::cout << "[Server] Nickname : " <<  (*it)->getNickname() << " | ";
+        std::cout << "fd : " << (*it)->getFd();
         std::cout << std::endl;
    }
 }
 
-void Server::deleteChannels(void)
+void Server::deleteAllChannels(void)
 {
     std::vector<Channel *>::iterator    it;
 
     for (it = _Channels.begin(); it != _Channels.end(); it++)
     {
+        (*it)->getActiveOperatorsVector().clear();
+        (*it)->getActiveUsersVector().clear();
         delete(*it);
-        it = _Channels.erase(it);
-        
     }
     _Channels.clear();
 }

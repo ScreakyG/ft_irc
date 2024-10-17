@@ -68,13 +68,14 @@ class Server
 
         void                    deleteClient(int idx); //Remove from poll allSockets.
         void                    closeAllFds(void); // Close all fds.
-        void                    deleteChannels(void);
+        void                    deleteAllChannels(void);
+        void                    deleteAllClients(void);
 
         int                     getServerSocket(void); // Retourne le socket du server.
         Client*                 getClientStruct(int clientFd);
         pollfd*                 getClientPoll(int clientFd);
         std::string             getServerPassword(void); // Retourne le mot de passe du serveur.
-        std::vector<Client>&    getVectorClient(void); // Retourne le vecteur de client.
+        std::vector<Client *>&    getVectorClient(void); // Retourne le vecteur de client.
 
         void                    handleMessage(char *buffer, int clientFd);
         void                    handleCommand(std::string &command, int clientFd);
@@ -126,7 +127,7 @@ class Server
         int                        _serverSocket;
         sockaddr_in                _serverAddress;
         std::vector<pollfd>        _allSockets;
-        std::vector<Client>        _allClients;
+        std::vector<Client *>      _allClients;
         std::vector<Channel *>     _Channels;
 
        Server(); //Default Constructor.

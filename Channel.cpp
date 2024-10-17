@@ -66,14 +66,12 @@ std::vector<Client *>& Channel::getActiveOperatorsVector(void)
 
 void Channel::addClient(Client *client)
 {
-    Client *newClient = new Client(*client);
-   this->_connectedClients.push_back(newClient);
+   this->_connectedClients.push_back(client);
 }
 
 void Channel::quitClient(Client *client)
 {
     std::vector<Client *>::iterator it;
-    Client *clientToFree = NULL;
 
     for (it = _connectedClients.begin(); it != _connectedClients.end(); it++)
     {
@@ -81,9 +79,7 @@ void Channel::quitClient(Client *client)
         {
             if (this->isUserOperator(client) == true)
                 this->quitOperator(client);
-            clientToFree = *it;
             _connectedClients.erase(it);
-            delete clientToFree;
             return ;
         }
     }
@@ -115,10 +111,7 @@ bool Channel::isUserOperator(Client *client)
     for (it = _connectedOperators.begin(); it != _connectedOperators.end(); it++)
     {
         if (client->getFd() == (*it)->getFd())
-        {
-            //std::cout << client->getFd() << " | " << (*it)->getFd() << std::endl;
             return (true);
-        }
     }
     return (false);
 }

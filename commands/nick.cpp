@@ -19,7 +19,7 @@ void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd
     std::string nickname;
     Client      *client;
 
-    std::vector<Client> &allClients = server.getVectorClient();
+    std::vector<Client *> &allClients = server.getVectorClient();
 
     client = server.getClientStruct(clientFd);
     if (client == NULL)
@@ -49,7 +49,7 @@ void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd
 
     for (size_t i = 0; i < allClients.size(); i++) // Regarde si n'y a pas deja quelqu'un avec ce pseudo sur le server.
     {
-        if (nickname == allClients[i].getNickname())
+        if (nickname == allClients[i]->getNickname())
         {
             if (client->getNickname() == "") // Cas particulier au register seulement, on envoie '*' car le client n'a pas encore de pseudo. Sinon la client renvoie une commande etrange.
             {
