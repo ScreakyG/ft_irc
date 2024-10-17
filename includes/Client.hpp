@@ -68,5 +68,6 @@ class Client
         bool                    _enteredServerPassword;
         bool                    _hasRegistered;
         time_t                  _timeoutStart;
-        std::vector<Channel>    _clientChannels;
+        std::vector<Channel *>  _clientChannels;
 };
+

@@ -76,6 +76,7 @@ void Channel::quitClient(Client *client)
         if (client->getFd() == (*it)->getFd())
         {
             _connectedClients.erase(it);
+            break ;
         }
     }
 }

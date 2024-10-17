@@ -156,7 +156,7 @@ void Client::joinChannel(Server &server, Channel &channel, std::string channelPa
 
     if (channelPassword == channel.getChannelPassword())
     {
-        _clientChannels.push_back(channel);
+        _clientChannels.push_back(&channel);
         channel.addClient(this);
 
         message = ":" + this->getNickname() + "!~" + this->getUsername() + "@" + this->getHostname() + " JOIN " + channel.getChannelName() + "\r\n";
@@ -179,13 +179,13 @@ void Client::joinChannel(Server &server, Channel &channel, std::string channelPa
 
 void Client::leaveChannel(Channel &channel)
 {
-    std::vector<Channel>::iterator  it;
+    std::vector<Channel *>::iterator  it;
 
     for (it = _clientChannels.begin(); it != _clientChannels.end(); it++)
     {
-        if (channel.getChannelName() == it->getChannelName())
+        if (channel.getChannelName() == (*it)->getChannelName())
         {
-            it->quitClient(this);
+            (*it)->quitClient(this);
             _clientChannels.erase(it);
         }
     }
@@ -193,7 +193,8 @@ void Client::leaveChannel(Channel &channel)
 
 void Client::leaveAllChannels()
 {
-    _clientChannels.clear();
+    for (size_t idx = 0; idx < _clientChannels.size(); idx++)
+        _clientChannels[idx]->quitClient(this);
 }
 
 static std::string getActiveUsers(Channel &channel)
