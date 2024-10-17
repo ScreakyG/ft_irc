@@ -34,6 +34,7 @@ static void    joinChannels(Server &server, std::vector<std::pair<std::string, s
 
             server.addChannel(newChannel);
             channelToJoin = server.getChannel(channelName);
+            channelToJoin->addOperator(client); // Ajoute le createur du channel en tant que operateur.
             client->joinChannel(server, *channelToJoin, channelPassword);
 
 

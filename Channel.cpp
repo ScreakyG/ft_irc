@@ -12,7 +12,7 @@ Channel::Channel(std::string channelName, std::string channelPassword) : _channe
 {
 }
 
-Channel::Channel(const Channel &src) : _channelName(src._channelName), _channelPassword(src._channelPassword), _connectedClients(src._connectedClients), _topic(src._topic)
+Channel::Channel(const Channel &src) : _channelName(src._channelName), _channelPassword(src._channelPassword), _connectedClients(src._connectedClients), _connectedOperators(src._connectedOperators), _topic(src._topic)
 {
 }
 
@@ -29,6 +29,7 @@ Channel& Channel::operator=(const Channel &rhs)
         this->_channelName = rhs._channelName;
         this->_channelPassword = rhs._channelPassword;
         this->_connectedClients = rhs._connectedClients;
+        this->_connectedOperators = rhs._connectedOperators;
         this->_topic = rhs._topic;
     }
     return (*this);
@@ -58,10 +59,14 @@ std::vector<Client *>& Channel::getActiveUsersVector(void)
     return (this->_connectedClients);
 }
 
+std::vector<Client *>& Channel::getActiveOperatorsVector(void)
+{
+    return (this->_connectedOperators);
+}
+
 void Channel::addClient(Client *client)
 {
    this-> _connectedClients.push_back(client);
-    //Envoyer les messages de bienvenue dans le channel.
 }
 
 void Channel::quitClient(Client *client)
@@ -72,10 +77,43 @@ void Channel::quitClient(Client *client)
     {
         if (client->getFd() == (*it)->getFd())
         {
+            if (this->isUserOperator(client) == true)
+                this->quitOperator(client);
             _connectedClients.erase(it);
-            break ;
+            return ;
         }
     }
+}
+
+void Channel::addOperator(Client *client)
+{
+   this-> _connectedOperators.push_back(client);
+}
+
+void Channel::quitOperator(Client *client)
+{
+    std::vector<Client *>::iterator it;
+
+    for (it = _connectedOperators.begin(); it != _connectedOperators.end(); it++)
+    {
+        if (client->getFd() == (*it)->getFd())
+        {
+            _connectedOperators.erase(it);
+            return ;
+        }
+    }
+}
+
+bool Channel::isUserOperator(Client *client)
+{
+    std::vector<Client *>::iterator it;
+
+    for (it = _connectedOperators.begin(); it != _connectedOperators.end(); it++)
+    {
+        if (client->getFd() == (*it)->getFd())
+            return (true);
+    }
+    return (false);
 }
 
 void Channel::printUsers(void)

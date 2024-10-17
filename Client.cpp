@@ -157,8 +157,8 @@ void Client::joinChannel(Server &server, Channel &channel, std::string channelPa
 
     if (channelPassword == channel.getChannelPassword())
     {
-        _clientChannels.push_back(&channel);
-        channel.addClient(this);
+        _clientChannels.push_back(&channel); // Ajoute le channel a la liste des channels du client.
+        channel.addClient(this); // Ajouter le client dans la liste des clients du channel.
 
         message = ":" + this->getNickname() + "!~" + this->getUsername() + "@" + this->getHostname() + " JOIN " + channel.getChannelName() + "\r\n";
         server.sendToClient(message, this->getFd());
@@ -200,11 +200,14 @@ void Client::leaveAllChannels()
 static std::string getActiveUsers(Channel &channel)
 {
     std::string activeUsers;
+    std::string operatorPrefix;
     std::vector<Client *>::iterator it;
 
     for (it = channel.getActiveUsersVector().begin(); it != channel.getActiveUsersVector().end(); it++)
     {
        // std::cout << (*it)->getNickname() << std::endl;
+       if (channel.isUserOperator(*it))
+         activeUsers += "@";
         activeUsers += (*it)->getNickname();
         activeUsers += " ";
     }
