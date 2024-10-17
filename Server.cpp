@@ -557,16 +557,16 @@ bool Server::channelExist(std::string name)
 {
     for (size_t idx = 0; idx < _Channels.size(); idx++)
     {
-        if (_Channels[idx].getChannelName() == name)
+        if (_Channels[idx]->getChannelName() == name)
             return (true);
     }
     return (false);
 }
 
-void Server::addChannel(Channel &newChannel)
+void Server::addChannel(Channel *newChannel)
 {
     if (DEBUG == LIGHT || DEBUG == FULL)
-        std::cout << "NEW CHANNEL CREATED, Name = " << newChannel.getChannelName() << " | Password = " << newChannel.getChannelPassword() << std::endl;
+        std::cout << "NEW CHANNEL CREATED, Name = " << newChannel->getChannelName() << " | Password = " << newChannel->getChannelPassword() << std::endl;
 
     _Channels.push_back(newChannel);
 }
@@ -575,8 +575,8 @@ Channel* Server::getChannel(std::string channelName)
 {
     for (size_t idx = 0; idx < _Channels.size(); idx++)
     {
-        if (_Channels[idx].getChannelName() == channelName)
-            return (&_Channels[idx]);
+        if (_Channels[idx]->getChannelName() == channelName)
+            return (_Channels[idx]);
     }
     return (NULL);
 }
@@ -592,6 +592,19 @@ void Server::printAllUsers(void)
         std::cout << "fd : " << it->getFd();
         std::cout << std::endl;
    }
+}
+
+void Server::deleteChannels(void)
+{
+    std::vector<Channel *>::iterator    it;
+
+    for (it = _Channels.begin(); it != _Channels.end(); it++)
+    {
+        delete(*it);
+        it = _Channels.erase(it);
+        
+    }
+    _Channels.clear();
 }
 
 

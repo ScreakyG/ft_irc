@@ -33,6 +33,7 @@ int main(void)
         server.serverInit();
         server.startServerRoutine();
         server.closeAllFds();
+        server.deleteChannels();
     }
     catch (const std::exception &e)
     {

@@ -21,7 +21,7 @@ static void    joinChannels(Server &server, std::vector<std::pair<std::string, s
 
             if (channelToJoin != NULL)
             {
-               client->joinChannel(server, *channelToJoin, channelPassword);
+               client->joinChannel(server, channelToJoin, channelPassword);
             }
             else
                 std::cout << "Unexpected error when joingning a Channel" << std::endl;
@@ -29,13 +29,11 @@ static void    joinChannels(Server &server, std::vector<std::pair<std::string, s
         else
         {
             //Creer le channel.
-            Channel newChannel(channelName, channelPassword);
-            Channel*channelToJoin = NULL;
+            Channel *newChannel = new Channel(channelName, channelPassword);
 
             server.addChannel(newChannel);
-            channelToJoin = server.getChannel(channelName);
             //channelToJoin->addOperator(client); // Ajoute le createur du channel en tant que operateur.
-            client->joinChannel(server, *channelToJoin, channelPassword);
+            client->joinChannel(server, newChannel, channelPassword);
         }
     }
 }

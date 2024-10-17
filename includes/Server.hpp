@@ -68,6 +68,7 @@ class Server
 
         void                    deleteClient(int idx); //Remove from poll allSockets.
         void                    closeAllFds(void); // Close all fds.
+        void                    deleteChannels(void);
 
         int                     getServerSocket(void); // Retourne le socket du server.
         Client*                 getClientStruct(int clientFd);
@@ -84,7 +85,7 @@ class Server
         void                    checkClientRegisterTimeouts();
 
         bool                    channelExist(std::string name); // Regarde dans le vecteur '_Channels' si il y en a un qui existe avec le meme nom.
-        void                    addChannel(Channel &newChannel); // Ajoute un channel dans le vecteur '_Channels'.
+        void                    addChannel(Channel *newChannel); // Ajoute un channel dans le vecteur '_Channels'.
         Channel*                getChannel(std::string channelName); // Retourne le channel du vecteur '_Channels' correspondant a channelName.
 
 
@@ -126,7 +127,7 @@ class Server
         sockaddr_in                _serverAddress;
         std::vector<pollfd>        _allSockets;
         std::vector<Client>        _allClients;
-        std::vector<Channel>       _Channels;
+        std::vector<Channel *>     _Channels;
 
        Server(); //Default Constructor.
        Server(const Server &src); // Copy constructor.

@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-static std::string getActiveUsers(Channel &channel);
-static void sendTopic(Server &server, Client *client, Channel &channel);
+static std::string getActiveUsers(Channel *channel);
+static void sendTopic(Server &server, Client *client, Channel *channel);
 
 /******************************/
 /***CONSTRUCTORS/DESTRUCTORS***/
@@ -143,36 +143,36 @@ void Client::addToClientSendBuffer(std::string &string)
     this->_clientSendBuffer += string;
 }
 
-void Client::joinChannel(Server &server, Channel &channel, std::string channelPassword)
+void Client::joinChannel(Server &server, Channel *channel, std::string channelPassword)
 {
     std::string message;
     std::string activeUsers;
 
-    if (channelPassword != channel.getChannelPassword())
+    if (channelPassword != channel->getChannelPassword())
     {
-        message = ERR_BADCHANNELKEY(this->getNickname(), channel.getChannelName());
+        message = ERR_BADCHANNELKEY(this->getNickname(), channel->getChannelName());
         server.sendToClient(message, this->getFd());
         return ;
     }
 
-    if (channelPassword == channel.getChannelPassword())
+    if (channelPassword == channel->getChannelPassword())
     {
-        _clientChannels.push_back(&channel); // Ajoute le channel a la liste des channels du client.
-        channel.addClient(this); // Ajouter le client dans la liste des clients du channel.
+        _clientChannels.push_back(channel); // Ajoute le channel a la liste des channels du client.
+        channel->addClient(this); // Ajouter le client dans la liste des clients du channel.
 
         server.printAllUsers();
-        channel.printUsers();
+        channel->printUsers();
 
-        message = ":" + this->getNickname() + "!~" + this->getUsername() + "@" + this->getHostname() + " JOIN " + channel.getChannelName() + "\r\n";
+        message = ":" + this->getNickname() + "!~" + this->getUsername() + "@" + this->getHostname() + " JOIN " + channel->getChannelName() + "\r\n";
         server.sendToClient(message, this->getFd());
 
         sendTopic(server, this, channel);
 
         activeUsers = getActiveUsers(channel);
-        message = RPL_NAMREPLY(this->getNickname(), channel.getChannelName(), activeUsers);
+        message = RPL_NAMREPLY(this->getNickname(), channel->getChannelName(), activeUsers);
         server.sendToClient(message, this->getFd());
 
-        message = RPL_ENDOFNAMES(this->getNickname(), channel.getChannelName());
+        message = RPL_ENDOFNAMES(this->getNickname(), channel->getChannelName());
         server.sendToClient(message, this->getFd());
 
         // Envoyer les NAMRPLY avec tout les noms des utilisateurs.
@@ -200,16 +200,16 @@ void Client::leaveAllChannels()
         _clientChannels[idx]->quitClient(this);
 }
 
-static std::string getActiveUsers(Channel &channel)
+static std::string getActiveUsers(Channel *channel)
 {
     std::string activeUsers;
     std::string operatorPrefix;
     std::vector<Client *>::iterator it;
 
-    for (it = channel.getActiveUsersVector().begin(); it != channel.getActiveUsersVector().end(); it++)
+    for (it = channel->getActiveUsersVector().begin(); it != channel->getActiveUsersVector().end(); it++)
     {
        // std::cout << (*it)->getNickname() << std::endl;
-        if (channel.isUserOperator(*it))
+        if (channel->isUserOperator(*it))
             activeUsers += "@";
         activeUsers += (*it)->getNickname();
         activeUsers += " ";
@@ -217,18 +217,18 @@ static std::string getActiveUsers(Channel &channel)
     return (activeUsers);
 }
 
-static void sendTopic(Server &server, Client *client, Channel &channel)
+static void sendTopic(Server &server, Client *client, Channel *channel)
 {
     std::string message;
 
-    if (channel.getChannelTopic().empty() == true)
+    if (channel->getChannelTopic().empty() == true)
     {
-        message = RPL_NOTOPIC(client->getNickname(), channel.getChannelName());
+        message = RPL_NOTOPIC(client->getNickname(), channel->getChannelName());
         server.sendToClient(message, client->getFd());
     }
     else
     {
-        message = RPL_TOPIC(client->getNickname(), channel.getChannelName(), channel.getChannelTopic());
+        message = RPL_TOPIC(client->getNickname(), channel->getChannelName(), channel->getChannelTopic());
         server.sendToClient(message, client->getFd());
     }
     return ;
