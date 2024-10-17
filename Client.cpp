@@ -3,6 +3,7 @@
 #include <iostream>
 
 static std::string getActiveUsers(Channel &channel);
+static void sendTopic(Server &server, Client *client, Channel &channel);
 
 /******************************/
 /***CONSTRUCTORS/DESTRUCTORS***/
@@ -162,8 +163,7 @@ void Client::joinChannel(Server &server, Channel &channel, std::string channelPa
         message = ":" + this->getNickname() + "!~" + this->getUsername() + "@" + this->getHostname() + " JOIN " + channel.getChannelName() + "\r\n";
         server.sendToClient(message, this->getFd());
 
-        message = RPL_TOPIC(this->getNickname(), channel.getChannelName(), channel.getChannelTopic());
-        server.sendToClient(message, this->getFd());
+        sendTopic(server, this, channel);
 
         activeUsers = getActiveUsers(channel);
         message = RPL_NAMREPLY(this->getNickname(), channel.getChannelName(), activeUsers);
@@ -209,4 +209,21 @@ static std::string getActiveUsers(Channel &channel)
         activeUsers += " ";
     }
     return (activeUsers);
+}
+
+static void sendTopic(Server &server, Client *client, Channel &channel)
+{
+    std::string message;
+
+    if (channel.getChannelTopic().empty() == true)
+    {
+        message = RPL_NOTOPIC(client->getNickname(), channel.getChannelName());
+        server.sendToClient(message, client->getFd());
+    }
+    else
+    {
+        message = RPL_TOPIC(client->getNickname(), channel.getChannelName(), channel.getChannelTopic());
+        server.sendToClient(message, client->getFd());
+    }
+    return ;
 }

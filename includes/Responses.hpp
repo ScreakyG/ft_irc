@@ -35,6 +35,7 @@
 //JOIN
 
 #define ERR_BADCHANNELKEY(client, channelName) (":localhost 475 " + client + " " + channelName + " :Cannot join channel\r\n");
+#define RPL_NOTOPIC(client, channelName) (":localhost 331 " + client + " " + channelName + " :No topic is set\r\n");
 #define RPL_TOPIC(client, channelName, topic) (":localhost 332 " + client + " " + channelName + " :" + topic + "\r\n");
 #define RPL_NAMREPLY(client, channelName, users) (":localhost 353 " + client + " @ " + channelName + " :" + users + "\r\n");
 #define RPL_ENDOFNAMES(client, channelName) (":localhost 366 " + client + " " + channelName + " :End of /NAMES list.\r\n");

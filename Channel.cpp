@@ -4,19 +4,16 @@
 /***CONSTRUCTORS/DESTRUCTORS***/
 /******************************/
 
-Channel::Channel() : _channelName(""), _channelPassword("")
+Channel::Channel() : _channelName(""), _channelPassword(""), _topic("")
 {
-    _topic = "Default topic.";
 }
 
-Channel::Channel(std::string channelName, std::string channelPassword) : _channelName(channelName), _channelPassword(channelPassword)
+Channel::Channel(std::string channelName, std::string channelPassword) : _channelName(channelName), _channelPassword(channelPassword), _topic("")
 {
-    _topic = "Default topic.";
 }
 
 Channel::Channel(const Channel &src) : _channelName(src._channelName), _channelPassword(src._channelPassword), _connectedClients(src._connectedClients), _topic(src._topic)
 {
-
 }
 
 Channel::~Channel(){};
