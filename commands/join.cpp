@@ -34,13 +34,8 @@ static void    joinChannels(Server &server, std::vector<std::pair<std::string, s
 
             server.addChannel(newChannel);
             channelToJoin = server.getChannel(channelName);
-            channelToJoin->addOperator(client); // Ajoute le createur du channel en tant que operateur.
+            //channelToJoin->addOperator(client); // Ajoute le createur du channel en tant que operateur.
             client->joinChannel(server, *channelToJoin, channelPassword);
-
-
-            //newChannel.printUsers();
-            //server.printAllChannelsUsers();
-            // Rendre le client Operateur du channel.
         }
     }
 }
@@ -67,10 +62,10 @@ void checkChannelsNamesValid(Server &server, Client *client, std::vector<std::pa
     std::string                                                 message;
     std::vector<std::pair<std::string, std::string> >::iterator it;
 
-    for (it = namesAndPasswords.begin(); it != namesAndPasswords.end(); it++)
-    {
-        std::cout << "Name = " << it->first << " | Pass = " << it->second << std::endl;
-    }
+    // for (it = namesAndPasswords.begin(); it != namesAndPasswords.end(); it++)
+    // {
+    //     std::cout << "Name = " << it->first << " | Pass = " << it->second << std::endl;
+    // }
 
     for (it = namesAndPasswords.begin(); it != namesAndPasswords.end(); it++)
     {
@@ -91,9 +86,6 @@ void           exec_JOIN(Server &server, std::string &ogString, std::vector<std:
 {
     Client      *client;
     std::string message;
-
-
-    //std::cout << ogString << std::endl;
 
     client = server.getClientStruct(clientFd);
     if (client == NULL)

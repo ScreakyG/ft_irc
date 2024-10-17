@@ -582,13 +582,16 @@ Channel* Server::getChannel(std::string channelName)
 }
 
 
-void Server::printAllChannelsUsers(void)
+void Server::printAllUsers(void)
 {
-    for (size_t idx = 0; idx < _Channels.size(); idx++)
-    {
-        std::cout << _Channels[idx].getChannelName() << std::endl;
-        _Channels[idx].printUsers();
-    }
+   std::vector<Client>::iterator    it;
+
+   for (it = _allClients.begin(); it != _allClients.end(); it++)
+   {
+        std::cout << "[Server] Nickname : " <<  it->getNickname() << " | ";
+        std::cout << "fd : " << it->getFd();
+        std::cout << std::endl;
+   }
 }
 
 

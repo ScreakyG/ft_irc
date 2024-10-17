@@ -66,7 +66,7 @@ std::vector<Client *>& Channel::getActiveOperatorsVector(void)
 
 void Channel::addClient(Client *client)
 {
-   this-> _connectedClients.push_back(client);
+   this->_connectedClients.push_back(client);
 }
 
 void Channel::quitClient(Client *client)
@@ -111,7 +111,10 @@ bool Channel::isUserOperator(Client *client)
     for (it = _connectedOperators.begin(); it != _connectedOperators.end(); it++)
     {
         if (client->getFd() == (*it)->getFd())
+        {
+            //std::cout << client->getFd() << " | " << (*it)->getFd() << std::endl;
             return (true);
+        }
     }
     return (false);
 }
@@ -121,5 +124,17 @@ void Channel::printUsers(void)
     std::vector<Client *>::iterator it;
 
     for (it = this->_connectedClients.begin(); it != this->_connectedClients.end(); it++)
-        std::cout << (*it)->getNickname() << std::endl;
+    {
+        std::cout << "[Channel] Nickname : " <<  (*it)->getNickname() << " | ";
+        std::cout << "fd : " << (*it)->getFd();
+        std::cout << std::endl;
+    }
+}
+
+void Channel::printOperators(void)
+{
+    std::vector<Client *>::iterator it;
+
+    for (it = this->_connectedOperators.begin(); it != this->_connectedOperators.end(); it++)
+        std::cout << "Operator Nickname = " << (*it)->getNickname() << " | FD = " << (*it)->getFd() << std::endl;
 }

@@ -36,6 +36,7 @@ class Channel
         bool                    isUserOperator(Client *client);
 
         void                    printUsers(void);
+        void                    printOperators(void);
 
     private:
         std::string             _channelName;

@@ -88,7 +88,7 @@ class Server
         Channel*                getChannel(std::string channelName); // Retourne le channel du vecteur '_Channels' correspondant a channelName.
 
 
-        void                    printAllChannelsUsers(void);
+        void                    printAllUsers(void);
 
         /****EXCEPTIONS****/
         class SocketCreationError : public std::exception

@@ -70,4 +70,3 @@ class Client
         time_t                  _timeoutStart;
         std::vector<Channel *>  _clientChannels;
 };
-
