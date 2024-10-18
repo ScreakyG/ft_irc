@@ -164,7 +164,8 @@ void Client::joinChannel(Server &server, Channel *channel, std::string channelPa
         channel->printUsers();
 
         message = ":" + this->getNickname() + "!~" + this->getUsername() + "@" + this->getHostname() + " JOIN " + channel->getChannelName() + "\r\n";
-        server.sendToClient(message, this->getFd());
+        channel->announceNewUser(server, message);
+        //server.sendToClient(message, this->getFd());
 
         sendTopic(server, this, channel);
 

@@ -3,8 +3,11 @@
 #include <string>
 
 #include "Client.hpp"
+#include "Server.hpp"
+
 
 class Client;
+class Server;
 
 class Channel
 {
@@ -34,6 +37,8 @@ class Channel
         void                    quitOperator(Client *client);
 
         bool                    isUserOperator(Client *client);
+
+        void                    announceNewUser(Server &server, std::string &message);
 
         void                    printUsers(void);
         void                    printOperators(void);

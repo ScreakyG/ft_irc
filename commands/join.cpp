@@ -17,6 +17,7 @@ static void    joinChannels(Server &server, std::vector<std::pair<std::string, s
         if (server.channelExist(channelName) == true)
         {
             //Rejoindre le channel.
+            //Regarder si le client n'est pas deja dans le channel, inutile de l'ajouter une autre fois.
             Channel *channelToJoin = server.getChannel(channelName);
 
             if (channelToJoin != NULL)
@@ -61,10 +62,10 @@ void checkChannelsNamesValid(Server &server, Client *client, std::vector<std::pa
     std::string                                                 message;
     std::vector<std::pair<std::string, std::string> >::iterator it;
 
-    // for (it = namesAndPasswords.begin(); it != namesAndPasswords.end(); it++)
-    // {
-    //     std::cout << "Name = " << it->first << " | Pass = " << it->second << std::endl;
-    // }
+    for (it = namesAndPasswords.begin(); it != namesAndPasswords.end(); it++)
+    {
+        std::cout << "Name = " << it->first << " | Pass = " << it->second << std::endl;
+    }
 
     for (it = namesAndPasswords.begin(); it != namesAndPasswords.end(); it++)
     {

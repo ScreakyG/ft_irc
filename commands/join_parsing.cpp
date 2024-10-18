@@ -72,7 +72,7 @@ std::vector<std::pair<std::string, std::string> >  pairNamesPasswords(std::vecto
         if (idx < passwordsVector.size() && passwordsVector[idx].empty() == false)
             pair.second = passwordsVector[idx];
         else
-            pair.second = "NO_PASSWORD";
+            pair.second = "";
         vector.push_back(pair);
     }
     return (vector);

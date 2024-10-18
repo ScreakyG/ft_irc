@@ -135,3 +135,12 @@ void Channel::printOperators(void)
     for (it = this->_connectedOperators.begin(); it != this->_connectedOperators.end(); it++)
         std::cout << "Operator Nickname = " << (*it)->getNickname() << " | FD = " << (*it)->getFd() << std::endl;
 }
+
+void Channel::announceNewUser(Server &server, std::string &message)
+{
+    std::vector<Client *>::iterator it;
+    std::vector<Client *>           &clientsVector = this->getActiveUsersVector();
+
+    for (it = clientsVector.begin(); it != clientsVector.end(); it++)
+        server.sendToClient(message, (*it)->getFd());
+}
