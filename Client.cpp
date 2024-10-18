@@ -200,6 +200,18 @@ void Client::leaveAllChannels()
     _clientChannels.clear();
 }
 
+bool Client::alreadyJoined(std::string &channelName)
+{
+    std::vector<Channel *>::iterator    it;
+
+    for (it = _clientChannels.begin(); it != _clientChannels.end(); it++)
+    {
+        if ((*it)->getChannelName() == channelName)
+            return (true);
+    }
+    return (false);
+}
+
 static std::string getActiveUsers(Channel *channel)
 {
     std::string activeUsers;

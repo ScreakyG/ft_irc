@@ -16,6 +16,8 @@ static void    joinChannels(Server &server, std::vector<std::pair<std::string, s
         std::string channelPassword = namesAndPasswords[idx].second;
         if (server.channelExist(channelName) == true)
         {
+            if (client->alreadyJoined(channelName) == true)
+                continue ;
             //Rejoindre le channel.
             //Regarder si le client n'est pas deja dans le channel, inutile de l'ajouter une autre fois.
             Channel *channelToJoin = server.getChannel(channelName);
