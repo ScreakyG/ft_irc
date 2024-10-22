@@ -298,6 +298,9 @@ void Server::readClient(int idx)
 
 void Server::handleMessage(char *buffer, int clientFd)
 {
+    if (!buffer) // N'est pas sense arriver mais extra protection.
+       return ;
+
     std::string stringedBuffer(buffer);
     Client* client;
 
@@ -480,6 +483,9 @@ void Server::deleteClient(int fd_toClear)
     Client *client;
 
     client = getClientStruct(fd_toClear);
+    if (!client)
+        return ;
+
 
     if (client)
         client->leaveAllChannels();
