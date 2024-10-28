@@ -122,7 +122,7 @@ class Server
 
     private:
         static bool                _stopSignal;
-        int                        _serverPort;
+        long                        _serverPort;
         std::string                _serverPassword;
         int                        _serverSocket;
         sockaddr_in                _serverAddress;
