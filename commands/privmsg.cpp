@@ -14,7 +14,12 @@ void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clien
     }
 
     std::string target = arguments[0];
-    std::string message = arguments[1];
+    std::string message;
+    for (size_t i = 1; i < arguments.size(); ++i) {
+        message += arguments[i];
+        if (i < arguments.size() - 1)
+            message += " ";
+    }
 
     if (target[0] == '#')
     {
