@@ -44,3 +44,4 @@
 
 #define ERR_CHANOPRIVSNEEDED(client) (":localhost 482 " + client + " :You're not channel operator\r\n");
 #define ERR_INVITEONLYCHAN(client, channelName) (":localhost 473 " + client + " " + channelName + " :Cannot join channel (+i) - you must be invited\r\n");
+#define ERR_UNKNOWNMODE(client, modeFlag) (":localhost 472 " + client + " " + modeFlag + " :is not a recognized mode\r\n");
