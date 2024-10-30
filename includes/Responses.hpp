@@ -39,3 +39,8 @@
 #define RPL_TOPIC(client, channelName, topic) (":localhost 332 " + client + " " + channelName + " :" + topic + "\r\n");
 #define RPL_NAMREPLY(client, channelName, users) (":localhost 353 " + client + " @ " + channelName + " :" + users + "\r\n");
 #define RPL_ENDOFNAMES(client, channelName) (":localhost 366 " + client + " " + channelName + " :End of /NAMES list.\r\n");
+
+//MODE
+
+#define ERR_CHANOPRIVSNEEDED(client) (":localhost 482 " + client + " :You're not channel operator\r\n");
+#define ERR_INVITEONLYCHAN(client, channelName) (":localhost 473 " + client + " " + channelName + " :Cannot join channel (+i) - you must be invited\r\n");

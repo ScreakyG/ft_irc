@@ -384,6 +384,8 @@ void Server::executeCommand(std::string &ogString, std::string &commandName, std
         exec_PING((*this), arguments, clientFd);
     else if (commandName == "JOIN")
         exec_JOIN((*this), ogString, arguments, clientFd);
+    else if (commandName == "MODE")
+        exec_MODE(*(this), ogString, arguments, clientFd);
     else
     {
         message = ERR_UNKNOWNCOMMAND(client->getNickname(), commandName);

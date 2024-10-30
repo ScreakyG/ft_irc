@@ -4,15 +4,15 @@
 /***CONSTRUCTORS/DESTRUCTORS***/
 /******************************/
 
-Channel::Channel() : _channelName(""), _channelPassword(""), _topic("")
+Channel::Channel() : _channelName(""), _channelPassword(""), _topic(""), _inviteOnly(false)
 {
 }
 
-Channel::Channel(std::string channelName, std::string channelPassword) : _channelName(channelName), _channelPassword(channelPassword), _topic("")
+Channel::Channel(std::string channelName, std::string channelPassword) : _channelName(channelName), _channelPassword(channelPassword), _topic(""), _inviteOnly(false)
 {
 }
 
-Channel::Channel(const Channel &src) : _channelName(src._channelName), _channelPassword(src._channelPassword), _connectedClients(src._connectedClients), _connectedOperators(src._connectedOperators), _topic(src._topic)
+Channel::Channel(const Channel &src) : _channelName(src._channelName), _channelPassword(src._channelPassword), _connectedClients(src._connectedClients), _connectedOperators(src._connectedOperators), _topic(src._topic), _inviteOnly(src._inviteOnly)
 {
 }
 
@@ -31,6 +31,7 @@ Channel& Channel::operator=(const Channel &rhs)
         this->_connectedClients = rhs._connectedClients;
         this->_connectedOperators = rhs._connectedOperators;
         this->_topic = rhs._topic;
+        this->_inviteOnly = rhs._inviteOnly;
     }
     return (*this);
 }
@@ -126,6 +127,16 @@ void Channel::printUsers(void)
         std::cout << "fd : " << (*it)->getFd();
         std::cout << std::endl;
     }
+}
+
+void Channel::setInviteMode(bool value)
+{
+    this->_inviteOnly = value;
+}
+
+bool Channel::isInviteOnly(void)
+{
+    return (_inviteOnly);
 }
 
 void Channel::printOperators(void)

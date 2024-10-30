@@ -148,6 +148,13 @@ void Client::joinChannel(Server &server, Channel *channel, std::string channelPa
     std::string message;
     std::string activeUsers;
 
+    if (channel->isInviteOnly() == true)
+    {
+        message = ERR_INVITEONLYCHAN(this->getNickname(), channel->getChannelName());
+        server.sendToClient(message, this->getFd());
+        return ;
+    }
+
     if (channel->getChannelPassword().empty() == false && channelPassword != channel->getChannelPassword())
     {
         message = ERR_BADCHANNELKEY(this->getNickname(), channel->getChannelName());
@@ -155,27 +162,24 @@ void Client::joinChannel(Server &server, Channel *channel, std::string channelPa
         return ;
     }
 
-    // if (channelPassword == channel->getChannelPassword())
-    // {
-        _clientChannels.push_back(channel); // Ajoute le channel a la liste des channels du client.
-        channel->addClient(this); // Ajouter le client dans la liste des clients du channel.
+    _clientChannels.push_back(channel); // Ajoute le channel a la liste des channels du client.
+    channel->addClient(this); // Ajouter le client dans la liste des clients du channel.
 
-        server.printAllUsers();
-        channel->printUsers();
+    server.printAllUsers();
+    channel->printUsers();
 
-        message = ":" + this->getNickname() + "!~" + this->getUsername() + "@" + this->getHostname() + " JOIN " + channel->getChannelName() + "\r\n";
-        channel->announceNewUser(server, message);
-        //server.sendToClient(message, this->getFd());
+    message = ":" + this->getNickname() + "!~" + this->getUsername() + "@" + this->getHostname() + " JOIN " + channel->getChannelName() + "\r\n";
+    channel->announceNewUser(server, message);
+    //server.sendToClient(message, this->getFd());
 
-        sendTopic(server, this, channel);
+    sendTopic(server, this, channel);
 
-        activeUsers = getActiveUsers(channel);
-        message = RPL_NAMREPLY(this->getNickname(), channel->getChannelName(), activeUsers);
-        server.sendToClient(message, this->getFd());
+    activeUsers = getActiveUsers(channel);
+    message = RPL_NAMREPLY(this->getNickname(), channel->getChannelName(), activeUsers);
+    server.sendToClient(message, this->getFd());
 
-        message = RPL_ENDOFNAMES(this->getNickname(), channel->getChannelName());
-        server.sendToClient(message, this->getFd());
-    //}
+    message = RPL_ENDOFNAMES(this->getNickname(), channel->getChannelName());
+    server.sendToClient(message, this->getFd());
 }
 
 void Client::leaveChannel(Channel *channel)

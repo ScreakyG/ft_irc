@@ -40,6 +40,9 @@ class Channel
 
         void                    announceNewUser(Server &server, std::string &message);
 
+        void                    setInviteMode(bool value);
+        bool                    isInviteOnly(void);
+
         void                    printUsers(void);
         void                    printOperators(void);
 
@@ -49,4 +52,5 @@ class Channel
         std::vector<Client *>   _connectedClients;
         std::vector<Client *>   _connectedOperators;
         std::string             _topic;
+        bool                    _inviteOnly;
 };
