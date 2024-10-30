@@ -14,6 +14,7 @@ void exec_USER(Server &server, std::vector<std::string> &arguments, int clientFd
 void exec_PING(Server &server, std::vector<std::string> &arguments, int clientFd);
 void exec_CAP(Server &server, std::vector<std::string> &arguments, int clientFd);
 void exec_JOIN(Server &server, std::string &ogString, std::vector<std::string> &arguments, int clientFd);
+void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clientFd);
 
 
 

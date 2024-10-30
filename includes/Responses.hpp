@@ -39,3 +39,6 @@
 #define RPL_TOPIC(client, channelName, topic) (":localhost 332 " + client + " " + channelName + " :" + topic + "\r\n");
 #define RPL_NAMREPLY(client, channelName, users) (":localhost 353 " + client + " @ " + channelName + " :" + users + "\r\n");
 #define RPL_ENDOFNAMES(client, channelName) (":localhost 366 " + client + " " + channelName + " :End of /NAMES list.\r\n");
+
+#define ERR_NOSUCHNICK(source, target) (":localhost 401 " + source + " " + target + " :No such nick/channel\r\n")
+#define ERR_NOTONCHANNEL(source, channel) (":localhost 442 " + source + " " + channel + " :You're not on that channel\r\n")

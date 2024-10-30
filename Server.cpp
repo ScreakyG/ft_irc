@@ -384,6 +384,8 @@ void Server::executeCommand(std::string &ogString, std::string &commandName, std
         exec_PING((*this), arguments, clientFd);
     else if (commandName == "JOIN")
         exec_JOIN((*this), ogString, arguments, clientFd);
+    else if(commandName == "PRIVMSG")
+        exec_PRIVMSG((*this), arguments, clientFd);
     else
     {
         message = ERR_UNKNOWNCOMMAND(client->getNickname(), commandName);
@@ -406,7 +408,7 @@ void Server::isRegistrationComplete(Client *client)
     {
         client->setRegistered(true);
 
-        message = RPL_WELCOME(client->getNickname(), client->getNickname());
+ttttttttttttttt = RPL_WELCOME(client->getNickname(), client->getNickname());
         sendToClient(message, client->getFd());
         message = RPL_YOURHOST(client->getNickname());
         sendToClient(message, client->getFd());
