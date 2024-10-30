@@ -408,7 +408,7 @@ void Server::isRegistrationComplete(Client *client)
     {
         client->setRegistered(true);
 
-ttttttttttttttt = RPL_WELCOME(client->getNickname(), client->getNickname());
+        message = RPL_WELCOME(client->getNickname(), client->getNickname());
         sendToClient(message, client->getFd());
         message = RPL_YOURHOST(client->getNickname());
         sendToClient(message, client->getFd());

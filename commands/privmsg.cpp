@@ -15,9 +15,6 @@ void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clien
 
     std::string target = arguments[0];
     std::string message = arguments[1];
-    
-    if (message[0] == ':')
-        message = message.substr(1);
 
     if (target[0] == '#')
     {
@@ -29,25 +26,28 @@ void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clien
             return;
         }
 
-        if (!sender->alreadyJoined(target))
-        {
-            std::string response = ERR_NOTONCHANNEL(sender->getNickname(), target);
-            server.sendToClient(response, clientFd);
-            return;
-        }
+        std::string reply = ":" + sender->getNickname() + "!" + sender->getUsername() 
+                         + "@" + sender->getHostname() + " PRIVMSG " + target 
+                         + " :" + message + "\r\n";
 
-        std::string reply = ":" + sender->getNickname() + "!" + sender->getUsername() + "@" + sender->getHostname() + " PRIVMSG " + target + " :" + message + "\r\n";
-        channel->announceNewUser(server, reply);
+        std::vector<Client *> &channelClients = channel->getActiveUsersVector();
+        std::vector<Client *>::iterator it;
+        for (it = channelClients.begin(); it != channelClients.end(); ++it)
+        {
+            if ((*it)->getFd() != clientFd)
+                server.sendToClient(reply, (*it)->getFd());
+        }
     }
     else
     {
         Client *recipient = NULL;
-        for (size_t i = 0; i < FD_SETSIZE; i++)
+        std::vector<Client *> &allClients = server.getVectorClient();
+        std::vector<Client *>::iterator it;
+        for (it = allClients.begin(); it != allClients.end(); ++it)
         {
-            Client *client = server.getClientStruct(i);
-            if (client && client->getNickname() == target)
+            if ((*it)->getNickname() == target)
             {
-                recipient = client;
+                recipient = *it;
                 break;
             }
         }
@@ -59,7 +59,9 @@ void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clien
             return;
         }
 
-        std::string reply = ":" + sender->getNickname() + "!" + sender->getUsername() + "@" + sender->getHostname() + " PRIVMSG " + target + " :" + message + "\r\n";
+        std::string reply = ":" + sender->getNickname() + "!" + sender->getUsername() 
+                         + "@" + sender->getHostname() + " PRIVMSG " + target 
+                         + " :" + message + "\r\n";
         server.sendToClient(reply, recipient->getFd());
     }
 }
