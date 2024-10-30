@@ -30,13 +30,14 @@ static void    joinChannels(Server &server, std::vector<std::pair<std::string, s
         else
         {
             //Creer le channel.
-            Channel *newChannel = new Channel(channelName, channelPassword);
+            // Channel *newChannel = new Channel(channelName, channelPassword);
+            Channel *newChannel = new Channel(channelName, "");
 
             if (newChannel != NULL)
             {
                 server.addChannel(newChannel);
                 newChannel->addOperator(client); // Ajoute le createur du channel en tant que operateur.
-                client->joinChannel(server, newChannel, channelPassword);
+                client->joinChannel(server, newChannel, "");
             }
         }
     }
