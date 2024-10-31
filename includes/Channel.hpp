@@ -43,6 +43,9 @@ class Channel
         void                    printUsers(void);
         void                    printOperators(void);
 
+        bool isClientInChannel(Client* client);
+        void broadcastMessage(const std::string& message, int excludeClientFd);
+
     private:
         std::string             _channelName;
         std::string             _channelPassword;

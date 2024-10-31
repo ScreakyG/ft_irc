@@ -14,6 +14,7 @@
 #include <poll.h>
 #include <vector>
 #include <signal.h>
+#include <algorithm>  
 #include <sstream>
 #include <fcntl.h>
 #include <string>

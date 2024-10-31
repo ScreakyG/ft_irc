@@ -15,36 +15,44 @@ Channel	includes/Channel.hpp	/^class Channel$/;"	c
 Client	Client.cpp	/^Client::Client() : _clientFd(-1), _clientReadBuffer(""), _clientSendBuffer(""), _nickname(""), _oldNickname(""), _username(""), _hostname(""), _enteredServerPassword(false), _hasRegistered(false), _timeoutStart(0)$/;"	f	class:Client
 Client	Client.cpp	/^Client::Client(const Client &src) : _clientFd(src._clientFd), _clientReadBuffer(src._clientReadBuffer), _clientSendBuffer(src._clientSendBuffer), _nickname(src._nickname), _oldNickname(src._oldNickname), _username(src._username), _hostname(src._hostname), _enteredServerPassword(src._enteredServerPassword), _hasRegistered(src._hasRegistered), _timeoutStart(src._timeoutStart), _clientChannels(src._clientChannels)$/;"	f	class:Client
 Client	includes/Client.hpp	/^class Client$/;"	c
+ClientCompare	commands/privmsg.cpp	/^    ClientCompare(Client* target) : _target(target) {}$/;"	f	struct:ClientCompare
+ClientCompare	commands/privmsg.cpp	/^struct ClientCompare {$/;"	s	file:
 ClientDisconnect	includes/Server.hpp	/^        class ClientDisconnect : public std::exception$/;"	c	class:Server
-DEBUG	includes/Server.hpp	29;"	d
-DEFAULT_PASSWORD	includes/Server.hpp	34;"	d
-DEFAULT_PORT	includes/Server.hpp	33;"	d
+DEBUG	includes/Server.hpp	30;"	d
+DEFAULT_PASSWORD	includes/Server.hpp	35;"	d
+DEFAULT_PORT	includes/Server.hpp	34;"	d
 DEPS	Makefile	/^DEPS = $(SRCS:.cpp=.d)$/;"	m
 ERROR_MSG	includes/Responses.hpp	5;"	d
 ERR_ALREADYREGISTRED	includes/Responses.hpp	23;"	d
 ERR_BADCHANNELKEY	includes/Responses.hpp	37;"	d
+ERR_CANNOTSENDTOCHAN	includes/Responses.hpp	51;"	d
 ERR_ERRONEUSNICKNAME	includes/Responses.hpp	11;"	d
 ERR_NEEDMOREPARAMS	includes/Responses.hpp	24;"	d
 ERR_NICKNAMEINUSE	includes/Responses.hpp	12;"	d
 ERR_NONICKNAMEGIVEN	includes/Responses.hpp	10;"	d
+ERR_NORECIPIENT	includes/Responses.hpp	45;"	d
 ERR_NOSUCHCHANNEL	includes/Responses.hpp	7;"	d
-ERR_NOSUCHNICK	includes/Responses.hpp	43;"	d
+ERR_NOSUCHNICK	includes/Responses.hpp	44;"	d
 ERR_NOSUCHSERVER	includes/Responses.hpp	20;"	d
-ERR_NOTONCHANNEL	includes/Responses.hpp	44;"	d
+ERR_NOTEXTTOSEND	includes/Responses.hpp	49;"	d
+ERR_NOTONCHANNEL	includes/Responses.hpp	48;"	d
+ERR_NOTOPLEVEL	includes/Responses.hpp	46;"	d
 ERR_NOTREGISTERED	includes/Responses.hpp	26;"	d
 ERR_PASSWDMISMATCH	includes/Responses.hpp	16;"	d
+ERR_TOOMANYTARGETS	includes/Responses.hpp	50;"	d
 ERR_UNKNOWNCOMMAND	includes/Responses.hpp	25;"	d
+ERR_WILDTOPLEVEL	includes/Responses.hpp	47;"	d
 FULL	includes/Random.hpp	/^    FULL = 2$/;"	e	enum:__anon1
 GREEN	includes/Colors.hpp	5;"	d
 LIGHT	includes/Random.hpp	/^    LIGHT = 1,$/;"	e	enum:__anon1
 ListenServerError	includes/Server.hpp	/^        class ListenServerError: public std::exception$/;"	c	class:Server
 NAME	Makefile	/^NAME = ircserv$/;"	m
-NICK_MAXLEN	includes/Server.hpp	36;"	d
+NICK_MAXLEN	includes/Server.hpp	37;"	d
 OFF	includes/Random.hpp	/^    OFF = 0,$/;"	e	enum:__anon1
 PURPLE	includes/Colors.hpp	8;"	d
 PollError	includes/Server.hpp	/^        class PollError : public std::exception$/;"	c	class:Server
 RED	includes/Colors.hpp	4;"	d
-REGISTER_TIMEOUT	includes/Server.hpp	37;"	d
+REGISTER_TIMEOUT	includes/Server.hpp	38;"	d
 RESET	includes/Colors.hpp	3;"	d
 RPL_CREATED	includes/Responses.hpp	33;"	d
 RPL_ENDOFNAMES	includes/Responses.hpp	41;"	d
@@ -53,7 +61,7 @@ RPL_NOTOPIC	includes/Responses.hpp	38;"	d
 RPL_TOPIC	includes/Responses.hpp	39;"	d
 RPL_WELCOME	includes/Responses.hpp	31;"	d
 RPL_YOURHOST	includes/Responses.hpp	32;"	d
-SERVER_IP	includes/Server.hpp	32;"	d
+SERVER_IP	includes/Server.hpp	33;"	d
 SRCS	Makefile	/^SRCS = main.cpp Server.cpp Channel.cpp Client.cpp commands\/pass.cpp commands\/nick.cpp commands\/user.cpp commands\/ping.cpp commands\/join.cpp commands\/join_parsing.cpp commands\/cap.cpp commands\/privmsg.cpp$/;"	m
 SRCS_OBJS	Makefile	/^SRCS_OBJS = $(SRCS:.cpp=.o)$/;"	m
 Server	Server.cpp	/^Server::Server(const Server &src): _serverPort(src._serverPort), _serverPassword(src._serverPassword), _serverSocket(src._serverSocket), _serverAddress(src._serverAddress), _allSockets(src._allSockets), _allClients(src._allClients), _Channels(src._Channels)$/;"	f	class:Server
@@ -85,6 +93,7 @@ _serverPort	includes/Server.hpp	/^        long                        _serverPor
 _serverSocket	includes/Server.hpp	/^        int                        _serverSocket;$/;"	m	class:Server
 _stopSignal	Server.cpp	/^bool Server::_stopSignal = false;$/;"	m	class:Server	file:
 _stopSignal	includes/Server.hpp	/^        static bool                _stopSignal;$/;"	m	class:Server
+_target	commands/privmsg.cpp	/^    Client* _target;$/;"	m	struct:ClientCompare	file:
 _timeoutStart	includes/Client.hpp	/^        time_t                  _timeoutStart;$/;"	m	class:Client
 _topic	includes/Channel.hpp	/^        std::string             _topic;$/;"	m	class:Channel
 _username	includes/Client.hpp	/^        std::string             _username;$/;"	m	class:Client
@@ -121,6 +130,7 @@ executeCommand	Server.cpp	/^void Server::executeCommand(std::string &ogString, s
 getActiveOperatorsVector	Channel.cpp	/^std::vector<Client *>& Channel::getActiveOperatorsVector(void)$/;"	f	class:Channel
 getActiveUsers	Client.cpp	/^static std::string getActiveUsers(Channel *channel)$/;"	f	file:
 getActiveUsersVector	Channel.cpp	/^std::vector<Client *>& Channel::getActiveUsersVector(void)$/;"	f	class:Channel
+getAllClients	includes/Server.hpp	/^        std::vector<Client *>& getAllClients(void) { return _allClients; }$/;"	f	class:Server
 getChannel	Server.cpp	/^Channel* Server::getChannel(std::string channelName)$/;"	f	class:Server
 getChannelName	Channel.cpp	/^std::string Channel::getChannelName(void)$/;"	f	class:Channel
 getChannelPassword	Channel.cpp	/^std::string Channel::getChannelPassword(void)$/;"	f	class:Channel
@@ -131,6 +141,7 @@ getClientSendBuffer	Client.cpp	/^std::string& Client::getClientSendBuffer(void)$
 getClientStruct	Server.cpp	/^Client* Server::getClientStruct(int clientFd)$/;"	f	class:Server
 getFd	Client.cpp	/^int Client::getFd(void)$/;"	f	class:Client
 getHostname	Client.cpp	/^std::string Client::getHostname(void)$/;"	f	class:Client
+getNbClients	includes/Server.hpp	/^        size_t getNbClients(void) const { return _allClients.size(); }$/;"	f	class:Server
 getNickname	Client.cpp	/^std::string Client::getNickname(void)$/;"	f	class:Client
 getOldNickname	Client.cpp	/^std::string Client::getOldNickname(void)$/;"	f	class:Client
 getServerPassword	Server.cpp	/^std::string Server::getServerPassword(void)$/;"	f	class:Server
@@ -151,6 +162,7 @@ leaveAllChannels	Client.cpp	/^void Client::leaveAllChannels()$/;"	f	class:Client
 leaveChannel	Client.cpp	/^void Client::leaveChannel(Channel *channel)$/;"	f	class:Client
 listenPort	Server.cpp	/^void Server::listenPort(void)$/;"	f	class:Server
 main	main.cpp	/^int main(int ac, char **av)$/;"	f
+operator ()	commands/privmsg.cpp	/^    bool operator()(const Client* client) const {$/;"	f	struct:ClientCompare
 operator =	Channel.cpp	/^Channel& Channel::operator=(const Channel &rhs)$/;"	f	class:Channel
 operator =	Client.cpp	/^Client& Client::operator=(const Client &rhs)$/;"	f	class:Client
 operator =	Server.cpp	/^Server& Server::operator=(const Server &rhs)$/;"	f	class:Server

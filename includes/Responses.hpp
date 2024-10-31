@@ -40,5 +40,12 @@
 #define RPL_NAMREPLY(client, channelName, users) (":localhost 353 " + client + " @ " + channelName + " :" + users + "\r\n");
 #define RPL_ENDOFNAMES(client, channelName) (":localhost 366 " + client + " " + channelName + " :End of /NAMES list.\r\n");
 
+//PRIVMSG
 #define ERR_NOSUCHNICK(source, target) (":localhost 401 " + source + " " + target + " :No such nick/channel\r\n")
+#define ERR_NORECIPIENT(client, command) (":localhost 411 " + client + " :No recipient given (" + command + ")\r\n")
+#define ERR_NOTOPLEVEL(client, mask) (":localhost 413 " + client + " " + mask + " :No toplevel domain specified\r\n")
+#define ERR_WILDTOPLEVEL(client, mask) (":localhost 414 " + client + " " + mask + " :Wildcard in toplevel domain\r\n")
 #define ERR_NOTONCHANNEL(source, channel) (":localhost 442 " + source + " " + channel + " :You're not on that channel\r\n")
+#define ERR_NOTEXTTOSEND(client) (":localhost 412 " + client + " :No text to send\r\n")
+#define ERR_TOOMANYTARGETS(client) (":localhost 407 " + client + " :Too many targets\r\n")
+#define ERR_CANNOTSENDTOCHAN(client, channel) (":localhost 404 " + client + " " + channel + " :Cannot send to channel\r\n")
