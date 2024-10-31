@@ -13,12 +13,12 @@ void sendModeReply(Server &server, Client *client, Channel *channel, std::string
 
 void modifyInviteMode(Server &server, Client *client, Channel *channel, bool removeMode)
 {
-    if (removeMode == false)
+    if (removeMode == false && channel->isInviteOnly() == false)
     {
         channel->setInviteMode(true);
         sendModeReply(server, client, channel, "+i");
     }
-    else if (removeMode == true)
+    else if (removeMode == true && channel->isInviteOnly() == true)
     {
         channel->setInviteMode(false);
         sendModeReply(server, client, channel, "-i");

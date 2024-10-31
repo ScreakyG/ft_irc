@@ -1,5 +1,20 @@
 #include "../includes/Commands.hpp"
 
+static bool isValidFlagsString(std::string &flagsString)
+{
+    std::string::iterator   it;
+
+    if (flagsString.empty() == true)
+        return (false);
+
+    for (it = flagsString.begin(); it != flagsString.end(); it ++)
+    {
+        if (*it != '-' || *it != '+')
+            return (true);
+    }
+    return (false);
+}
+
 static bool isFlagSupported(char flag)
 {
     std::string supportedFlags = "itkol";
@@ -10,6 +25,28 @@ static bool isFlagSupported(char flag)
             return (true);
     }
     return (false);
+}
+
+static bool validFlagArguments(std::string &flagsString, int idx, std::vector<std::string> &arguments)
+{
+    if (flagsString[idx] == 'i' || flagsString[idx] == 't') //Ces flags n'aurons jamais besoin d'argument.
+        return (true);
+
+    // Pour les autres on regarde si il y a d'autres arguments derriere.
+    if (arguments.size() < 3)
+        return (false);
+
+    if (arguments.size() > 3)
+    {
+        // On doit egalement verifier ici si l'argument est valide , exemple : user existant..
+        if (arguments[2].empty() == true)
+            return (false);
+    }
+
+    std::cout << "ARGUMENT DE MODE = " << arguments[2] << "\n";
+
+    // Si un flag necessite un argument, on ne doit pas lire le reste des flags et stopper la boucle.
+    return (true);
 }
 
 static void setFlag(Server &server, Client *client, Channel *channel, char flag, bool removeMode)
@@ -35,12 +72,16 @@ static void readFlags(Server &server, std::vector<std::string> &arguments, Clien
     std::string message;
     bool        removeMode = false;
 
-    flags = arguments[1];
+    flags = arguments[1]; // Debut des flags.
+    
+    // Faire une verification pour regarder si la chaine est pas vide ou si elle ne contient pas que des '-' ou '+'.
+    if (isValidFlagsString(flags) == false)
+        return ;
 
     // Si un seul des flags est non valide alors on ne fait rien.
     for (size_t idx = 0; idx < flags.size(); idx++)
     {
-        if (idx == 0 && (flags[0] == '-' || flags[0] == '+'))
+        if (flags[idx] == '-' || flags[idx] == '+')
             continue ;
         if (isFlagSupported(flags[idx]) == false)
         {
@@ -48,6 +89,12 @@ static void readFlags(Server &server, std::vector<std::string> &arguments, Clien
 
             flagString += flags[idx];
             message = ERR_UNKNOWNMODE(client->getNickname(), flagString);
+            server.sendToClient(message, client->getFd());
+            return ;
+        }
+        if (validFlagArguments(flags, idx, arguments) == false)
+        {
+            message = ERR_NEEDMOREPARAMS(client->getNickname(), "MODE");
             server.sendToClient(message, client->getFd());
             return ;
         }
