@@ -23,10 +23,10 @@ static void setFlag(Server &server, Client *client, Channel *channel, char flag,
         return ;
     }
 
-    if (flag == 'i' && removeMode == false)
-        channel->setInviteMode(true);
-    else if (flag == 'i' && removeMode == true)
-        channel->setInviteMode(false);
+    //////////////////////////////////////////
+
+    if (flag == 'i')
+        modifyInviteMode(server, client, channel, removeMode);
 }
 
 static void readFlags(Server &server, std::vector<std::string> &arguments, Client *client, Channel *channel)
@@ -37,20 +37,23 @@ static void readFlags(Server &server, std::vector<std::string> &arguments, Clien
 
     flags = arguments[1];
 
+    // Si un seul des flags est non valide alors on ne fait rien.
     for (size_t idx = 0; idx < flags.size(); idx++)
     {
         if (idx == 0 && (flags[0] == '-' || flags[0] == '+'))
             continue ;
         if (isFlagSupported(flags[idx]) == false)
         {
-            std::string charToString(flags[idx],2);
+            std::string flagString;
 
-            message = ERR_UNKNOWNMODE(client->getNickname(), charToString);
+            flagString += flags[idx];
+            message = ERR_UNKNOWNMODE(client->getNickname(), flagString);
             server.sendToClient(message, client->getFd());
             return ;
         }
     }
 
+    // Les flags sont valides alors on les executes.
     for (size_t idx = 0; idx < flags.size(); idx++)
     {
         if (idx == 0 && (flags[0] == '-' || flags[0] == '+'))

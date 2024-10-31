@@ -4,9 +4,11 @@
 #include "Client.hpp"
 #include "Random.hpp"
 #include "Responses.hpp"
+#include "Channel.hpp"
 
 class Server;
 class Client;
+class Channel;
 
 void exec_PASS(Server &server, std::vector<std::string> &arguments, int clientFd);
 void exec_NICK(Server &server,std::vector<std::string> &arguments, int clientFd);
@@ -26,3 +28,9 @@ std::vector<std::string> splitString(std::string &channels);
 void splitChannelsAndPasswords(std::string &input, std::string &channels, std::string &passwords);
 void   trimString(std::string &str, const char *charset);
 void checkChannelsNamesValid(Server &server, Client *client, std::vector<std::pair<std::string, std::string> > &namesAndPasswords);
+
+
+// MODE ACTIONS FUNCTIONS
+
+void sendModeReply(Server &server, Client *client, Channel *channel, std::string flags);
+void modifyInviteMode(Server &server, Client *client, Channel *channel, bool removeMode);
