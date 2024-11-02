@@ -67,15 +67,17 @@ std::string modifyOperators(Server &server, Client *client, Channel *channel, bo
         return ("");
     }
 
-    if (removeMode == false && channel->isUserOperator(clientToModify) == false)
+    if (removeMode == false)
     {
-        channel->addOperator(clientToModify);
+        if (channel->isUserOperator(clientToModify) == false)
+            channel->addOperator(clientToModify);
         successfullFlagsArgs += argumentName + " ";
         return ("+o");
     }
-    else if (removeMode == true && channel->isUserOperator(clientToModify) == true)
+    else if (removeMode == true)
     {
-        channel->quitOperator(clientToModify);
+        if (channel->isUserOperator(clientToModify) == true)
+            channel->quitOperator(clientToModify);
         successfullFlagsArgs += argumentName + " ";
         return ("-o");
     }
