@@ -33,4 +33,6 @@ void checkChannelsNamesValid(Server &server, Client *client, std::vector<std::pa
 // MODE ACTIONS FUNCTIONS
 
 void sendModeReply(Server &server, Client *client, Channel *channel, std::string flags);
-void modifyInviteMode(Server &server, Client *client, Channel *channel, bool removeMode);
+std::string modifyInviteMode(Server &server, Client *client, Channel *channel, bool removeMode);
+std::string modifiyTopicRestrictions(Server &server, Client *client, Channel *channel, bool removeMode);
+// std::string modifyOperators(Server &server, Client *client, Channel *channel, bool removeMode);

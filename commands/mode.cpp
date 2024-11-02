@@ -36,12 +36,9 @@ static bool validFlagArguments(std::string &flagsString, int idx, std::vector<st
     if (arguments.size() < 3)
         return (false);
 
-    if (arguments.size() > 3)
-    {
-        // On doit egalement verifier ici si l'argument est valide , exemple : user existant..
-        if (arguments[2].empty() == true)
-            return (false);
-    }
+    // On doit egalement verifier ici si l'argument est valide , exemple : user existant..
+    if (arguments[2].empty() == true)
+        return (false);
 
     std::cout << "ARGUMENT DE MODE = " << arguments[2] << "\n";
 
@@ -49,7 +46,7 @@ static bool validFlagArguments(std::string &flagsString, int idx, std::vector<st
     return (true);
 }
 
-static void setFlag(Server &server, Client *client, Channel *channel, char flag, bool removeMode)
+static void setFlag(Server &server, Client *client, Channel *channel, char flag, bool removeMode, std::string &successfullModes)
 {
     std::string message;
 
@@ -63,7 +60,12 @@ static void setFlag(Server &server, Client *client, Channel *channel, char flag,
     //////////////////////////////////////////
 
     if (flag == 'i')
-        modifyInviteMode(server, client, channel, removeMode);
+       successfullModes += modifyInviteMode(server, client, channel, removeMode);
+    else if (flag == 't')
+        successfullModes += modifiyTopicRestrictions(server, client, channel, removeMode);
+        
+    // else if (flag == 'o')
+    //     successfullModes += modifyOperators(server, client, channel, removeMode);
 }
 
 static void readFlags(Server &server, std::vector<std::string> &arguments, Client *client, Channel *channel)
@@ -72,8 +74,10 @@ static void readFlags(Server &server, std::vector<std::string> &arguments, Clien
     std::string message;
     bool        removeMode = false;
 
+    std::string successfullModes;
+
     flags = arguments[1]; // Debut des flags.
-    
+
     // Faire une verification pour regarder si la chaine est pas vide ou si elle ne contient pas que des '-' ou '+'.
     if (isValidFlagsString(flags) == false)
         return ;
@@ -103,14 +107,19 @@ static void readFlags(Server &server, std::vector<std::string> &arguments, Clien
     // Les flags sont valides alors on les executes.
     for (size_t idx = 0; idx < flags.size(); idx++)
     {
-        if (idx == 0 && (flags[0] == '-' || flags[0] == '+'))
+        if (flags[idx] == '-' || flags[idx] == '+')
         {
-            if (flags[0] == '-')
+            if (flags[idx] == '-')
                 removeMode = true;
+            else
+                removeMode = false;
             continue ;
         }
-        setFlag(server, client, channel, flags[idx], removeMode);
+        setFlag(server, client, channel, flags[idx], removeMode, successfullModes);
     }
+
+    if (successfullModes.empty() == false)
+        sendModeReply(server, client, channel, successfullModes);
 }
 
 void exec_MODE(Server &server, std::string &ogString ,std::vector<std::string> &arguments, int clientFd)

@@ -43,6 +43,9 @@ class Channel
         void                    setInviteMode(bool value);
         bool                    isInviteOnly(void);
 
+        void                    setTopicRestrictions(bool value);
+        bool                    isTopicRestricted(void);
+
         void                    printUsers(void);
         void                    printOperators(void);
 
@@ -53,4 +56,5 @@ class Channel
         std::vector<Client *>   _connectedOperators;
         std::string             _topic;
         bool                    _inviteOnly;
+        bool                    _topicRestricted;
 };

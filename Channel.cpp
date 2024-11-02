@@ -4,15 +4,15 @@
 /***CONSTRUCTORS/DESTRUCTORS***/
 /******************************/
 
-Channel::Channel() : _channelName(""), _channelPassword(""), _topic(""), _inviteOnly(false)
+Channel::Channel() : _channelName(""), _channelPassword(""), _topic(""), _inviteOnly(false), _topicRestricted(true)
 {
 }
 
-Channel::Channel(std::string channelName, std::string channelPassword) : _channelName(channelName), _channelPassword(channelPassword), _topic(""), _inviteOnly(false)
+Channel::Channel(std::string channelName, std::string channelPassword) : _channelName(channelName), _channelPassword(channelPassword), _topic(""), _inviteOnly(false), _topicRestricted(true)
 {
 }
 
-Channel::Channel(const Channel &src) : _channelName(src._channelName), _channelPassword(src._channelPassword), _connectedClients(src._connectedClients), _connectedOperators(src._connectedOperators), _topic(src._topic), _inviteOnly(src._inviteOnly)
+Channel::Channel(const Channel &src) : _channelName(src._channelName), _channelPassword(src._channelPassword), _connectedClients(src._connectedClients), _connectedOperators(src._connectedOperators), _topic(src._topic), _inviteOnly(src._inviteOnly), _topicRestricted(src._topicRestricted)
 {
 }
 
@@ -32,6 +32,7 @@ Channel& Channel::operator=(const Channel &rhs)
         this->_connectedOperators = rhs._connectedOperators;
         this->_topic = rhs._topic;
         this->_inviteOnly = rhs._inviteOnly;
+        this->_topicRestricted = rhs._topicRestricted;
     }
     return (*this);
 }
@@ -137,6 +138,16 @@ void Channel::setInviteMode(bool value)
 bool Channel::isInviteOnly(void)
 {
     return (_inviteOnly);
+}
+
+void Channel::setTopicRestrictions(bool value)
+{
+    this->_topicRestricted = value;
+}
+
+bool Channel::isTopicRestricted(void)
+{
+    return (_topicRestricted);
 }
 
 void Channel::printOperators(void)
