@@ -27,26 +27,25 @@ static bool isFlagSupported(char flag)
     return (false);
 }
 
-static bool validFlagArguments(std::string &flagsString, int idx, std::vector<std::string> &arguments)
+static bool validFlagArguments(std::string &flagsString, int idx, unsigned long &arg_idx, std::vector<std::string> &arguments)
 {
-    if (flagsString[idx] == 'i' || flagsString[idx] == 't') //Ces flags n'aurons jamais besoin d'argument.
+    if (flagsString[idx] == 'i' || flagsString[idx] == 't') //Ces flags n'aurons jamais besoin d'arguments.
         return (true);
 
-    // Pour les autres on regarde si il y a d'autres arguments derriere.
-    if (arguments.size() < 3)
+    // On regarde les flags qui necessiste un argument.
+    if (arguments.size() < 3 + arg_idx)
         return (false);
 
-    // On doit egalement verifier ici si l'argument est valide , exemple : user existant..
-    if (arguments[2].empty() == true)
+    if (arguments[2 + arg_idx].empty() == true)
         return (false);
 
-    std::cout << "ARGUMENT DE MODE = " << arguments[2] << "\n";
+    std::cout << "ARGUMENT FOR FLAG : " << flagsString[idx] << " = " << arguments[2 + arg_idx] << "\n";
+    arg_idx++;
 
-    // Si un flag necessite un argument, on ne doit pas lire le reste des flags et stopper la boucle.
     return (true);
 }
 
-static void setFlag(Server &server, Client *client, Channel *channel, char flag, bool removeMode, std::string &successfullModes)
+static void setFlag(Server &server, Client *client, Channel *channel, std::vector<std::string> &arguments, char flag, unsigned long &arg_idx, bool removeMode, std::string &successfullModes, std::string &successfullFlagsArgs)
 {
     std::string message;
 
@@ -63,9 +62,12 @@ static void setFlag(Server &server, Client *client, Channel *channel, char flag,
        successfullModes += modifyInviteMode(server, client, channel, removeMode);
     else if (flag == 't')
         successfullModes += modifiyTopicRestrictions(server, client, channel, removeMode);
-        
-    // else if (flag == 'o')
-    //     successfullModes += modifyOperators(server, client, channel, removeMode);
+
+    else if (flag == 'o')
+    {
+        successfullModes += modifyOperators(server, client, channel, removeMode, arguments[2 + arg_idx], successfullFlagsArgs);
+        arg_idx++;
+    }
 }
 
 static void readFlags(Server &server, std::vector<std::string> &arguments, Client *client, Channel *channel)
@@ -75,6 +77,8 @@ static void readFlags(Server &server, std::vector<std::string> &arguments, Clien
     bool        removeMode = false;
 
     std::string successfullModes;
+    std::string succesfullFlagsArgs;
+    unsigned long arg_idx = 0;
 
     flags = arguments[1]; // Debut des flags.
 
@@ -96,7 +100,7 @@ static void readFlags(Server &server, std::vector<std::string> &arguments, Clien
             server.sendToClient(message, client->getFd());
             return ;
         }
-        if (validFlagArguments(flags, idx, arguments) == false)
+        if (validFlagArguments(flags, idx, arg_idx, arguments) == false)
         {
             message = ERR_NEEDMOREPARAMS(client->getNickname(), "MODE");
             server.sendToClient(message, client->getFd());
@@ -105,6 +109,8 @@ static void readFlags(Server &server, std::vector<std::string> &arguments, Clien
     }
 
     // Les flags sont valides alors on les executes.
+
+    arg_idx = 0;
     for (size_t idx = 0; idx < flags.size(); idx++)
     {
         if (flags[idx] == '-' || flags[idx] == '+')
@@ -115,15 +121,17 @@ static void readFlags(Server &server, std::vector<std::string> &arguments, Clien
                 removeMode = false;
             continue ;
         }
-        setFlag(server, client, channel, flags[idx], removeMode, successfullModes);
+        setFlag(server, client, channel, arguments, flags[idx], arg_idx, removeMode, successfullModes, succesfullFlagsArgs);
     }
 
     if (successfullModes.empty() == false)
-        sendModeReply(server, client, channel, successfullModes);
+        sendModeReply(server, client, channel, successfullModes, succesfullFlagsArgs);
 }
 
 void exec_MODE(Server &server, std::string &ogString ,std::vector<std::string> &arguments, int clientFd)
 {
+    (void)ogString;
+
     Client      *client;
     Channel     *channel;
     std::string message;
@@ -160,5 +168,4 @@ void exec_MODE(Server &server, std::string &ogString ,std::vector<std::string> &
         return ; // Changer car cela veut dire que la commande est du style MODE #CARS
 
     readFlags(server, arguments, client, channel);
-    (void)ogString;
 }

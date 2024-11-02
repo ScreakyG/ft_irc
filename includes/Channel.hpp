@@ -29,6 +29,7 @@ class Channel
         std::string             getChannelTopic(void);
         std::vector<Client *>&  getActiveUsersVector(void);
         std::vector<Client *>&  getActiveOperatorsVector(void);
+        Client*                 getClientOnChannel(std::string name);
 
         void                    addClient(Client *client);
         void                    quitClient(Client *client);

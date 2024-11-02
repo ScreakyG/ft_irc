@@ -166,3 +166,15 @@ void Channel::announceNewUser(Server &server, std::string &message)
     for (it = clientsVector.begin(); it != clientsVector.end(); it++)
         server.sendToClient(message, (*it)->getFd());
 }
+
+Client* Channel::getClientOnChannel(std::string name)
+{
+    std::vector<Client *>::iterator it;
+
+    for (it = _connectedClients.begin(); it != _connectedClients.end(); it++)
+    {
+        if ((*it)->getNickname() == name)
+            return (*it);
+    }
+    return (NULL);
+}
