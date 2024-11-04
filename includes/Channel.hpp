@@ -50,6 +50,10 @@ class Channel
         void                    printUsers(void);
         void                    printOperators(void);
 
+        void                    changePassword(std::string password);
+        unsigned long           getUsersLimit(void);
+        void                    changeUsersLimit(unsigned long limit);
+
     private:
         std::string             _channelName;
         std::string             _channelPassword;
@@ -58,4 +62,5 @@ class Channel
         std::string             _topic;
         bool                    _inviteOnly;
         bool                    _topicRestricted;
+        unsigned long           _usersLimit;
 };

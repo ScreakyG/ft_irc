@@ -46,3 +46,4 @@
 #define ERR_INVITEONLYCHAN(client, channelName) (":localhost 473 " + client + " " + channelName + " :Cannot join channel (+i) - you must be invited\r\n");
 #define ERR_UNKNOWNMODE(client, modeFlag) (":localhost 472 " + client + " " + modeFlag + " :is not a recognized mode\r\n");
 #define ERR_NOSUCHNICK(client, target) (":localhost 401 " + client + " " + target + " :No such nick/channel\r\n");
+#define ERR_CHANNELISFULL(client, channelName) (":localhost 471 " + client + " " + channelName + " :Cannot join channel (+l) - channel is full, try again later\r\n");

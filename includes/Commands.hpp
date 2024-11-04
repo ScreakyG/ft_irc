@@ -36,3 +36,5 @@ void sendModeReply(Server &server, Client *client, Channel *channel, std::string
 std::string modifyInviteMode(Server &server, Client *client, Channel *channel, bool removeMode);
 std::string modifiyTopicRestrictions(Server &server, Client *client, Channel *channel, bool removeMode);
 std::string modifyOperators(Server &server, Client *client, Channel *channel, bool removeMode, std::string argumentName, std::string &successfullFlagsArgs);
+std::string modifyChannelKey(Server &server, Client *client, Channel *channel, bool removeMode, std::string argumentName, std::string &successfullFlagsArgs);
+std::string modifyChannelUsersLimit(Server &server, Client *client, Channel *channel, bool removeMode, std::string argumentName, std::string &successfullFlagsArgs);

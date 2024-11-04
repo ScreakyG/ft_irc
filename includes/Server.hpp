@@ -39,6 +39,7 @@
 //#define BACKLOG 10
 
 class Channel;
+class Client;
 
 class Server
 {

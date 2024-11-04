@@ -4,15 +4,15 @@
 /***CONSTRUCTORS/DESTRUCTORS***/
 /******************************/
 
-Channel::Channel() : _channelName(""), _channelPassword(""), _topic(""), _inviteOnly(false), _topicRestricted(true)
+Channel::Channel() : _channelName(""), _channelPassword(""), _topic(""), _inviteOnly(false), _topicRestricted(true), _usersLimit(0)
 {
 }
 
-Channel::Channel(std::string channelName, std::string channelPassword) : _channelName(channelName), _channelPassword(channelPassword), _topic(""), _inviteOnly(false), _topicRestricted(true)
+Channel::Channel(std::string channelName, std::string channelPassword) : _channelName(channelName), _channelPassword(channelPassword), _topic(""), _inviteOnly(false), _topicRestricted(true), _usersLimit(0)
 {
 }
 
-Channel::Channel(const Channel &src) : _channelName(src._channelName), _channelPassword(src._channelPassword), _connectedClients(src._connectedClients), _connectedOperators(src._connectedOperators), _topic(src._topic), _inviteOnly(src._inviteOnly), _topicRestricted(src._topicRestricted)
+Channel::Channel(const Channel &src) : _channelName(src._channelName), _channelPassword(src._channelPassword), _connectedClients(src._connectedClients), _connectedOperators(src._connectedOperators), _topic(src._topic), _inviteOnly(src._inviteOnly), _topicRestricted(src._topicRestricted), _usersLimit(0)
 {
 }
 
@@ -33,6 +33,7 @@ Channel& Channel::operator=(const Channel &rhs)
         this->_topic = rhs._topic;
         this->_inviteOnly = rhs._inviteOnly;
         this->_topicRestricted = rhs._topicRestricted;
+        this->_usersLimit = rhs._usersLimit;
     }
     return (*this);
 }
@@ -177,4 +178,19 @@ Client* Channel::getClientOnChannel(std::string name)
             return (*it);
     }
     return (NULL);
+}
+
+void Channel::changePassword(std::string password)
+{
+    this->_channelPassword = password;
+}
+
+unsigned long Channel::getUsersLimit(void)
+{
+    return (this->_usersLimit);
+}
+
+void Channel::changeUsersLimit(unsigned long limit)
+{
+    this->_usersLimit = limit;
 }

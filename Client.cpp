@@ -162,6 +162,13 @@ void Client::joinChannel(Server &server, Channel *channel, std::string channelPa
         return ;
     }
 
+    if (channel->getUsersLimit() != 0 && channel->getActiveUsersVector().size() >= channel->getUsersLimit())
+    {
+        message = ERR_CHANNELISFULL(this->getNickname(), channel->getChannelName());
+        server.sendToClient(message, this->getFd());
+        return ;
+    }
+
     _clientChannels.push_back(channel); // Ajoute le channel a la liste des channels du client.
     channel->addClient(this); // Ajouter le client dans la liste des clients du channel.
 

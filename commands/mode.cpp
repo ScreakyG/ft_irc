@@ -68,6 +68,16 @@ static void setFlag(Server &server, Client *client, Channel *channel, std::vecto
         successfullModes += modifyOperators(server, client, channel, removeMode, arguments[2 + arg_idx], successfullFlagsArgs);
         arg_idx++;
     }
+    else if (flag == 'k')
+    {
+        successfullModes += modifyChannelKey(server, client, channel, removeMode, arguments[2 + arg_idx], successfullFlagsArgs);
+        arg_idx++;
+    }
+    else if (flag == 'l')
+    {
+        successfullModes += modifyChannelUsersLimit(server, client, channel, removeMode, arguments[2 + arg_idx], successfullFlagsArgs);
+        arg_idx++;
+    }
 }
 
 static void readFlags(Server &server, std::vector<std::string> &arguments, Client *client, Channel *channel)

@@ -1,4 +1,5 @@
 #include "../includes/Commands.hpp"
+#include <limits>
 
 void sendModeReply(Server &server, Client *client, Channel *channel, std::string flags, std::string flagsArguments)
 {
@@ -80,6 +81,54 @@ std::string modifyOperators(Server &server, Client *client, Channel *channel, bo
             channel->quitOperator(clientToModify);
         successfullFlagsArgs += argumentName + " ";
         return ("-o");
+    }
+    return ("");
+}
+
+std::string modifyChannelKey(Server &server, Client *client, Channel *channel, bool removeMode, std::string argumentName, std::string &successfullFlagsArgs)
+{
+    (void)server;
+    (void)client;
+
+    if (removeMode == true && channel->getChannelPassword().empty() == false)
+    {
+        channel->changePassword("");
+        successfullFlagsArgs += "* ";
+        return ("-k");
+    }
+    else if (removeMode == false)
+    {
+        channel->changePassword(argumentName);
+        successfullFlagsArgs += argumentName + " ";
+        return ("+k");
+    }
+    return ("");
+}
+
+std::string modifyChannelUsersLimit(Server &server, Client *client, Channel *channel, bool removeMode, std::string argumentName, std::string &successfullFlagsArgs)
+{
+    (void)server;
+    (void)client;
+
+    unsigned long   newLimit;
+    char   *endptr;
+
+    errno = 0;
+    if (removeMode == true && channel->getUsersLimit() != 0)
+    {
+        channel->changeUsersLimit(0);
+        return ("-l");
+    }
+    else if (removeMode == false)
+    {
+        if (argumentName.find("-") != std::string::npos)
+            return ("");
+        newLimit = std::strtoul(argumentName.c_str(), &endptr, 10);
+        if (*endptr != '\0' || errno == ERANGE)
+            return ("");
+        channel->changeUsersLimit(newLimit);
+        successfullFlagsArgs += argumentName + " ";
+        return ("+l");
     }
     return ("");
 }
