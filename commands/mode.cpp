@@ -27,9 +27,9 @@ static bool isFlagSupported(char flag)
     return (false);
 }
 
-static bool validFlagArguments(std::string &flagsString, int idx, unsigned long &arg_idx, std::vector<std::string> &arguments)
+static bool validFlagArguments(std::string &flagsString, int idx, unsigned long &arg_idx, std::vector<std::string> &arguments, bool removeMode)
 {
-    if (flagsString[idx] == 'i' || flagsString[idx] == 't') //Ces flags n'aurons jamais besoin d'arguments.
+    if (flagsString[idx] == 'i' || flagsString[idx] == 't' || (removeMode == true && (flagsString[idx] == 'k' || flagsString[idx] == 'l'))) //Ces flags n'aurons jamais besoin d'arguments.
         return (true);
 
     // On regarde les flags qui necessiste un argument.
@@ -70,13 +70,23 @@ static void setFlag(Server &server, Client *client, Channel *channel, std::vecto
     }
     else if (flag == 'k')
     {
-        successfullModes += modifyChannelKey(server, client, channel, removeMode, arguments[2 + arg_idx], successfullFlagsArgs);
-        arg_idx++;
+        if (removeMode == true)
+            successfullModes += modifyChannelKey(server, client, channel, removeMode, "", successfullFlagsArgs);
+        else
+        {
+            successfullModes += modifyChannelKey(server, client, channel, removeMode, arguments[2 + arg_idx], successfullFlagsArgs);
+            arg_idx++;
+        }
     }
     else if (flag == 'l')
     {
-        successfullModes += modifyChannelUsersLimit(server, client, channel, removeMode, arguments[2 + arg_idx], successfullFlagsArgs);
-        arg_idx++;
+        if (removeMode == true)
+            successfullModes += modifyChannelUsersLimit(server, client, channel, removeMode, "", successfullFlagsArgs);
+        else
+        {
+            successfullModes += modifyChannelUsersLimit(server, client, channel, removeMode, arguments[2 + arg_idx], successfullFlagsArgs);
+            arg_idx++;
+        }
     }
 }
 
@@ -100,7 +110,13 @@ static void readFlags(Server &server, std::vector<std::string> &arguments, Clien
     for (size_t idx = 0; idx < flags.size(); idx++)
     {
         if (flags[idx] == '-' || flags[idx] == '+')
+        {
+            if (flags[idx] == '-')
+                removeMode = true;
+            else
+                removeMode = false;
             continue ;
+        }
         if (isFlagSupported(flags[idx]) == false)
         {
             std::string flagString;
@@ -110,7 +126,7 @@ static void readFlags(Server &server, std::vector<std::string> &arguments, Clien
             server.sendToClient(message, client->getFd());
             return ;
         }
-        if (validFlagArguments(flags, idx, arg_idx, arguments) == false)
+        if (validFlagArguments(flags, idx, arg_idx, arguments, removeMode) == false)
         {
             message = ERR_NEEDMOREPARAMS(client->getNickname(), "MODE");
             server.sendToClient(message, client->getFd());
@@ -120,6 +136,7 @@ static void readFlags(Server &server, std::vector<std::string> &arguments, Clien
 
     // Les flags sont valides alors on les executes.
 
+    removeMode = 0;
     arg_idx = 0;
     for (size_t idx = 0; idx < flags.size(); idx++)
     {
