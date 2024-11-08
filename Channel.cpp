@@ -222,3 +222,8 @@ std::string Channel::getChannelModes(void)
 
     return (currentModes);
 }
+
+void Channel::setTopic(std::string topic)
+{
+    _topic = topic;
+}

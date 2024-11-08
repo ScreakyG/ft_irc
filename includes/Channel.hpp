@@ -48,6 +48,7 @@ class Channel
 
         void                    setTopicRestrictions(bool value);
         bool                    isTopicRestricted(void);
+        void                    setTopic(std::string topic);
 
         void                    printUsers(void);
         void                    printOperators(void);

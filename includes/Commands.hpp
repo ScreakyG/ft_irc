@@ -18,6 +18,7 @@ void exec_CAP(Server &server, std::vector<std::string> &arguments, int clientFd)
 void exec_JOIN(Server &server, std::string &ogString, std::vector<std::string> &arguments, int clientFd);
 void exec_MODE(Server &server, std::string &ogString, std::vector<std::string> &arguments, int clientFd);
 void exec_KICK(Server &server, std::string &ogString, std::vector<std::string> &arguments, int clientFd);
+void exec_TOPIC(Server &server, std::vector<std::string> &arguments, int clientFd);
 
 
 

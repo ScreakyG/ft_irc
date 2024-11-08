@@ -388,6 +388,8 @@ void Server::executeCommand(std::string &ogString, std::string &commandName, std
         exec_MODE(*(this), ogString, arguments, clientFd);
     else if (commandName == "KICK")
         exec_KICK((*this), ogString, arguments, clientFd);
+    else if (commandName == "TOPIC")
+        exec_TOPIC((*this), arguments, clientFd);
     else
     {
         message = ERR_UNKNOWNCOMMAND(client->getNickname(), commandName);
