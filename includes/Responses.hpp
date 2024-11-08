@@ -48,3 +48,4 @@
 #define ERR_NOSUCHNICK(client, target) (":localhost 401 " + client + " " + target + " :No such nick/channel\r\n");
 #define ERR_CHANNELISFULL(client, channelName) (":localhost 471 " + client + " " + channelName + " :Cannot join channel (+l) - channel is full, try again later\r\n");
 #define ERR_NOTONCHANNEL(client, channelName) (":localhost 442 " + client + " " + channelName + " :You're not on that channel\r\n");
+#define RPL_CHANNELMODEIS(client, channelName, channelModes) (":localhost 324 " + client + " " + channelName + " " + channelModes + "\r\n");

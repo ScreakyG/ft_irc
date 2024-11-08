@@ -206,3 +206,19 @@ void Channel::changeUsersLimit(unsigned long limit)
 {
     this->_usersLimit = limit;
 }
+
+std::string Channel::getChannelModes(void)
+{
+    std::string currentModes;
+
+    if (_topicRestricted == false && _inviteOnly == false)
+        return ("");
+
+    currentModes += "+";
+    if (_topicRestricted == true)
+        currentModes += "t";
+    if (_inviteOnly == true)
+        currentModes += "i";
+
+    return (currentModes);
+}
