@@ -30,6 +30,13 @@ void exec_KICK(Server &server, std::string &ogString, std::vector<std::string> &
         return ;
     }
 
+    if (client->hasRegistered() == false)
+    {
+        message = ERR_NOTREGISTERED;
+        server.sendToClient(message, clientFd);
+        return ;
+    }
+
     if (arguments.size() < 2)
     {
         message = ERR_NEEDMOREPARAMS(client->getNickname(), "KICK");

@@ -163,6 +163,13 @@ void exec_MODE(Server &server, std::string &ogString ,std::vector<std::string> &
         return ;
     }
 
+    if (client->hasRegistered() == false)
+    {
+        message = ERR_NOTREGISTERED;
+        server.sendToClient(message, clientFd);
+        return ;
+    }
+
     if (arguments.size() == 0)
     {
         message = ERR_NEEDMOREPARAMS(client->getNickname(), "MODE");
