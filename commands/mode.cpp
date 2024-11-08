@@ -49,15 +49,6 @@ static void setFlag(Server &server, Client *client, Channel *channel, std::vecto
 {
     std::string message;
 
-    if (channel->isUserOperator(client) == false)
-    {
-        message = ERR_CHANOPRIVSNEEDED(client->getNickname());
-        server.sendToClient(message, client->getFd());
-        return ;
-    }
-
-    //////////////////////////////////////////
-
     if (flag == 'i')
        successfullModes += modifyInviteMode(server, client, channel, removeMode);
     else if (flag == 't')
@@ -179,17 +170,27 @@ void exec_MODE(Server &server, std::string &ogString ,std::vector<std::string> &
     }
 
     channelName = arguments[0];
-
-    if (server.channelExist(channelName) == false)
+    channel = server.getChannel(channelName);
+    if (channel == NULL)
     {
         message = ERR_NOSUCHCHANNEL(client->getNickname(), channelName);
         server.sendToClient(message, client->getFd());
         return ;
     }
 
-    channel = server.getChannel(channelName);
-    if (!channel)
+    if (channel->isUserOnChannel(client) == false)
+    {
+        message = ERR_NOTONCHANNEL(client->getNickname(), channelName)
+        server.sendToClient(message, client->getFd());
         return ;
+    }
+
+    if (channel->isUserOperator(client) == false)
+    {
+        message = ERR_CHANOPRIVSNEEDED(client->getNickname());
+        server.sendToClient(message, client->getFd());
+        return ;
+    }
 
     if (arguments.size() < 2)
         return ; // Changer car cela veut dire que la commande est du style MODE #CARS

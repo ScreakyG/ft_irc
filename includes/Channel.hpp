@@ -37,6 +37,7 @@ class Channel
         void                    addOperator(Client *client);
         void                    quitOperator(Client *client);
 
+        bool                    isUserOnChannel(Client *client);
         bool                    isUserOperator(Client *client);
 
         void                    announceNewUser(Server &server, std::string &message);

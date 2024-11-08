@@ -107,6 +107,18 @@ void Channel::quitOperator(Client *client)
     }
 }
 
+bool Channel::isUserOnChannel(Client *client)
+{
+    std::vector<Client *>::iterator it;
+
+    for (it = _connectedClients.begin(); it != _connectedClients.end(); it++)
+    {
+        if (client->getFd() == (*it)->getFd())
+            return (true);
+    }
+    return (false);
+}
+
 bool Channel::isUserOperator(Client *client)
 {
     std::vector<Client *>::iterator it;
