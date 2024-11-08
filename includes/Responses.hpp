@@ -40,7 +40,6 @@
 #define RPL_NAMREPLY(client, channelName, users) (":localhost 353 " + client + " @ " + channelName + " :" + users + "\r\n");
 #define RPL_ENDOFNAMES(client, channelName) (":localhost 366 " + client + " " + channelName + " :End of /NAMES list.\r\n");
 
-//MODE
 
 #define ERR_CHANOPRIVSNEEDED(client) (":localhost 482 " + client + " :You're not channel operator\r\n");
 #define ERR_INVITEONLYCHAN(client, channelName) (":localhost 473 " + client + " " + channelName + " :Cannot join channel (+i) - you must be invited\r\n");
@@ -49,3 +48,5 @@
 #define ERR_CHANNELISFULL(client, channelName) (":localhost 471 " + client + " " + channelName + " :Cannot join channel (+l) - channel is full, try again later\r\n");
 #define ERR_NOTONCHANNEL(client, channelName) (":localhost 442 " + client + " " + channelName + " :You're not on that channel\r\n");
 #define RPL_CHANNELMODEIS(client, channelName, channelModes) (":localhost 324 " + client + " " + channelName + " " + channelModes + "\r\n");
+#define ERR_USERONCHANNEL(client, clientTarget, channelName) (":localhost 443 " + client + " " + clientTarget + " " + channelName + " :is already on channel\r\n");
+#define RPL_INVITING(client, channelName, clientTarget) (":localhost 341 " + client + " " + clientTarget + " " + channelName + "\r\n");

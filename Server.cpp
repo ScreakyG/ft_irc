@@ -390,6 +390,8 @@ void Server::executeCommand(std::string &ogString, std::string &commandName, std
         exec_KICK((*this), ogString, arguments, clientFd);
     else if (commandName == "TOPIC")
         exec_TOPIC((*this), arguments, clientFd);
+    else if (commandName == "INVITE")
+        exec_INVITE((*this), arguments, clientFd);
     else
     {
         message = ERR_UNKNOWNCOMMAND(client->getNickname(), commandName);
@@ -649,6 +651,21 @@ void Server::deleteAllChannels(void)
         delete(*it);
     }
     _Channels.clear();
+}
+
+Client* Server::getClientByName(std::string clientName)
+{
+    std::vector<Client *>::iterator it;
+
+    for (it = _allClients.begin(); it != _allClients.end(); it++)
+    {
+        if ((*it)->hasRegistered() == true)
+        {
+            if ((*it)->getNickname() == clientName)
+                return ((*it));
+        }
+    }
+    return (NULL);
 }
 
 

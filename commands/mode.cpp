@@ -154,7 +154,6 @@ void exec_MODE(Server &server, std::string &ogString ,std::vector<std::string> &
     Channel     *channel;
     std::string message;
     std::string channelName;
-    // std::string currentModes;
 
     client = server.getClientStruct(clientFd);
     if (client == NULL)
@@ -193,22 +192,20 @@ void exec_MODE(Server &server, std::string &ogString ,std::vector<std::string> &
         return ;
     }
 
+    // Cela veut dire que l'input est du style MODE #CARS.
+    if (arguments.size() < 2)
+    {
+        message = RPL_CHANNELMODEIS(client->getNickname(), channelName, channel->getChannelModes());
+        server.sendToClient(message, client->getFd());
+        return ;
+    }
+
     if (channel->isUserOperator(client) == false)
     {
         message = ERR_CHANOPRIVSNEEDED(client->getNickname());
         server.sendToClient(message, client->getFd());
         return ;
     }
-
-    // Cela veut dire que l'input est du style MODE #CARS.
-    if (arguments.size() < 2)
-    {
-        // currentModes = channel->getChannelModes();
-        message = RPL_CHANNELMODEIS(client->getNickname(), channelName, channel->getChannelModes());
-        server.sendToClient(message, client->getFd());
-        return ;
-    }
-
 
     readFlags(server, arguments, client, channel);
 }

@@ -19,6 +19,7 @@ void exec_JOIN(Server &server, std::string &ogString, std::vector<std::string> &
 void exec_MODE(Server &server, std::string &ogString, std::vector<std::string> &arguments, int clientFd);
 void exec_KICK(Server &server, std::string &ogString, std::vector<std::string> &arguments, int clientFd);
 void exec_TOPIC(Server &server, std::vector<std::string> &arguments, int clientFd);
+void exec_INVITE(Server &server, std::vector<std::string> &arguments, int clientFd);
 
 
 

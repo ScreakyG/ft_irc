@@ -76,7 +76,8 @@ class Server
         Client*                 getClientStruct(int clientFd);
         pollfd*                 getClientPoll(int clientFd);
         std::string             getServerPassword(void); // Retourne le mot de passe du serveur.
-        std::vector<Client *>&    getVectorClient(void); // Retourne le vecteur de client.
+        std::vector<Client *>&  getVectorClient(void); // Retourne le vecteur de client.
+        Client*                 getClientByName(std::string clientName); //Retoure un client grace a son username.
 
         void                    handleMessage(char *buffer, int clientFd);
         void                    handleCommand(std::string &command, int clientFd);
@@ -123,7 +124,7 @@ class Server
 
     private:
         static bool                _stopSignal;
-        long                        _serverPort;
+        long                       _serverPort;
         std::string                _serverPassword;
         int                        _serverSocket;
         sockaddr_in                _serverAddress;
