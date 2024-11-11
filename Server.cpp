@@ -384,6 +384,7 @@ void Server::executeCommand(std::string &ogString, std::string &commandName, std
         exec_PING((*this), arguments, clientFd);
     else if (commandName == "JOIN")
         exec_JOIN((*this), ogString, arguments, clientFd);
+<<<<<<< HEAD
     else if (commandName == "MODE")
         exec_MODE(*(this), ogString, arguments, clientFd);
     else if (commandName == "KICK")
@@ -392,6 +393,10 @@ void Server::executeCommand(std::string &ogString, std::string &commandName, std
         exec_TOPIC((*this), arguments, clientFd);
     else if (commandName == "INVITE")
         exec_INVITE((*this), arguments, clientFd);
+=======
+    else if(commandName == "PRIVMSG")
+        exec_PRIVMSG((*this), arguments, clientFd);
+>>>>>>> ketzon
     else
     {
         message = ERR_UNKNOWNCOMMAND(client->getNickname(), commandName);

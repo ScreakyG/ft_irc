@@ -14,6 +14,7 @@
 #include <poll.h>
 #include <vector>
 #include <signal.h>
+#include <algorithm>  
 #include <sstream>
 #include <fcntl.h>
 #include <string>
@@ -93,6 +94,13 @@ class Server
 
 
         void                    printAllUsers(void);
+
+        void                    sendReply(int clientFd, int errorCode, const std::string& message);
+        Client*                 getClientByNickname(const std::string& nickname);
+
+        std::vector<Client *>& getAllClients(void) { return _allClients; }
+
+        size_t getNbClients(void) const { return _allClients.size(); }
 
         /****EXCEPTIONS****/
         class SocketCreationError : public std::exception

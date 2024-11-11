@@ -53,9 +53,14 @@ class Channel
         void                    printUsers(void);
         void                    printOperators(void);
 
+<<<<<<< HEAD
         void                    changePassword(std::string password);
         unsigned long           getUsersLimit(void);
         void                    changeUsersLimit(unsigned long limit);
+=======
+        bool isClientInChannel(Client* client);
+        void broadcastMessage(const std::string& message, int excludeClientFd);
+>>>>>>> ketzon
 
     private:
         std::string             _channelName;
