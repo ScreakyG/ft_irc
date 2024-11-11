@@ -72,4 +72,8 @@ void exec_INVITE(Server &server, std::vector<std::string> &arguments, int client
     // Message pour celui qui recoit l'invite.
     message = ":" + client->getNickname() + "!~" + client->getUsername() + "@" + client->getHostname() + " INVITE " + clientToInvite->getNickname() + " :" + channel->getChannelName() + "\r\n";
     server.sendToClient(message, clientToInvite->getFd());
+
+    // Ajout de l'utilisateur dans la whitelist du channel.
+
+    channel->getInvitedUsersVector().push_back(clientToInvite);
 }

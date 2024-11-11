@@ -12,7 +12,7 @@ Channel::Channel(std::string channelName, std::string channelPassword) : _channe
 {
 }
 
-Channel::Channel(const Channel &src) : _channelName(src._channelName), _channelPassword(src._channelPassword), _connectedClients(src._connectedClients), _connectedOperators(src._connectedOperators), _topic(src._topic), _inviteOnly(src._inviteOnly), _topicRestricted(src._topicRestricted), _usersLimit(0)
+Channel::Channel(const Channel &src) : _channelName(src._channelName), _channelPassword(src._channelPassword), _connectedClients(src._connectedClients), _connectedOperators(src._connectedOperators), _topic(src._topic), _inviteOnly(src._inviteOnly), _topicRestricted(src._topicRestricted), _usersLimit(0), _invitedUsers(src._invitedUsers)
 {
 }
 
@@ -34,6 +34,7 @@ Channel& Channel::operator=(const Channel &rhs)
         this->_inviteOnly = rhs._inviteOnly;
         this->_topicRestricted = rhs._topicRestricted;
         this->_usersLimit = rhs._usersLimit;
+        this->_invitedUsers = rhs._invitedUsers;
     }
     return (*this);
 }
@@ -66,6 +67,12 @@ std::vector<Client *>& Channel::getActiveOperatorsVector(void)
 {
     return (this->_connectedOperators);
 }
+
+std::vector<Client *>& Channel::getInvitedUsersVector(void)
+{
+    return (this->_invitedUsers);
+}
+
 
 void Channel::addClient(Client *client)
 {
@@ -226,4 +233,30 @@ std::string Channel::getChannelModes(void)
 void Channel::setTopic(std::string topic)
 {
     _topic = topic;
+}
+
+bool Channel::isClientInvited(Client *client)
+{
+    std::vector<Client *>::iterator it;
+
+    for (it = _invitedUsers.begin(); it != _invitedUsers.end(); it++)
+    {
+        if ((*it)->getFd() == client->getFd()) // Utile si le client change de nom, son fd permet de l'identifier.
+            return (true);
+    }
+    return (false);
+}
+
+void Channel::removeClientFromWhitelist(Client *client)
+{
+    std::vector<Client *>::iterator it;
+
+    for (it = _invitedUsers.begin(); it != _invitedUsers.end(); it++)
+    {
+        if ((*it)->getFd() == client->getFd()) // Utile si le client change de nom, son fd permet de l'identifier.
+        {
+            _invitedUsers.erase(it);
+            return ;
+        }
+    }
 }

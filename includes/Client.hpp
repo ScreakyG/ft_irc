@@ -55,6 +55,7 @@ class Client
 
         bool        alreadyJoined(std::string &channelName); // Regarde si un client est deja dans un channel.
         void        joinChannel(Server &server, Channel *channel, std::string channelPassword); // Rejoint le channel.
+        void        joinAsInvited(Server &server, Channel *channel);
         void        leaveChannel(Channel *channel); //Quitte un channel
         void        leaveAllChannels(); //Quitte tout les channels.
 

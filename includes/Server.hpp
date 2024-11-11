@@ -14,7 +14,7 @@
 #include <poll.h>
 #include <vector>
 #include <signal.h>
-#include <algorithm>  
+#include <algorithm>
 #include <sstream>
 #include <fcntl.h>
 #include <string>
@@ -69,6 +69,7 @@ class Server
         void                    sendToClient(std::string &message, int clientFd); // Envoie un message client.
 
         void                    deleteClient(int idx); //Remove from poll allSockets.
+        void                    deleteClientFromAllWhitelists(Client *client);
         void                    closeAllFds(void); // Close all fds.
         void                    deleteAllChannels(void);
         void                    deleteAllClients(void);

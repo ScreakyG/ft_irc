@@ -498,7 +498,10 @@ void Server::deleteClient(int fd_toClear)
 
 
     if (client)
+    {
+        deleteClientFromAllWhitelists(client);
         client->leaveAllChannels();
+    }
 
     for (size_t i = 0; i < this->_allSockets.size(); i++)  // Remove it from the '_pollfd allSockets';
     {
@@ -533,6 +536,17 @@ void Server::deleteAllClients(void)
         deleteClient(_allClients[i]->getFd());
     }
     _allClients.clear();
+}
+
+void  Server::deleteClientFromAllWhitelists(Client *client)
+{
+    std::vector<Channel *>::iterator it;
+
+    if (!client)
+        return ;
+
+    for (it = _Channels.begin(); it != _Channels.end(); it++)
+        (*it)->removeClientFromWhitelist(client);
 }
 
 void Server::closeAllFds(void)
@@ -650,6 +664,7 @@ void Server::deleteAllChannels(void)
     {
         (*it)->getActiveOperatorsVector().clear();
         (*it)->getActiveUsersVector().clear();
+        (*it)->getInvitedUsersVector().clear();
         delete(*it);
     }
     _Channels.clear();

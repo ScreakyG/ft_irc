@@ -29,6 +29,7 @@ class Channel
         std::string             getChannelTopic(void);
         std::vector<Client *>&  getActiveUsersVector(void);
         std::vector<Client *>&  getActiveOperatorsVector(void);
+        std::vector<Client *>&  getInvitedUsersVector(void);
         Client*                 getClientOnChannel(std::string name);
         std::string             getChannelModes(void);
 
@@ -58,6 +59,8 @@ class Channel
         void                    changeUsersLimit(unsigned long limit);
         bool                    isClientInChannel(Client* client);
         void                    broadcastMessage(const std::string& message, int excludeClientFd);
+        bool                    isClientInvited(Client *client);
+        void                    removeClientFromWhitelist(Client *client);
 
     private:
         std::string             _channelName;
@@ -68,4 +71,5 @@ class Channel
         bool                    _inviteOnly;
         bool                    _topicRestricted;
         unsigned long           _usersLimit;
+       std::vector<Client *>    _invitedUsers;
 };

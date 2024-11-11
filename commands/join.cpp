@@ -23,7 +23,12 @@ static void    joinChannels(Server &server, std::vector<std::pair<std::string, s
             Channel *channelToJoin = server.getChannel(channelName);
 
             if (channelToJoin != NULL)
-               client->joinChannel(server, channelToJoin, channelPassword);
+            {
+                if (channelToJoin->isClientInvited(client) == true)
+                    client->joinAsInvited(server, channelToJoin);
+                else
+                    client->joinChannel(server, channelToJoin, channelPassword);
+            }
             else
                 std::cout << "[Server] " << "[" << client->getFd() << "] " << "Unexpected error when joingning a Channel" << std::endl;
         }

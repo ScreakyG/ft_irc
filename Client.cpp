@@ -172,8 +172,8 @@ void Client::joinChannel(Server &server, Channel *channel, std::string channelPa
     _clientChannels.push_back(channel); // Ajoute le channel a la liste des channels du client.
     channel->addClient(this); // Ajouter le client dans la liste des clients du channel.
 
-    server.printAllUsers();
-    channel->printUsers();
+    // server.printAllUsers();
+    // channel->printUsers();
 
     message = ":" + this->getNickname() + "!~" + this->getUsername() + "@" + this->getHostname() + " JOIN " + channel->getChannelName() + "\r\n";
     channel->announceNewUser(server, message);
@@ -187,6 +187,28 @@ void Client::joinChannel(Server &server, Channel *channel, std::string channelPa
 
     message = RPL_ENDOFNAMES(this->getNickname(), channel->getChannelName());
     server.sendToClient(message, this->getFd());
+}
+
+void  Client::joinAsInvited(Server &server, Channel *channel)
+{
+    std::string message;
+    std::string activeUsers;
+
+    _clientChannels.push_back(channel);
+    channel->addClient(this);
+
+    message = ":" + this->getNickname() + "!~" + this->getUsername() + "@" + this->getHostname() + " JOIN " + channel->getChannelName() + "\r\n";
+    channel->announceNewUser(server, message);
+
+    sendTopic(server, this, channel);
+    activeUsers = getActiveUsers(channel);
+    message = RPL_NAMREPLY(this->getNickname(), channel->getChannelName(), activeUsers);
+    server.sendToClient(message, this->getFd());
+
+    message = RPL_ENDOFNAMES(this->getNickname(), channel->getChannelName());
+    server.sendToClient(message, this->getFd());
+
+    channel->removeClientFromWhitelist(this);
 }
 
 void Client::leaveChannel(Channel *channel)
