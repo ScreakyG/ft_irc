@@ -4,6 +4,7 @@
 //to do
 //add CANNOTSENDTOCHAN
 //fix NOTEXTTOSEND comportement
+
 void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clientFd)
 {
     Client *sender = server.getClientStruct(clientFd);
@@ -21,6 +22,8 @@ void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clien
         server.sendToClient(response, clientFd);
         return;
     }
+
+    // Construction du message initial
     std::string target = arguments[0];
     std::string message;
     for (size_t i = 1; i < arguments.size(); ++i) 
@@ -29,12 +32,16 @@ void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clien
         if (i < arguments.size() - 1)
             message += " ";
     }
+
+    // Vérification message vide
     if (message.empty() || message == ":")
     {
         std::string response = ERR_NOTEXTTOSEND(sender->getNickname());
         server.sendToClient(response, clientFd);
         return;
     }
+
+    // Gestion des cibles multiples
     std::vector<std::string> targets;
     size_t pos = 0;
     while ((pos = target.find(',')) != std::string::npos) 
@@ -49,6 +56,33 @@ void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clien
         server.sendToClient(response, clientFd);
         return;
     }
+
+    // Construction du message complet avec préfixe
+    std::string fullMessage = ":" + sender->getNickname() + "!" + sender->getUsername() 
+                           + "@" + sender->getHostname() + " PRIVMSG " + targets[0] 
+                           + " :" + message + "\r\n";
+
+    // Gestion de la limite de 512 caractères
+    if (fullMessage.length() > 512)
+    {
+        size_t prefixLen = 1 // ":"
+                        + sender->getNickname().length() 
+                        + 1 // "!"
+                        + sender->getUsername().length()
+                        + 1 // "@" 
+                        + sender->getHostname().length()
+                        + 9 // " PRIVMSG "
+                        + targets[0].length()
+                        + 2 // " :"
+                        + 2; // "\r\n"
+
+        message = message.substr(0, 512 - prefixLen);
+        fullMessage = ":" + sender->getNickname() + "!" + sender->getUsername() 
+                   + "@" + sender->getHostname() + " PRIVMSG " + targets[0] 
+                   + " :" + message + "\r\n";
+    }
+
+    // Gestion des messages de canal
     if (targets[0][0] == '#')
     {
         Channel *channel = server.getChannel(targets[0]);
@@ -72,16 +106,16 @@ void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clien
             server.sendToClient(response, clientFd);
             return;
         }
-        std::string reply = ":" + sender->getNickname() + "!" + sender->getUsername() //fix gestion message
-                         + "@" + sender->getHostname() + " PRIVMSG " + targets[0] 
-                         + " :" + message + "\r\n";
+
+        // Envoi aux membres du canal
         std::vector<Client *>::iterator it;
         for (it = channelClients.begin(); it != channelClients.end(); ++it)
         {
             if ((*it)->getFd() != clientFd)
-                server.sendToClient(reply, (*it)->getFd());
+                server.sendToClient(fullMessage, (*it)->getFd());
         }
     }
+    // Gestion des messages privés
     else
     {
         if (targets[0].find('.') != std::string::npos) 
@@ -99,6 +133,7 @@ void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clien
                 return;
             }
         }
+        
         Client *recipient = NULL;
         std::vector<Client *> &allClients = server.getVectorClient();
         std::vector<Client *>::iterator it;
@@ -116,9 +151,8 @@ void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clien
             server.sendToClient(response, clientFd);
             return;
         }
-        std::string reply = ":" + sender->getNickname() + "!" + sender->getUsername() 
-                         + "@" + sender->getHostname() + " PRIVMSG " + targets[0] 
-                         + " :" + message + "\r\n";
-        server.sendToClient(reply, recipient->getFd());
+
+        // Envoi du message privé
+        server.sendToClient(fullMessage, recipient->getFd());
     }
 }
