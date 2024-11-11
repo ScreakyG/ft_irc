@@ -194,6 +194,13 @@ void  Client::joinAsInvited(Server &server, Channel *channel)
     std::string message;
     std::string activeUsers;
 
+    if (channel->getUsersLimit() != 0 && channel->getActiveUsersVector().size() >= channel->getUsersLimit())
+    {
+        message = ERR_CHANNELISFULL(this->getNickname(), channel->getChannelName());
+        server.sendToClient(message, this->getFd());
+        return ;
+    }
+
     _clientChannels.push_back(channel);
     channel->addClient(this);
 
