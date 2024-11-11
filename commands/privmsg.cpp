@@ -8,7 +8,6 @@ struct ClientCompare {
     Client* _target;
 };
 
-
 //to do
 //add CANNOTSENDTOCHAN
 //fix NOTEXTTOSEND comportement
@@ -63,6 +62,12 @@ void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clien
         if (!channel)
         {
             std::string response = ERR_NOSUCHCHANNEL(sender->getNickname(), targets[0]);
+            server.sendToClient(response, clientFd);
+            return;
+        }
+        if (!channel->isUserOnChannel(sender))
+        {
+            std::string response = ERR_CANNOTSENDTOCHAN(sender->getNickname(), targets[0]);
             server.sendToClient(response, clientFd);
             return;
         }

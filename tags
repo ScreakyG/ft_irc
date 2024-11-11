@@ -33,7 +33,6 @@ ERR_INVITEONLYCHAN	includes/Responses.hpp	45;"	d
 ERR_NEEDMOREPARAMS	includes/Responses.hpp	24;"	d
 ERR_NICKNAMEINUSE	includes/Responses.hpp	12;"	d
 ERR_NONICKNAMEGIVEN	includes/Responses.hpp	10;"	d
-ERR_NORECIPIENT	commands/privmsg.cpp	11;"	d	file:
 ERR_NORECIPIENT	includes/Responses.hpp	59;"	d
 ERR_NOSUCHCHANNEL	includes/Responses.hpp	7;"	d
 ERR_NOSUCHNICK	includes/Responses.hpp	47;"	d
