@@ -15,8 +15,8 @@ Channel	includes/Channel.hpp	/^class Channel$/;"	c
 Client	Client.cpp	/^Client::Client() : _clientFd(-1), _clientReadBuffer(""), _clientSendBuffer(""), _nickname(""), _oldNickname(""), _username(""), _hostname(""), _enteredServerPassword(false), _hasRegistered(false), _timeoutStart(0)$/;"	f	class:Client
 Client	Client.cpp	/^Client::Client(const Client &src) : _clientFd(src._clientFd), _clientReadBuffer(src._clientReadBuffer), _clientSendBuffer(src._clientSendBuffer), _nickname(src._nickname), _oldNickname(src._oldNickname), _username(src._username), _hostname(src._hostname), _enteredServerPassword(src._enteredServerPassword), _hasRegistered(src._hasRegistered), _timeoutStart(src._timeoutStart), _clientChannels(src._clientChannels)$/;"	f	class:Client
 Client	includes/Client.hpp	/^class Client$/;"	c
-ClientCompare	commands/privmsg.cpp	/^    ClientCompare(Client* target) : _target(target) {}$/;"	f	struct:ClientCompare
-ClientCompare	commands/privmsg.cpp	/^struct ClientCompare {$/;"	s	file:
+ClientCompare	includes/Commands.hpp	/^    ClientCompare(Client* target) : _target(target) {}$/;"	f	struct:ClientCompare
+ClientCompare	includes/Commands.hpp	/^struct ClientCompare {$/;"	s
 ClientDisconnect	includes/Server.hpp	/^        class ClientDisconnect : public std::exception$/;"	c	class:Server
 DEBUG	includes/Server.hpp	30;"	d
 DEFAULT_PASSWORD	includes/Server.hpp	35;"	d
@@ -101,7 +101,7 @@ _serverPort	includes/Server.hpp	/^        long                       _serverPort
 _serverSocket	includes/Server.hpp	/^        int                        _serverSocket;$/;"	m	class:Server
 _stopSignal	Server.cpp	/^bool Server::_stopSignal = false;$/;"	m	class:Server	file:
 _stopSignal	includes/Server.hpp	/^        static bool                _stopSignal;$/;"	m	class:Server
-_target	commands/privmsg.cpp	/^    Client* _target;$/;"	m	struct:ClientCompare	file:
+_target	includes/Commands.hpp	/^    Client* _target;$/;"	m	struct:ClientCompare
 _timeoutStart	includes/Client.hpp	/^        time_t                  _timeoutStart;$/;"	m	class:Client
 _topic	includes/Channel.hpp	/^        std::string             _topic;$/;"	m	class:Channel
 _topicRestricted	includes/Channel.hpp	/^        bool                    _topicRestricted;$/;"	m	class:Channel
@@ -193,7 +193,7 @@ modifyChannelKey	commands/mode_actions.cpp	/^std::string modifyChannelKey(Server
 modifyChannelUsersLimit	commands/mode_actions.cpp	/^std::string modifyChannelUsersLimit(Server &server, Client *client, Channel *channel, bool removeMode, std::string argumentName, std::string &successfullFlagsArgs)$/;"	f
 modifyInviteMode	commands/mode_actions.cpp	/^std::string modifyInviteMode(Server &server, Client *client, Channel *channel, bool removeMode)$/;"	f
 modifyOperators	commands/mode_actions.cpp	/^std::string modifyOperators(Server &server, Client *client, Channel *channel, bool removeMode, std::string argumentName, std::string &successfullFlagsArgs)$/;"	f
-operator ()	commands/privmsg.cpp	/^    bool operator()(const Client* client) const {$/;"	f	struct:ClientCompare
+operator ()	includes/Commands.hpp	/^    bool operator()(const Client* client) const {$/;"	f	struct:ClientCompare
 operator =	Channel.cpp	/^Channel& Channel::operator=(const Channel &rhs)$/;"	f	class:Channel
 operator =	Client.cpp	/^Client& Client::operator=(const Client &rhs)$/;"	f	class:Client
 operator =	Server.cpp	/^Server& Server::operator=(const Server &rhs)$/;"	f	class:Server

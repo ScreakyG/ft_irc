@@ -1,12 +1,5 @@
 #include "../includes/Commands.hpp"
 
-struct ClientCompare {
-    ClientCompare(Client* target) : _target(target) {}
-    bool operator()(const Client* client) const {
-        return client == _target;
-    }
-    Client* _target;
-};
 
 //to do
 //add CANNOTSENDTOCHAN

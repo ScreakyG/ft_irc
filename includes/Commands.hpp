@@ -10,6 +10,14 @@ class Server;
 class Client;
 class Channel;
 
+struct ClientCompare {
+    ClientCompare(Client* target) : _target(target) {}
+    bool operator()(const Client* client) const {
+        return client == _target;
+    }
+    Client* _target;
+};
+
 void exec_PASS(Server &server, std::vector<std::string> &arguments, int clientFd);
 void exec_NICK(Server &server,std::vector<std::string> &arguments, int clientFd);
 void exec_USER(Server &server, std::vector<std::string> &arguments, int clientFd);
