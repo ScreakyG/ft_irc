@@ -394,6 +394,8 @@ void Server::executeCommand(std::string &ogString, std::string &commandName, std
         exec_INVITE((*this), arguments, clientFd);
     else if(commandName == "PRIVMSG")
         exec_PRIVMSG((*this), arguments, clientFd);
+    else if(commandName == "PART")
+        exec_PART((*this), arguments, clientFd);
     else
     {
         message = ERR_UNKNOWNCOMMAND(client->getNickname(), commandName);

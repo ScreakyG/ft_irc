@@ -29,6 +29,7 @@ void exec_KICK(Server &server, std::string &ogString, std::vector<std::string> &
 void exec_TOPIC(Server &server, std::vector<std::string> &arguments, int clientFd);
 void exec_INVITE(Server &server, std::vector<std::string> &arguments, int clientFd);
 void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clientFd);
+void exec_PART(Server &server, std::vector<std::string> &arguments, int clientFd);
 
 
 

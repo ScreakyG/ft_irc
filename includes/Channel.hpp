@@ -57,7 +57,8 @@ class Channel
         void                    changePassword(std::string password);
         unsigned long           getUsersLimit(void);
         void                    changeUsersLimit(unsigned long limit);
-        bool                    isClientInChannel(Client* client);
+        bool                    isClientOnChannel(Client *client);
+        // bool                    isClientInChannel(Client* client);
         void                    broadcastMessage(const std::string& message, int excludeClientFd);
         bool                    isClientInvited(Client *client);
         void                    removeClientFromWhitelist(Client *client);
