@@ -16,14 +16,11 @@ void exec_USER(Server &server, std::vector<std::string> &arguments, int clientFd
 void exec_PING(Server &server, std::vector<std::string> &arguments, int clientFd);
 void exec_CAP(Server &server, std::vector<std::string> &arguments, int clientFd);
 void exec_JOIN(Server &server, std::string &ogString, std::vector<std::string> &arguments, int clientFd);
-<<<<<<< HEAD
 void exec_MODE(Server &server, std::string &ogString, std::vector<std::string> &arguments, int clientFd);
 void exec_KICK(Server &server, std::string &ogString, std::vector<std::string> &arguments, int clientFd);
 void exec_TOPIC(Server &server, std::vector<std::string> &arguments, int clientFd);
 void exec_INVITE(Server &server, std::vector<std::string> &arguments, int clientFd);
-=======
 void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clientFd);
->>>>>>> ketzon
 
 
 

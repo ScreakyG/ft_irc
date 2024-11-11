@@ -8,6 +8,7 @@ struct ClientCompare {
     Client* _target;
 };
 
+
 //to do
 //add CANNOTSENDTOCHAN
 //fix NOTEXTTOSEND comportement
