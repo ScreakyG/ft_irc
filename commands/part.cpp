@@ -72,6 +72,7 @@ void exec_PART(Server &server, std::vector<std::string> &arguments, int clientFd
         }
 
         message = ":" + client->getNickname() + "!~" + client->getUsername() + "@" + client->getHostname() + " PART " + channel->getChannelName() + "\r\n";
+        channel->notifyUsers(server, message, client);
         server.sendToClient(message, client->getFd());
         client->leaveChannel(channel);
     }
