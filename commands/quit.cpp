@@ -1,6 +1,6 @@
 #include "../includes/Commands.hpp"
 
-static bool alreadyAdded(Client *clientToAdd, std::vector<Client *> &clientsToNotify)
+bool alreadyAdded(Client *clientToAdd, std::vector<Client *> &clientsToNotify)
 {
     std::vector<Client *>::iterator    it;
 
@@ -12,7 +12,7 @@ static bool alreadyAdded(Client *clientToAdd, std::vector<Client *> &clientsToNo
     return (false);
 }
 
-static std::vector<Client *> getClientsToNotify(Client *sender)
+std::vector<Client *> getClientsToNotify(Client *sender)
 {
     std::vector<Client *>               cliensToNotify;
     std::vector<Channel *>              clientChannels = sender->getClientChannel();
@@ -46,9 +46,10 @@ void exec_QUIT(Server &server, std::vector<std::string> &arguments, int clientFd
 
     if (client->hasRegistered() == false)
     {
-        message = ERR_NOTREGISTERED;
+        message = "Closing Link: " + client->getHostname() + " (Client Quit)";
+        message = ERROR_MSG(message);
         server.sendToClient(message, clientFd);
-        return ;
+        throw Server::ClientDisconnect();
     }
 
     // Cera utilise dans le cas d'un ctrl+c.
@@ -56,7 +57,7 @@ void exec_QUIT(Server &server, std::vector<std::string> &arguments, int clientFd
     quitMessage = ":" + client->getNickname() + "!~" + client->getUsername() + "@" + client->getHostname() + " QUIT ";
 
     if (arguments.size() == 0)
-        quitMessage += ":Remote host closed the connection.";
+        quitMessage += ":(Client Quit)";
 
     for (size_t idx = 0; idx < arguments.size(); idx++)
     {
@@ -73,14 +74,6 @@ void exec_QUIT(Server &server, std::vector<std::string> &arguments, int clientFd
     clientsToNotify = getClientsToNotify(client);
     for (it = clientsToNotify.begin(); it != clientsToNotify.end(); it++)
         server.sendToClient(quitMessage, (*it)->getFd());
-
-    // server.sendToClient(quitMessage, client->getFd());
-
-    // std::vector<Channel *>&             clientChannels = client->getClientChannel();
-    // std::vector<Channel *>::iterator    it;
-
-    // for (it = clientChannels.begin(); it != clientChannels.end(); it++)
-    //     (*it)->notifyUsers(server, quitMessage, client);
-
+        
     throw Server::ClientDisconnect();
 }

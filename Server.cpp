@@ -286,6 +286,7 @@ void Server::readClient(int idx)
     if (amountReceived == 0)
     {
         std::cout << "[" << this->_allSockets[idx].fd << "]" << " : Client ctrl-c connection." << std::endl;
+        notifyServerUsers(this->_allSockets[idx].fd);
         deleteClient(this->_allSockets[idx].fd);
     }
     else
@@ -658,6 +659,42 @@ void Server::printAllUsers(void)
         std::cout << "fd : " << (*it)->getFd();
         std::cout << std::endl;
    }
+}
+
+void Server::notifyServerUsers(int clientFd)
+{
+    Client                              *client;
+    std::string                         quitMessage;
+
+    client = this->getClientStruct(clientFd);
+    if (client == NULL)
+    {
+        std::cout << RED << "[" << clientFd << "] [Server] Client is not connected to server" << RESET << std::endl;
+        return ;
+    }
+
+    if (client->hasRegistered() == false)
+        return ;
+
+    quitMessage = ":" + client->getNickname() + "!~" + client->getUsername() + "@" + client->getHostname() + " QUIT ";
+    quitMessage += ":Remote host closed the connection.\r\n";
+
+    std::vector<Client *>              clientsToNotify;
+    std::vector<Client *>::iterator    it;
+
+    clientsToNotify = getClientsToNotify(client);
+    for (it = clientsToNotify.begin(); it != clientsToNotify.end(); it++)
+    {
+        // On veut supprimer le fd du sender.
+        if ((*it)->getFd() == client->getFd())
+        {
+            clientsToNotify.erase(it);
+            break ;
+        }
+    }
+
+    for (it = clientsToNotify.begin(); it != clientsToNotify.end(); it++)
+        this->sendToClient(quitMessage, (*it)->getFd());
 }
 
 void Server::deleteAllChannels(void)

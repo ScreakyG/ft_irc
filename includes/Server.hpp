@@ -95,6 +95,7 @@ class Server
 
 
         void                    printAllUsers(void);
+        void                    notifyServerUsers(int clientFd);
 
         // void                    sendReply(int clientFd, int errorCode, const std::string& message);
         Client*                 getClientByNickname(const std::string& nickname);

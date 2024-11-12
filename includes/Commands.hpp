@@ -35,6 +35,8 @@ void exec_QUIT(Server &server, std::vector<std::string> &arguments, int clientFd
 //
 
 std::vector<std::string> multipleArgParser(std::string string);
+std::vector<Client *> getClientsToNotify(Client *sender);
+bool alreadyAdded(Client *clientToAdd, std::vector<Client *> &clientsToNotify);
 
 // JOIN PARSING FUNCTIONS
 
