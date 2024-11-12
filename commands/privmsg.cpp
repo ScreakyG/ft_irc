@@ -34,7 +34,7 @@ void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clien
     }
 
     // Vérification message vide
-    if (message.empty() || message == ":")
+    if (message.empty() || message == "::" || message == ":")
     {
         std::string response = ERR_NOTEXTTOSEND(sender->getNickname());
         server.sendToClient(response, clientFd);

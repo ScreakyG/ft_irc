@@ -9,7 +9,7 @@ CXX	Makefile	/^CXX = c++$/;"	m
 CXXFLAGS	Makefile	/^CXXFLAGS = -Wall -Wextra -Werror -MMD -g -std=c++98$/;"	m
 CYAN	includes/Colors.hpp	9;"	d
 Channel	Channel.cpp	/^Channel::Channel() : _channelName(""), _channelPassword(""), _topic(""), _inviteOnly(false), _topicRestricted(true), _usersLimit(0)$/;"	f	class:Channel
-Channel	Channel.cpp	/^Channel::Channel(const Channel &src) : _channelName(src._channelName), _channelPassword(src._channelPassword), _connectedClients(src._connectedClients), _connectedOperators(src._connectedOperators), _topic(src._topic), _inviteOnly(src._inviteOnly), _topicRestricted(src._topicRestricted), _usersLimit(0)$/;"	f	class:Channel
+Channel	Channel.cpp	/^Channel::Channel(const Channel &src) : _channelName(src._channelName), _channelPassword(src._channelPassword), _connectedClients(src._connectedClients), _connectedOperators(src._connectedOperators), _topic(src._topic), _inviteOnly(src._inviteOnly), _topicRestricted(src._topicRestricted), _usersLimit(0), _invitedUsers(src._invitedUsers)$/;"	f	class:Channel
 Channel	Channel.cpp	/^Channel::Channel(std::string channelName, std::string channelPassword) : _channelName(channelName), _channelPassword(channelPassword), _topic(""), _inviteOnly(false), _topicRestricted(true), _usersLimit(0)$/;"	f	class:Channel
 Channel	includes/Channel.hpp	/^class Channel$/;"	c
 Client	Client.cpp	/^Client::Client() : _clientFd(-1), _clientReadBuffer(""), _clientSendBuffer(""), _nickname(""), _oldNickname(""), _username(""), _hostname(""), _enteredServerPassword(false), _hasRegistered(false), _timeoutStart(0)$/;"	f	class:Client
@@ -69,7 +69,7 @@ RPL_TOPIC	includes/Responses.hpp	39;"	d
 RPL_WELCOME	includes/Responses.hpp	31;"	d
 RPL_YOURHOST	includes/Responses.hpp	32;"	d
 SERVER_IP	includes/Server.hpp	33;"	d
-SRCS	Makefile	/^SRCS = main.cpp Server.cpp Channel.cpp Client.cpp commands\/pass.cpp commands\/nick.cpp commands\/user.cpp commands\/ping.cpp commands\/join.cpp commands\/join_parsing.cpp commands\/cap.cpp commands\/mode.cpp commands\/mode_actions.cpp commands\/kick.cpp commands\/topic.cpp commands\/invite.cpp commands\/privmsg.cpp$/;"	m
+SRCS	Makefile	/^SRCS = main.cpp Server.cpp Channel.cpp Client.cpp commands\/pass.cpp commands\/nick.cpp commands\/user.cpp commands\/ping.cpp commands\/join.cpp commands\/join_parsing.cpp commands\/cap.cpp commands\/mode.cpp commands\/mode_actions.cpp commands\/kick.cpp commands\/topic.cpp commands\/invite.cpp commands\/privmsg.cpp commands\/part.cpp$/;"	m
 SRCS_OBJS	Makefile	/^SRCS_OBJS = $(SRCS:.cpp=.o)$/;"	m
 Server	Server.cpp	/^Server::Server(const Server &src): _serverPort(src._serverPort), _serverPassword(src._serverPassword), _serverSocket(src._serverSocket), _serverAddress(src._serverAddress), _allSockets(src._allSockets), _allClients(src._allClients), _Channels(src._Channels)$/;"	f	class:Server
 Server	Server.cpp	/^Server::Server(int port, std::string password): _serverPort(port), _serverPassword(password), _serverSocket(-1)$/;"	f	class:Server
@@ -93,6 +93,7 @@ _enteredServerPassword	includes/Client.hpp	/^        bool                    _en
 _hasRegistered	includes/Client.hpp	/^        bool                    _hasRegistered;$/;"	m	class:Client
 _hostname	includes/Client.hpp	/^        std::string             _hostname;$/;"	m	class:Client
 _inviteOnly	includes/Channel.hpp	/^        bool                    _inviteOnly;$/;"	m	class:Channel
+_invitedUsers	includes/Channel.hpp	/^       std::vector<Client *>    _invitedUsers;$/;"	m	class:Channel
 _nickname	includes/Client.hpp	/^        std::string             _nickname;$/;"	m	class:Client
 _oldNickname	includes/Client.hpp	/^        std::string             _oldNickname;$/;"	m	class:Client
 _serverAddress	includes/Server.hpp	/^        sockaddr_in                _serverAddress;$/;"	m	class:Server
@@ -131,12 +132,14 @@ debug	includes/Random.hpp	/^} debug;$/;"	t	typeref:enum:__anon1
 deleteAllChannels	Server.cpp	/^void Server::deleteAllChannels(void)$/;"	f	class:Server
 deleteAllClients	Server.cpp	/^void Server::deleteAllClients(void)$/;"	f	class:Server
 deleteClient	Server.cpp	/^void Server::deleteClient(int fd_toClear)$/;"	f	class:Server
+deleteClientFromAllWhitelists	Server.cpp	/^void  Server::deleteClientFromAllWhitelists(Client *client)$/;"	f	class:Server
 exec_CAP	commands/cap.cpp	/^void exec_CAP(Server &server, std::vector<std::string> &arguments, int clientFd)$/;"	f
 exec_INVITE	commands/invite.cpp	/^void exec_INVITE(Server &server, std::vector<std::string> &arguments, int clientFd)$/;"	f
 exec_JOIN	commands/join.cpp	/^void           exec_JOIN(Server &server, std::string &ogString, std::vector<std::string> &arguments, int clientFd)$/;"	f
 exec_KICK	commands/kick.cpp	/^void exec_KICK(Server &server, std::string &ogString, std::vector<std::string> &arguments, int clientFd)$/;"	f
 exec_MODE	commands/mode.cpp	/^void exec_MODE(Server &server, std::string &ogString ,std::vector<std::string> &arguments, int clientFd)$/;"	f
 exec_NICK	commands/nick.cpp	/^void exec_NICK(Server &server, std::vector<std::string> &arguments, int clientFd)$/;"	f
+exec_PART	commands/part.cpp	/^void exec_PART(Server &server, std::vector<std::string> &arguments, int clientFd)$/;"	f
 exec_PASS	commands/pass.cpp	/^void   exec_PASS(Server &server, std::vector<std::string> &arguments, int clientFd)$/;"	f
 exec_PING	commands/ping.cpp	/^void exec_PING(Server &server, std::vector<std::string> &arguments, int clientFd)$/;"	f
 exec_PRIVMSG	commands/privmsg.cpp	/^void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clientFd)$/;"	f
@@ -146,12 +149,12 @@ executeCommand	Server.cpp	/^void Server::executeCommand(std::string &ogString, s
 getActiveOperatorsVector	Channel.cpp	/^std::vector<Client *>& Channel::getActiveOperatorsVector(void)$/;"	f	class:Channel
 getActiveUsers	Client.cpp	/^static std::string getActiveUsers(Channel *channel)$/;"	f	file:
 getActiveUsersVector	Channel.cpp	/^std::vector<Client *>& Channel::getActiveUsersVector(void)$/;"	f	class:Channel
-getAllClients	includes/Server.hpp	/^        std::vector<Client *>& getAllClients(void) { return _allClients; }$/;"	f	class:Server
 getChannel	Server.cpp	/^Channel* Server::getChannel(std::string channelName)$/;"	f	class:Server
 getChannelModes	Channel.cpp	/^std::string Channel::getChannelModes(void)$/;"	f	class:Channel
 getChannelName	Channel.cpp	/^std::string Channel::getChannelName(void)$/;"	f	class:Channel
 getChannelPassword	Channel.cpp	/^std::string Channel::getChannelPassword(void)$/;"	f	class:Channel
 getChannelTopic	Channel.cpp	/^std::string Channel::getChannelTopic(void)$/;"	f	class:Channel
+getChannelsToLeave	commands/part.cpp	/^static std::vector<std::string> getChannelsToLeave(std::string channelsString)$/;"	f	file:
 getClientByName	Server.cpp	/^Client* Server::getClientByName(std::string clientName)$/;"	f	class:Server
 getClientOnChannel	Channel.cpp	/^Client* Channel::getClientOnChannel(std::string name)$/;"	f	class:Channel
 getClientPoll	Server.cpp	/^pollfd* Server::getClientPoll(int clientFd)$/;"	f	class:Server
@@ -160,6 +163,7 @@ getClientSendBuffer	Client.cpp	/^std::string& Client::getClientSendBuffer(void)$
 getClientStruct	Server.cpp	/^Client* Server::getClientStruct(int clientFd)$/;"	f	class:Server
 getFd	Client.cpp	/^int Client::getFd(void)$/;"	f	class:Client
 getHostname	Client.cpp	/^std::string Client::getHostname(void)$/;"	f	class:Client
+getInvitedUsersVector	Channel.cpp	/^std::vector<Client *>& Channel::getInvitedUsersVector(void)$/;"	f	class:Channel
 getNbClients	includes/Server.hpp	/^        size_t getNbClients(void) const { return _allClients.size(); }$/;"	f	class:Server
 getNickname	Client.cpp	/^std::string Client::getNickname(void)$/;"	f	class:Client
 getOldNickname	Client.cpp	/^std::string Client::getOldNickname(void)$/;"	f	class:Client
@@ -173,6 +177,7 @@ handleCommand	Server.cpp	/^void Server::handleCommand(std::string &command, int 
 handleMessage	Server.cpp	/^void Server::handleMessage(char *buffer, int clientFd)$/;"	f	class:Server
 hasEnteredServerPassword	Client.cpp	/^bool Client::hasEnteredServerPassword(void)$/;"	f	class:Client
 hasRegistered	Client.cpp	/^bool Client::hasRegistered(void)$/;"	f	class:Client
+isClientInvited	Channel.cpp	/^bool Channel::isClientInvited(Client *client)$/;"	f	class:Channel
 isFlagSupported	commands/mode.cpp	/^static bool isFlagSupported(char flag)$/;"	f	file:
 isInviteOnly	Channel.cpp	/^bool Channel::isInviteOnly(void)$/;"	f	class:Channel
 isRegistrationComplete	Server.cpp	/^void Server::isRegistrationComplete(Client *client)$/;"	f	class:Server
@@ -181,6 +186,7 @@ isUserOnChannel	Channel.cpp	/^bool Channel::isUserOnChannel(Client *client)$/;"	
 isUserOperator	Channel.cpp	/^bool Channel::isUserOperator(Client *client)$/;"	f	class:Channel
 isValidFlagsString	commands/mode.cpp	/^static bool isValidFlagsString(std::string &flagsString)$/;"	f	file:
 isValidNickname	commands/nick.cpp	/^static bool isValidNickname(std::string nickname)$/;"	f	file:
+joinAsInvited	Client.cpp	/^void  Client::joinAsInvited(Server &server, Channel *channel)$/;"	f	class:Client
 joinChannel	Client.cpp	/^void Client::joinChannel(Server &server, Channel *channel, std::string channelPassword)$/;"	f	class:Client
 joinChannels	commands/join.cpp	/^static void    joinChannels(Server &server, std::vector<std::pair<std::string, std::string> > &namesAndPasswords, Client *client)$/;"	f	file:
 kickUser	commands/kick.cpp	/^static void kickUser(Server &server, Channel *channel, Client *client, Client *target)$/;"	f	file:
@@ -207,6 +213,7 @@ quitClient	Channel.cpp	/^void Channel::quitClient(Client *client)$/;"	f	class:Ch
 quitOperator	Channel.cpp	/^void Channel::quitOperator(Client *client)$/;"	f	class:Channel
 readClient	Server.cpp	/^void Server::readClient(int idx)$/;"	f	class:Server
 readFlags	commands/mode.cpp	/^static void readFlags(Server &server, std::vector<std::string> &arguments, Client *client, Channel *channel)$/;"	f	file:
+removeClientFromWhitelist	Channel.cpp	/^void Channel::removeClientFromWhitelist(Client *client)$/;"	f	class:Channel
 sendModeReply	commands/mode_actions.cpp	/^void sendModeReply(Server &server, Client *client, Channel *channel, std::string flags, std::string flagsArguments)$/;"	f
 sendToClient	Server.cpp	/^void Server::sendToClient(std::string &message, int clientFd)$/;"	f	class:Server
 sendTopic	Client.cpp	/^static void sendTopic(Server &server, Client *client, Channel *channel)$/;"	f	file:
