@@ -285,7 +285,7 @@ void Server::readClient(int idx)
     }
     if (amountReceived == 0)
     {
-        std::cout << "[" << this->_allSockets[idx].fd << "]" << " : Client closed connection." << std::endl;
+        std::cout << "[" << this->_allSockets[idx].fd << "]" << " : Client ctrl-c connection." << std::endl;
         deleteClient(this->_allSockets[idx].fd);
     }
     else
@@ -396,6 +396,8 @@ void Server::executeCommand(std::string &ogString, std::string &commandName, std
         exec_PRIVMSG((*this), arguments, clientFd);
     else if(commandName == "PART")
         exec_PART((*this), arguments, clientFd);
+    else if(commandName == "QUIT")
+        exec_QUIT((*this), arguments, clientFd);
     else
     {
         message = ERR_UNKNOWNCOMMAND(client->getNickname(), commandName);
@@ -527,7 +529,7 @@ void Server::deleteClient(int fd_toClear)
         }
     }
      close(fd_toClear); // Close the socket
-     std::cout << "Disconnecting socket : [" << fd_toClear  << "]" << std::endl;
+     std::cout << "Disconnected socket : [" << fd_toClear  << "]" << std::endl;
 }
 
 void Server::deleteAllClients(void)

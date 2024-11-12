@@ -269,6 +269,11 @@ static std::string getActiveUsers(Channel *channel)
     return (activeUsers);
 }
 
+std::vector<Channel *>& Client::getClientChannel(void)
+{
+    return (_clientChannels);
+}
+
 static void sendTopic(Server &server, Client *client, Channel *channel)
 {
     std::string message;

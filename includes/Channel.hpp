@@ -43,6 +43,7 @@ class Channel
         bool                    isUserOperator(Client *client);
 
         void                    announceNewUser(Server &server, std::string &message);
+        void                    notifyUsers(Server &server, std::string &message, Client *clientSender);
 
         void                    setInviteMode(bool value);
         bool                    isInviteOnly(void);

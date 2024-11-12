@@ -30,8 +30,11 @@ void exec_TOPIC(Server &server, std::vector<std::string> &arguments, int clientF
 void exec_INVITE(Server &server, std::vector<std::string> &arguments, int clientFd);
 void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clientFd);
 void exec_PART(Server &server, std::vector<std::string> &arguments, int clientFd);
+void exec_QUIT(Server &server, std::vector<std::string> &arguments, int clientFd);
 
+//
 
+std::vector<std::string> multipleArgParser(std::string string);
 
 // JOIN PARSING FUNCTIONS
 

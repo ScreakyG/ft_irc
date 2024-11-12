@@ -187,6 +187,18 @@ void Channel::announceNewUser(Server &server, std::string &message)
         server.sendToClient(message, (*it)->getFd());
 }
 
+void Channel::notifyUsers(Server &server, std::string &message, Client *clientSender)
+{
+    std::vector<Client *>::iterator it;
+    std::vector<Client *>           &clientsVector = this->getActiveUsersVector();
+
+    for (it = clientsVector.begin(); it != clientsVector.end(); it++)
+    {
+        if ((*it)->getFd() != clientSender->getFd())
+            server.sendToClient(message, (*it)->getFd());
+    }
+}
+
 Client* Channel::getClientOnChannel(std::string name)
 {
     std::vector<Client *>::iterator it;
