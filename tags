@@ -69,7 +69,7 @@ RPL_TOPIC	includes/Responses.hpp	39;"	d
 RPL_WELCOME	includes/Responses.hpp	31;"	d
 RPL_YOURHOST	includes/Responses.hpp	32;"	d
 SERVER_IP	includes/Server.hpp	33;"	d
-SRCS	Makefile	/^SRCS = main.cpp Server.cpp Channel.cpp Client.cpp commands\/pass.cpp commands\/nick.cpp commands\/user.cpp commands\/ping.cpp commands\/join.cpp commands\/join_parsing.cpp commands\/cap.cpp commands\/mode.cpp commands\/mode_actions.cpp commands\/kick.cpp commands\/topic.cpp commands\/invite.cpp commands\/privmsg.cpp commands\/part.cpp$/;"	m
+SRCS	Makefile	/^SRCS = main.cpp Server.cpp Channel.cpp Client.cpp commands\/pass.cpp commands\/nick.cpp commands\/user.cpp commands\/ping.cpp commands\/join.cpp commands\/join_parsing.cpp commands\/cap.cpp commands\/mode.cpp commands\/mode_actions.cpp commands\/kick.cpp commands\/topic.cpp commands\/invite.cpp commands\/privmsg.cpp commands\/part.cpp commands\/quit.cpp$/;"	m
 SRCS_OBJS	Makefile	/^SRCS_OBJS = $(SRCS:.cpp=.o)$/;"	m
 Server	Server.cpp	/^Server::Server(const Server &src): _serverPort(src._serverPort), _serverPassword(src._serverPassword), _serverSocket(src._serverSocket), _serverAddress(src._serverAddress), _allSockets(src._allSockets), _allClients(src._allClients), _Channels(src._Channels)$/;"	f	class:Server
 Server	Server.cpp	/^Server::Server(int port, std::string password): _serverPort(port), _serverPassword(password), _serverSocket(-1)$/;"	f	class:Server
@@ -114,6 +114,7 @@ addClient	Channel.cpp	/^void Channel::addClient(Client *client)$/;"	f	class:Chan
 addOperator	Channel.cpp	/^void Channel::addOperator(Client *client)$/;"	f	class:Channel
 addToClientSendBuffer	Client.cpp	/^void Client::addToClientSendBuffer(std::string &string)$/;"	f	class:Client
 addtoClientReadBuffer	Client.cpp	/^void Client::addtoClientReadBuffer(std::string &string)  \/\/ Ajoute string au _clientBuffer;$/;"	f	class:Client
+alreadyAdded	commands/quit.cpp	/^bool alreadyAdded(Client *clientToAdd, std::vector<Client *> &clientsToNotify)$/;"	f
 alreadyJoined	Client.cpp	/^bool Client::alreadyJoined(std::string &channelName)$/;"	f	class:Client
 announceNewUser	Channel.cpp	/^void Channel::announceNewUser(Server &server, std::string &message)$/;"	f	class:Channel
 bindServerSocket	Server.cpp	/^void Server::bindServerSocket(void)$/;"	f	class:Server
@@ -143,6 +144,7 @@ exec_PART	commands/part.cpp	/^void exec_PART(Server &server, std::vector<std::st
 exec_PASS	commands/pass.cpp	/^void   exec_PASS(Server &server, std::vector<std::string> &arguments, int clientFd)$/;"	f
 exec_PING	commands/ping.cpp	/^void exec_PING(Server &server, std::vector<std::string> &arguments, int clientFd)$/;"	f
 exec_PRIVMSG	commands/privmsg.cpp	/^void exec_PRIVMSG(Server &server, std::vector<std::string> &arguments, int clientFd)$/;"	f
+exec_QUIT	commands/quit.cpp	/^void exec_QUIT(Server &server, std::vector<std::string> &arguments, int clientFd)$/;"	f
 exec_TOPIC	commands/topic.cpp	/^void exec_TOPIC(Server &server, std::vector<std::string> &arguments, int clientFd)$/;"	f
 exec_USER	commands/user.cpp	/^void exec_USER(Server &server, std::vector<std::string> &arguments, int clientFd)$/;"	f
 executeCommand	Server.cpp	/^void Server::executeCommand(std::string &ogString, std::string &commandName, std::vector<std::string> &arguments, int clientFd)$/;"	f	class:Server
@@ -154,13 +156,14 @@ getChannelModes	Channel.cpp	/^std::string Channel::getChannelModes(void)$/;"	f	c
 getChannelName	Channel.cpp	/^std::string Channel::getChannelName(void)$/;"	f	class:Channel
 getChannelPassword	Channel.cpp	/^std::string Channel::getChannelPassword(void)$/;"	f	class:Channel
 getChannelTopic	Channel.cpp	/^std::string Channel::getChannelTopic(void)$/;"	f	class:Channel
-getChannelsToLeave	commands/part.cpp	/^static std::vector<std::string> getChannelsToLeave(std::string channelsString)$/;"	f	file:
 getClientByName	Server.cpp	/^Client* Server::getClientByName(std::string clientName)$/;"	f	class:Server
+getClientChannel	Client.cpp	/^std::vector<Channel *>& Client::getClientChannel(void)$/;"	f	class:Client
 getClientOnChannel	Channel.cpp	/^Client* Channel::getClientOnChannel(std::string name)$/;"	f	class:Channel
 getClientPoll	Server.cpp	/^pollfd* Server::getClientPoll(int clientFd)$/;"	f	class:Server
 getClientReadBuffer	Client.cpp	/^std::string& Client::getClientReadBuffer(void) \/\/ Retourne le _clientBuffer;$/;"	f	class:Client
 getClientSendBuffer	Client.cpp	/^std::string& Client::getClientSendBuffer(void)$/;"	f	class:Client
 getClientStruct	Server.cpp	/^Client* Server::getClientStruct(int clientFd)$/;"	f	class:Server
+getClientsToNotify	commands/quit.cpp	/^std::vector<Client *> getClientsToNotify(Client *sender)$/;"	f
 getFd	Client.cpp	/^int Client::getFd(void)$/;"	f	class:Client
 getHostname	Client.cpp	/^std::string Client::getHostname(void)$/;"	f	class:Client
 getInvitedUsersVector	Channel.cpp	/^std::vector<Client *>& Channel::getInvitedUsersVector(void)$/;"	f	class:Channel
@@ -199,6 +202,9 @@ modifyChannelKey	commands/mode_actions.cpp	/^std::string modifyChannelKey(Server
 modifyChannelUsersLimit	commands/mode_actions.cpp	/^std::string modifyChannelUsersLimit(Server &server, Client *client, Channel *channel, bool removeMode, std::string argumentName, std::string &successfullFlagsArgs)$/;"	f
 modifyInviteMode	commands/mode_actions.cpp	/^std::string modifyInviteMode(Server &server, Client *client, Channel *channel, bool removeMode)$/;"	f
 modifyOperators	commands/mode_actions.cpp	/^std::string modifyOperators(Server &server, Client *client, Channel *channel, bool removeMode, std::string argumentName, std::string &successfullFlagsArgs)$/;"	f
+multipleArgParser	commands/part.cpp	/^std::vector<std::string> multipleArgParser(std::string string)$/;"	f
+notifyServerUsers	Server.cpp	/^void Server::notifyServerUsers(int clientFd)$/;"	f	class:Server
+notifyUsers	Channel.cpp	/^void Channel::notifyUsers(Server &server, std::string &message, Client *clientSender)$/;"	f	class:Channel
 operator ()	includes/Commands.hpp	/^    bool operator()(const Client* client) const {$/;"	f	struct:ClientCompare
 operator =	Channel.cpp	/^Channel& Channel::operator=(const Channel &rhs)$/;"	f	class:Channel
 operator =	Client.cpp	/^Client& Client::operator=(const Client &rhs)$/;"	f	class:Client
