@@ -5,6 +5,7 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 BLUE	includes/Colors.hpp	7;"	d
+BUFFER_SIZE	bot.cpp	10;"	d	file:
 CXX	Makefile	/^CXX = c++$/;"	m
 CXXFLAGS	Makefile	/^CXXFLAGS = -Wall -Wextra -Werror -MMD -g -std=c++98$/;"	m
 CYAN	includes/Colors.hpp	9;"	d
@@ -50,6 +51,7 @@ ERR_WILDTOPLEVEL	includes/Responses.hpp	55;"	d
 FULL	includes/Random.hpp	/^    FULL = 2$/;"	e	enum:__anon1
 GREEN	includes/Colors.hpp	5;"	d
 LIGHT	includes/Random.hpp	/^    LIGHT = 1,$/;"	e	enum:__anon1
+LINK	bot.cpp	9;"	d	file:
 ListenServerError	includes/Server.hpp	/^        class ListenServerError: public std::exception$/;"	c	class:Server
 NAME	Makefile	/^NAME = ircserv$/;"	m
 NICK_MAXLEN	includes/Server.hpp	37;"	d
@@ -177,6 +179,7 @@ getUsername	Client.cpp	/^std::string Client::getUsername(void)$/;"	f	class:Clien
 getUsersLimit	Channel.cpp	/^unsigned long Channel::getUsersLimit(void)$/;"	f	class:Channel
 getVectorClient	Server.cpp	/^std::vector<Client *>&    Server::getVectorClient(void)$/;"	f	class:Server
 handleCommand	Server.cpp	/^void Server::handleCommand(std::string &command, int clientFd)$/;"	f	class:Server
+handleConnection	bot.cpp	/^void handleConnection(int socket, const std::string& password, const std::string& nickname, const std::string& channel)$/;"	f
 handleMessage	Server.cpp	/^void Server::handleMessage(char *buffer, int clientFd)$/;"	f	class:Server
 hasEnteredServerPassword	Client.cpp	/^bool Client::hasEnteredServerPassword(void)$/;"	f	class:Client
 hasRegistered	Client.cpp	/^bool Client::hasRegistered(void)$/;"	f	class:Client
@@ -196,6 +199,7 @@ kickUser	commands/kick.cpp	/^static void kickUser(Server &server, Channel *chann
 leaveAllChannels	Client.cpp	/^void Client::leaveAllChannels()$/;"	f	class:Client
 leaveChannel	Client.cpp	/^void Client::leaveChannel(Channel *channel)$/;"	f	class:Client
 listenPort	Server.cpp	/^void Server::listenPort(void)$/;"	f	class:Server
+main	bot.cpp	/^int main(int ac, char** av)$/;"	f
 main	main.cpp	/^int main(int ac, char **av)$/;"	f
 modifiyTopicRestrictions	commands/mode_actions.cpp	/^std::string modifiyTopicRestrictions(Server &server, Client *client, Channel *channel, bool removeMode)$/;"	f
 modifyChannelKey	commands/mode_actions.cpp	/^std::string modifyChannelKey(Server &server, Client *client, Channel *channel, bool removeMode, std::string argumentName, std::string &successfullFlagsArgs)$/;"	f
@@ -220,6 +224,7 @@ quitOperator	Channel.cpp	/^void Channel::quitOperator(Client *client)$/;"	f	clas
 readClient	Server.cpp	/^void Server::readClient(int idx)$/;"	f	class:Server
 readFlags	commands/mode.cpp	/^static void readFlags(Server &server, std::vector<std::string> &arguments, Client *client, Channel *channel)$/;"	f	file:
 removeClientFromWhitelist	Channel.cpp	/^void Channel::removeClientFromWhitelist(Client *client)$/;"	f	class:Channel
+sendData	bot.cpp	/^void sendData(int socket, const std::string& data)$/;"	f
 sendModeReply	commands/mode_actions.cpp	/^void sendModeReply(Server &server, Client *client, Channel *channel, std::string flags, std::string flagsArguments)$/;"	f
 sendToClient	Server.cpp	/^void Server::sendToClient(std::string &message, int clientFd)$/;"	f	class:Server
 sendTopic	Client.cpp	/^static void sendTopic(Server &server, Client *client, Channel *channel)$/;"	f	file:
