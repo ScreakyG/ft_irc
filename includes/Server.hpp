@@ -35,6 +35,7 @@
 #define DEFAULT_PASSWORD "lol"
 
 #define NICK_MAXLEN 9
+#define MAX_TARGETS 2
 #define REGISTER_TIMEOUT 30
 
 //#define BACKLOG 10
