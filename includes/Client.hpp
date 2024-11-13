@@ -53,6 +53,8 @@ class Client
         std::string& getClientSendBuffer(void); // Retourne le _clientSendBuffer;
         void        addToClientSendBuffer(std::string &string); // Ajoute string au _clientSendBuffer;
 
+        std::vector<Channel *>& getClientChannel(void);
+
         bool        alreadyJoined(std::string &channelName); // Regarde si un client est deja dans un channel.
         void        joinChannel(Server &server, Channel *channel, std::string channelPassword); // Rejoint le channel.
         void        joinAsInvited(Server &server, Channel *channel);

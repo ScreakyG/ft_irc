@@ -285,7 +285,8 @@ void Server::readClient(int idx)
     }
     if (amountReceived == 0)
     {
-        std::cout << "[" << this->_allSockets[idx].fd << "]" << " : Client closed connection." << std::endl;
+        std::cout << "[" << this->_allSockets[idx].fd << "]" << " : Client ctrl-c connection." << std::endl;
+        notifyServerUsers(this->_allSockets[idx].fd);
         deleteClient(this->_allSockets[idx].fd);
     }
     else
@@ -396,6 +397,8 @@ void Server::executeCommand(std::string &ogString, std::string &commandName, std
         exec_PRIVMSG((*this), arguments, clientFd);
     else if(commandName == "PART")
         exec_PART((*this), arguments, clientFd);
+    else if(commandName == "QUIT")
+        exec_QUIT((*this), arguments, clientFd);
     else
     {
         message = ERR_UNKNOWNCOMMAND(client->getNickname(), commandName);
@@ -527,7 +530,7 @@ void Server::deleteClient(int fd_toClear)
         }
     }
      close(fd_toClear); // Close the socket
-     std::cout << "Disconnecting socket : [" << fd_toClear  << "]" << std::endl;
+     std::cout << "Disconnected socket : [" << fd_toClear  << "]" << std::endl;
 }
 
 void Server::deleteAllClients(void)
@@ -656,6 +659,42 @@ void Server::printAllUsers(void)
         std::cout << "fd : " << (*it)->getFd();
         std::cout << std::endl;
    }
+}
+
+void Server::notifyServerUsers(int clientFd)
+{
+    Client                              *client;
+    std::string                         quitMessage;
+
+    client = this->getClientStruct(clientFd);
+    if (client == NULL)
+    {
+        std::cout << RED << "[" << clientFd << "] [Server] Client is not connected to server" << RESET << std::endl;
+        return ;
+    }
+
+    if (client->hasRegistered() == false)
+        return ;
+
+    quitMessage = ":" + client->getNickname() + "!~" + client->getUsername() + "@" + client->getHostname() + " QUIT ";
+    quitMessage += ":Remote host closed the connection.\r\n";
+
+    std::vector<Client *>              clientsToNotify;
+    std::vector<Client *>::iterator    it;
+
+    clientsToNotify = getClientsToNotify(client);
+    for (it = clientsToNotify.begin(); it != clientsToNotify.end(); it++)
+    {
+        // On veut supprimer le fd du sender.
+        if ((*it)->getFd() == client->getFd())
+        {
+            clientsToNotify.erase(it);
+            break ;
+        }
+    }
+
+    for (it = clientsToNotify.begin(); it != clientsToNotify.end(); it++)
+        this->sendToClient(quitMessage, (*it)->getFd());
 }
 
 void Server::deleteAllChannels(void)
