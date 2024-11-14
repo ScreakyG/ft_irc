@@ -15,11 +15,15 @@ $(NAME): $(SRCS_OBJS)
 		$(CXX) $(CXXFLAGS) $(SRCS_OBJS) -o $(NAME)
 
 clean:
-		rm -rf $(SRCS_OBJS) $(DEPS)
+		rm -rf $(SRCS_OBJS) $(DEPS) bot.d bot.o
 
 fclean: clean
 		rm -rf $(NAME)
+		rm -rf bot
 
 re: fclean all
+
+bot:
+	c++ $(CXXFLAGS) bot.cpp -o bot
 
 -include $(DEPS)

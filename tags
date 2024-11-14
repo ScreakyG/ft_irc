@@ -53,13 +53,14 @@ GREEN	includes/Colors.hpp	5;"	d
 LIGHT	includes/Random.hpp	/^    LIGHT = 1,$/;"	e	enum:__anon1
 LINK	bot.cpp	9;"	d	file:
 ListenServerError	includes/Server.hpp	/^        class ListenServerError: public std::exception$/;"	c	class:Server
+MAX_TARGETS	includes/Server.hpp	38;"	d
 NAME	Makefile	/^NAME = ircserv$/;"	m
 NICK_MAXLEN	includes/Server.hpp	37;"	d
 OFF	includes/Random.hpp	/^    OFF = 0,$/;"	e	enum:__anon1
 PURPLE	includes/Colors.hpp	8;"	d
 PollError	includes/Server.hpp	/^        class PollError : public std::exception$/;"	c	class:Server
 RED	includes/Colors.hpp	4;"	d
-REGISTER_TIMEOUT	includes/Server.hpp	38;"	d
+REGISTER_TIMEOUT	includes/Server.hpp	39;"	d
 RESET	includes/Colors.hpp	3;"	d
 RPL_CHANNELMODEIS	includes/Responses.hpp	50;"	d
 RPL_CREATED	includes/Responses.hpp	33;"	d
@@ -129,6 +130,7 @@ checkClientSendBuffer	Server.cpp	/^void Server::checkClientSendBuffer(int idx)$/
 checkPassword	main.cpp	/^std::string checkPassword(const char* passStr)$/;"	f
 checkPort	main.cpp	/^long checkPort(const char* portStr)$/;"	f
 closeAllFds	Server.cpp	/^void Server::closeAllFds(void)$/;"	f	class:Server
+constructFullMessage	commands/privmsg.cpp	/^static std::string constructFullMessage(Client *sender, std::string message, std::string targetName)$/;"	f	file:
 createIpv4Address	Server.cpp	/^void Server::createIpv4Address(const char *ip, int port)$/;"	f	class:Server
 createServerSocket	Server.cpp	/^void Server::createServerSocket(void)$/;"	f	class:Server
 debug	includes/Random.hpp	/^} debug;$/;"	t	typeref:enum:__anon1

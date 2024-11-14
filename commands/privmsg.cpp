@@ -1,10 +1,6 @@
 #include "../includes/Commands.hpp"
 
 
-//to do
-//add CANNOTSENDTOCHAN
-//fix NOTEXTTOSEND comportement
-
 static std::string constructFullMessage(Client *sender, std::string message, std::string targetName)
 {
     std::string fullMessage = ":" + sender->getNickname() + "!" + sender->getUsername()
