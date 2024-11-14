@@ -27,9 +27,9 @@ void handleConnection(int socket, const std::string& password, const std::string
 
 int main(int ac, char** av)
 {
-   if (ac != 5)
+   if (ac != 4)
    {
-       std::cout << "Usage: " << av[0] << " <port> <password> <channel> <nickname>" << std::endl;
+       std::cout << "Usage: " << av[0] << " <port> <password> <channel> " << std::endl;
        return 1;
    }
 
@@ -37,7 +37,7 @@ int main(int ac, char** av)
    std::string port = av[1];
    std::string password = av[2];
    std::string channel = av[3];
-   std::string nickname = av[4];
+   std::string nickname = "Marvin";
 
    if (channel[0] != '#')
        channel = "#" + channel;
