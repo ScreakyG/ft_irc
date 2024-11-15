@@ -1,15 +1,21 @@
 #include "../includes/Commands.hpp"
 
-static std::string getComment(std::string commentArgument, Client *target)
+static std::string getComment(std::vector<std::string > &arguments, Client *target)
 {
     std::string comment;
 
-    if (commentArgument[0] != ':')
-        comment = ":";
-    if (commentArgument.size() == 1)
-        comment += target->getNickname();
-    else
-        comment += commentArgument;
+    if (arguments.size() == 3 && arguments[2].size() == 1)
+    {
+        comment = target->getNickname();
+        return (comment);
+    }
+
+    for (size_t idx = 2; idx < arguments.size(); idx++)
+    {
+        comment += arguments[idx];
+        if (idx < arguments.size() - 1)
+            comment += " ";
+    }
     return (comment);
 }
 
@@ -25,7 +31,7 @@ static void kickUser(Server &server, Channel *channel, Client *client, Client *t
         message = ":" + client->getNickname() + "!~" + client->getUsername() + "@" + client->getHostname() + " KICK " + channel->getChannelName() + " :" + target->getNickname() + " " + target->getNickname() + "\r\n";
     else
     {
-        std::string comment = getComment(arguments[2], target);
+        std::string comment = getComment(arguments, target);
         message = ":" + client->getNickname() + "!~" + client->getUsername() + "@" + client->getHostname() + " KICK " + channel->getChannelName() + " " + target->getNickname() + " " + comment + "\r\n";
     }
 
