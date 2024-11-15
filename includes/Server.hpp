@@ -27,7 +27,7 @@
 #include "Responses.hpp"
 #include "Channel.hpp"
 
-#define DEBUG LIGHT
+#define DEBUG OFF
 
 //#define SERVER_NAME "localhost"
 #define SERVER_IP "127.0.0.1"
