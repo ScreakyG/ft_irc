@@ -93,7 +93,7 @@ class Server
         bool                    channelExist(std::string name); // Regarde dans le vecteur '_Channels' si il y en a un qui existe avec le meme nom.
         void                    addChannel(Channel *newChannel); // Ajoute un channel dans le vecteur '_Channels'.
         Channel*                getChannel(std::string channelName); // Retourne le channel du vecteur '_Channels' correspondant a channelName.
-
+        void                    destroyEmptyChannels(void);
 
         void                    printAllUsers(void);
         void                    notifyServerUsers(int clientFd);

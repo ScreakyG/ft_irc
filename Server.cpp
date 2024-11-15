@@ -94,12 +94,12 @@ void Server::createServerSocket(void)
         close(this->_serverSocket);
         throw std::runtime_error("Failed to set SO_REUSEADDR option to socket");
     }
-    int flags = fcntl(this->_serverSocket, F_GETFL, 0); //Recupere les flags actuels de la socket.
-    if (fcntl(this->_serverSocket, F_SETFL, flags | O_NONBLOCK) == -1) // Set des nouveaux flags sur la socket, les ancients + O_NONBLOCK.
-    {
-        close(this->_serverSocket);
-        throw std::runtime_error("Failed to set O_NONBLOCK option to socket");
-    }
+    // int flags = fcntl(this->_serverSocket, F_GETFL, 0); //Recupere les flags actuels de la socket.
+    // if (fcntl(this->_serverSocket, F_SETFL, flags | O_NONBLOCK) == -1) // Set des nouveaux flags sur la socket, les ancients + O_NONBLOCK.
+    // {
+    //     close(this->_serverSocket);
+    //     throw std::runtime_error("Failed to set O_NONBLOCK option to socket");
+    // }
 }
 
 void Server::createIpv4Address(const char *ip, int port)
@@ -156,6 +156,7 @@ void Server::startServerRoutine(void)
         int status;
 
         checkClientRegisterTimeouts();
+        destroyEmptyChannels();
 
         status = poll(&this->_allSockets[0], this->_allSockets.size(), 2000);
         if (Server::_stopSignal == true)
@@ -227,13 +228,13 @@ void Server::acceptNewClient(void)
         return ;
     }
 
-    int flags = fcntl(newClientFd, F_GETFL, 0);
-    if (fcntl(newClientFd, F_SETFL, flags | O_NONBLOCK) == -1) // Set des nouveaux flags sur la socket, les ancients + O_NONBLOCK.
-    {
-        close(newClientFd);
-        std::cout << "[Server] Failed to set O_NONBLOCK option to socket" << std::endl;
-        return ;
-    }
+    // int flags = fcntl(newClientFd, F_GETFL, 0);
+    // if (fcntl(newClientFd, F_SETFL, flags | O_NONBLOCK) == -1) // Set des nouveaux flags sur la socket, les ancients + O_NONBLOCK.
+    // {
+    //     close(newClientFd);
+    //     std::cout << "[Server] Failed to set O_NONBLOCK option to socket" << std::endl;
+    //     return ;
+    // }
     else
     {
         newClientPoll.fd = newClientFd;
@@ -597,14 +598,14 @@ void Server::sendToClient(std::string &message, int clientFd)
     sentBytes = send(clientFd, clientStruct->getClientSendBuffer().c_str(), clientStruct->getClientSendBuffer().size(), 0);
     if (sentBytes == -1)
     {
-        if (errno == EAGAIN || errno == EWOULDBLOCK) // On garde le buffer intact et on ressaye au prochain appel de sendToClient().
-            std::cerr << RED << "[Server] " << "[" << clientFd << "] " << "Sending socket temporarily unavailable for writing : " << std::strerror(errno) << RESET << std::endl;
-        else // Une erreur plus grave est arrive , pour des mesures de securite il vaut mieux deconnecter le client.
-        {
+        // if (errno == EAGAIN || errno == EWOULDBLOCK) // On garde le buffer intact et on ressaye au prochain appel de sendToClient().
+        //     std::cerr << RED << "[Server] " << "[" << clientFd << "] " << "Sending socket temporarily unavailable for writing : " << std::strerror(errno) << RESET << std::endl;
+        // else // Une erreur plus grave est arrive , pour des mesures de securite il vaut mieux deconnecter le client.
+        // {
             std::cerr << RED << "[Server] " << "[" << clientFd << "] " << "sending error : " << std::strerror(errno) << RESET << std::endl;
             throw Server::ClientDisconnect(); // Il faut mette des try catch autour des fonctions qui sendToClient().
-        }
-        return ;
+        // }
+        // return ;
     }
     if (static_cast<size_t>(sentBytes) != clientStruct->getClientSendBuffer().size())
     {
@@ -726,6 +727,18 @@ Client* Server::getClientByName(std::string clientName)
     return (NULL);
 }
 
+void Server::destroyEmptyChannels(void)
+{
+    for (size_t idx = 0; idx < _Channels.size(); idx++)
+    {
+        if (_Channels[idx]->getActiveUsersVector().size() == 0)
+        {
+            Channel *tmp = _Channels[idx];
+            _Channels.erase(_Channels.begin() + idx);
+            delete (tmp);
+        }
+    }
+}
 
 /******************************/
 /*********EXCEPTIONS***********/

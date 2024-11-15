@@ -1,6 +1,19 @@
 #include "../includes/Commands.hpp"
 
-static void kickUser(Server &server, Channel *channel, Client *client, Client *target)
+static std::string getComment(std::string commentArgument, Client *target)
+{
+    std::string comment;
+
+    if (commentArgument[0] != ':')
+        comment = ":";
+    if (commentArgument.size() == 1)
+        comment += target->getNickname();
+    else
+        comment += commentArgument;
+    return (comment);
+}
+
+static void kickUser(Server &server, Channel *channel, Client *client, Client *target, std::vector<std::string> &arguments)
 {
     std::string message;
 
@@ -8,7 +21,14 @@ static void kickUser(Server &server, Channel *channel, Client *client, Client *t
     // Que se passe t'il si on se kick soit meme et que on etait le dernier user du channel ? Si il reste quelqun, devient t'il operateur ?
 
 
-    message = ":" + client->getNickname() + "!~" + client->getUsername() + "@" + client->getHostname() + " KICK " + channel->getChannelName() + " " + target->getNickname() + " :" + target->getNickname() + "\r\n";
+    if (arguments.size() < 3)
+        message = ":" + client->getNickname() + "!~" + client->getUsername() + "@" + client->getHostname() + " KICK " + channel->getChannelName() + " :" + target->getNickname() + " " + target->getNickname() + "\r\n";
+    else
+    {
+        std::string comment = getComment(arguments[2], target);
+        message = ":" + client->getNickname() + "!~" + client->getUsername() + "@" + client->getHostname() + " KICK " + channel->getChannelName() + " " + target->getNickname() + " " + comment + "\r\n";
+    }
+
     channel->announceNewUser(server, message);
     target->leaveChannel(channel);
     channel->quitClient(target);
@@ -74,5 +94,5 @@ void exec_KICK(Server &server, std::string &ogString, std::vector<std::string> &
         return ;
     }
 
-    kickUser(server, channel, client, target);
+    kickUser(server, channel, client, target, arguments);
 }
