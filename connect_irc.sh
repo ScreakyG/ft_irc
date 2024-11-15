@@ -9,15 +9,22 @@ HOST="localhost"
 while getopts "n:p:h:w:" opt; do
     case $opt in
         n) NICK="$OPTARG";;
-        p) PORT="$OPTARG";;
+        p) PORT="$OPTARG";;  # Cette option permet de changer le port
         h) HOST="$OPTARG";;
         w) PASSWORD="$OPTARG";;
         \?) echo "Usage: $0 [-n nickname] [-p port] [-h host] [-w password]" >&2; exit 1;;
     esac
 done
 
+# Vérification du nickname
 if [ -z "$NICK" ]; then
     echo "Nickname requis (-n nickname)"
+    exit 1
+fi
+
+# Vérification que le port est un nombre valide
+if ! [[ "$PORT" =~ ^[0-9]+$ ]]; then
+    echo "Le port doit être un nombre"
     exit 1
 fi
 
@@ -29,8 +36,11 @@ trap "rm -f $TMPFILE" EXIT
 cat > $TMPFILE << EOF
 PASS ${PASSWORD}
 NICK ${NICK}
-USER ${NICK} * * :${NICK} Real Name
+USER ${NICK} * *:${NICK} Real Name
 EOF
+
+# Affichage des informations de connexion
+echo "Connexion à ${HOST}:${PORT} avec le nickname ${NICK}"
 
 # Connexion avec maintien de la session
 (cat $TMPFILE; cat) | nc -C ${HOST} ${PORT}

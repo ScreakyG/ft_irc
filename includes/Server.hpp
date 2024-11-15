@@ -75,10 +75,12 @@ class Server
         void                    deleteAllChannels(void);
         void                    deleteAllClients(void);
 
+		long					getServerPort(void) const; // retourne le port du server.
         int                     getServerSocket(void); // Retourne le socket du server.
         Client*                 getClientStruct(int clientFd);
         pollfd*                 getClientPoll(int clientFd);
         std::string             getServerPassword(void); // Retourne le mot de passe du serveur.
+        std::string             getServerPw(void) const; // Fonction const
         std::vector<Client *>&  getVectorClient(void); // Retourne le vecteur de client.
         Client*                 getClientByName(std::string clientName); //Retoure un client grace a son username.
 

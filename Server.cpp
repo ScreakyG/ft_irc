@@ -484,9 +484,19 @@ std::vector<Client *>&    Server::getVectorClient(void)
     return (this->_allClients);
 }
 
+long Server::getServerPort(void) const
+{
+	return (this->_serverPort);
+}
+
 int Server::getServerSocket(void)
 {
     return (this->_serverSocket);
+}
+
+std::string Server::getServerPw(void) const
+{
+	return (this->_serverPassword);
 }
 
 std::string Server::getServerPassword(void)

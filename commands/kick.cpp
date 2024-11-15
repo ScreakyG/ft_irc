@@ -89,7 +89,7 @@ void exec_KICK(Server &server, std::string &ogString, std::vector<std::string> &
     target = channel->getClientOnChannel(arguments[1]);
     if (target == NULL)
     {
-        message == ERR_NOSUCHNICK(client->getNickname(), arguments[1]);
+        message = ERR_NOSUCHNICK(client->getNickname(), arguments[1]);
         server.sendToClient(message, client->getFd());
         return ;
     }

@@ -8,13 +8,12 @@
 
 void printInfoBanner(const Server &server)
 {
-    (void)server;
     std::cout << "-----------------------------------" << std::endl;
     std::cout << "-------- IRC SERVER CONFIG :--------" << std::endl;
     std::cout << "-----------------------------------" << std::endl;
     std::cout << "--IP : " << SERVER_IP << " ---------" << std::endl;
-    std::cout << "--PORT : " << DEFAULT_PORT <<" ------" << std::endl;
-    std::cout << "--PASSWORD : " << DEFAULT_PASSWORD << " -----------------------------" << std::endl;
+    std::cout << "--PORT : " << server.getServerPort() <<" ------" << std::endl;
+    std::cout << "--PASSWORD : " << server.getServerPw() << " -----------------------------" << std::endl;
     std::cout << "-----------------------------------" << std::endl;
 }
 
